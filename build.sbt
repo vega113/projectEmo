@@ -11,3 +11,8 @@ lazy val root = (project in file("."))
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
     )
   )
+
+libraryDependencies ++= Seq(
+  "com.typesafe.play" %% "anorm" % "2.7.0",
+  "mysql" % "mysql-connector-java" % "8.0.32"
+)
