@@ -1,0 +1,13 @@
+id,emotion_name,emotion_type
+Joy,Joy,Positive
+Trust,Trust,Positive
+Surprise,Surprise,Neutral
+Interest,Interest,Positive
+Fear,Fear,Negative
+Shame,Shame,Negative
+Anger,Anger,Negative
+Sadness,Sadness,Negative
+Disgust,Disgust,Negative
+Love,Love,Positive
+Jealousy,Jealousy,Negative
+Apathy,Apathy,Negative

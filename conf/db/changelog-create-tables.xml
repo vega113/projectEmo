@@ -69,12 +69,6 @@
             <column name="emotion_id" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="suggested_action_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="suggested_action_link_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
         <addForeignKeyConstraint constraintName="fk_sub_emotions_emotion_id"
                                  baseTableName="sub_emotions" baseColumnNames="emotion_id"
@@ -123,7 +117,7 @@
     <!-- Create suggested_actions table -->
     <changeSet author="Yuri_Zelikov" id="create_suggested_actions_table">
         <createTable tableName="suggested_actions">
-            <column name="id" type="INT" autoIncrement="true">
+            <column name="id" type="VARCHAR(255)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="action_description" type="VARCHAR(255)">
@@ -132,23 +126,8 @@
         </createTable>
     </changeSet>
 
-    <!-- Create suggested_action_links table -->
-    <changeSet author="Yuri_Zelikov" id="create_suggested_action_links_table">
-        <createTable tableName="suggested_action_links">
-            <column name="id" type="INT" autoIncrement="true">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="suggested_action_id" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="url" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addForeignKeyConstraint constraintName="fk_suggested_action_links_suggested_action_id"
-                                 baseTableName="suggested_action_links" baseColumnNames="suggested_action_id"
-                                 referencedTableName="suggested_actions" referencedColumnNames="id"/>
-    </changeSet>
+
+
 
     <!-- Create emotion_records table -->
     <changeSet author="Yuri_Zelikov" id="create_emotion_records_table">
@@ -209,4 +188,36 @@
                                  baseTableName="emotion_records_triggers" baseColumnNames="trigger_id"
                                  referencedTableName="triggers" referencedColumnNames="id"/>
     </changeSet>
+
+    <changeSet author="Yuri_Zelikov" id="create_sub_emotion_suggested_action_table">
+        <createTable tableName="sub_emotion_suggested_action">
+            <column name="sub_emotion_id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="suggested_action_id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="sub_emotion_id" baseTableName="sub_emotion_suggested_action" constraintName="fk_sub_emotion_suggested_action_sub_emotion_id" referencedColumnNames="id" referencedTableName="sub_emotions"/>
+        <addForeignKeyConstraint baseColumnNames="suggested_action_id" baseTableName="sub_emotion_suggested_action" constraintName="fk_sub_emotion_suggested_action_suggested_action_id" referencedColumnNames="id" referencedTableName="suggested_actions"/>
+    </changeSet>
+
+    <!-- Create suggested_action_links table -->
+    <changeSet author="Yuri_Zelikov" id="create_suggested_action_links_table">
+        <createTable tableName="suggested_action_links">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="suggested_action_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_suggested_action_links_suggested_action_id"
+                                 baseTableName="suggested_action_links" baseColumnNames="suggested_action_id"
+                                 referencedTableName="suggested_actions" referencedColumnNames="id"/>
+    </changeSet>
+
 </databaseChangeLog>
