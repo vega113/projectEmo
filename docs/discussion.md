@@ -187,3 +187,143 @@ Cross-platform compatibility: If the application is intended for multiple platfo
 By choosing MySQL and Anorm for your emotion tracking application, you will have a well-supported, widely-used database management system, and a simple data access layer that integrates seamlessly with your Scala/Play application.
 ```
 
+# Updated table of main and sub-emotions
+| Main Emotion | Positive/Negative | Sub-Emotions                                                                                                                                                                                                                                                                                          |
+|--------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Joy          | Positive          | Enthusiasm, Excitement, Passion, Euphoria, Trembling, Satisfaction, Charm, Happiness, Bliss, Amusement, Triumph, Pleasure, Serenity, Contentment, Pride, Gratitude, Elation, Optimism                                                                                                                 |
+| Trust        | Positive          | Calmness, Relief, Peacefulness, Relaxation, Comfort, Tenderness, Generosity, Admiration, Awe, Attachment, Respect, Friendliness, Sympathy, Compassion, Dependability, Loyalty, Confidence, Faith, Security, Dependence                                                                                |
+| Surprise     | Neutral           | Astonishment, Shock, Defeat, Bewilderment, Amazement, Upset, Confusion, Startlement, Perplexity, Disbelief, Wonder, Inquisitiveness, Intrigue, Fascination, Eagerness, Disorientation, Dizziness, Uncertainty, Disarray                                                                               |
+| Interest     | Positive          | Curiosity, Focus, Engagement, Hope, Enthusiasm, Impatience                                                                                                                                                                                                                                            |
+| Fear         | Negative          | Suspicion, Alertness, Concern, Anxiety, Awkwardness, Trembling, Worry, Fright, Agitation, Horror, Sense of threat, Apprehension, Panic, Dread, Uneasiness, Trepidation, Insecurity                                                                                                                    |
+| Shame        | Negative          | Guilt, Embarrassment, Humiliation, Remorse, Disgrace, Shyness, Regret, Dishonor, Chagrin                                                                                                                                                                                                              |
+| Anger        | Negative          | Indignation, Hatred, Offense, Irritability, Annoyance, Insult, Aggressiveness, Fury, Nervousness, Frustration, Resentment, Hostility, Bitterness                                                                                                                                                      |
+| Sadness      | Negative          | Depression, Vulnerability, Despair, Loneliness, Isolation, Grief, Oppression, Gloom, Desperation, Devastation, Helplessness, Weakness, Alienation, Disappointment, Pain, Abandonment, Dejection, Apathy, Disorder, Melancholy, Heaviness, Sorrow, Infringement, Hopelessness, Weariness, Listlessness |
+| Disgust      | Negative          | Arrogance, Contempt, Self-satisfaction, Impatience, Repulsion, Revulsion, Loathing, Distaste, Aversion, Disdain, Repugnance, Disapproval, Nausea                                                                                                                                                      |
+| Love         | Positive          | Affection, Adoration, Attachment, Fondness, Infatuation, Warmth, Compassion                                                                                                                                                                                                                           |
+| Jealousy     | Negative          | Covetousness, Resentment, Insecurity, Longing                                                                                                                                                                                                                                                         |
+| Apathy       | Negative          | Indifference, Disinterest, Lethargy                                                                                                                                                                                                                                                                   |
+                                                                                  
+
+
+# Tables model
+
+| Table Name                        | Fields                                                   |
+|-----------------------------------|----------------------------------------------------------|
+| users                             | id, username, email, password, created                   |
+| emotions                          | id, emotion_name, emotion_type                           |
+| sub_emotions                      | id, sub_emotion_name, emotion_id                         |
+| triggers                          | id, trigger_name, trigger_type, parent_id                |
+| trigger_examples                  | id, trigger_id, example                                  |
+| suggested_actions                 | id, action_description                                   |
+| suggested_action_links            | id, suggested_action_id, url                             |
+| emotion_records                   | id, user_id, emotion_id, created                         |
+| emotion_records_sub_emotions      | emotion_record_id, sub_emotion_id                        |
+| emotion_records_triggers          | emotion_record_id, trigger_id                            |
+                                                                                                         
+
+# Here's a new table of unique suggested reactions, each containing a single action:
+      
+| Suggested Reaction                       |
+|------------------------------------------|
+| Prioritize tasks                         |
+| Break work into smaller chunks           |
+| Take breaks                              |
+| Ask for help                             |
+| Practice time management                 |
+| Practice active listening                |
+| Express your feelings assertively        |
+| Find common ground                       |
+| Seek professional help if needed         |
+| Create a budget                          |
+| Reduce expenses                          |
+| Seek financial advice                    |
+| Explore additional income sources        |
+| Seek medical help                        |
+| Follow doctor's advice                   |
+| Maintain a healthy lifestyle             |
+| Seek support from friends and family     |
+| Practice deep breathing                  |
+| Visualize success                        |
+| Rehearse                                 |
+| Focus on the message                     |
+| Seek feedback                            |
+| Set realistic expectations               |
+| Prepare conversation topics              |
+| Find common interests                    |
+| Reach out to your support network        |
+| Update your resume                       |
+| Network                                  |
+| Explore new opportunities                |
+| Consider upskilling                      |
+| Opt for alternative transportation       |
+| Listen to music or podcasts              |
+| Practice mindfulness                     |
+| Adjust your schedule                     |
+| Process your emotions                    |
+| Gather information                       |
+| Develop a plan                           |
+| Practice self-compassion                 |
+| Delegate responsibilities                 |
+| Create a schedule                        |
+| Set intermediate goals                   |
+| Join a support group                     |
+| Honor their memory                       |
+| Communicate openly                       |
+| Seek compromise                          |
+| Practice forgiveness                     |
+| Prioritize                               |
+| Be patient with yourself                 |
+| Set clear goals                          |
+| Use a timer                              |
+| Eliminate distractions                   |
+| Reward yourself for progress             |
+| Report the behavior                      |
+| Maintain boundaries                      |
+| Practice self-care                       |
+| Learn from mistakes                      |
+| Set new goals                            |
+| Set boundaries                           |
+| Reassess goals and expectations          |
+| Evaluate and learn from the experience   |
+| Celebrate your success                   |
+| Share your joy with loved ones           |
+| Express gratitude                        |
+| Enjoy the moment                         |
+| Create lasting memories                  |
+| Reminisce about shared experiences       |
+| Catch up on life events                  |
+| Make plans for future meetups            |
+| Express appreciation                     |
+| Share your progress                      |
+| Celebrate milestones                     |
+| Pay it forward                           |
+| Practice empathy                         |
+| Share your experience with others        |
+| Reflect on its impact                    |
+| Plan ahead                               |
+| Embrace new experiences                  |
+| Document memories                        |
+| Share your experiences                   |
+| Share your work                          |
+| Set goals for improvement                |
+| Collaborate with others                  |
+| Recognize your achievement               |
+| Reflect on lessons learned               |
+| Nurture the relationship                 |
+| Be present and engaged                   |
+| Reflect on your growth                   |
+| Celebrate your resilience                |
+| Share your story                         |
+| Maintain a healthy lifestyle             |
+| Listen actively                          |
+| Plan family activities                   |
+| Maintain open communication              |
+| Continue to grow and develop             |
+| Reflect on your journey                  |
+| Seek feedback on your progress           |
+| Practice self-compassion                 |
+| Reflect on the experience                |
+| Share your insights                      |
+| Nurture your spiritual practice          |
+| Be open to growth and learning           |
+

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="Yuri_Zelikov" id="create_users_table">
+        <createTable tableName="users">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Yuri_Zelikov" id="create_users_username_index">
+        <createIndex indexName="users_username_idx" tableName="users">
+            <column name="username"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="Yuri_Zelikov" id="create_users_email_index">
+        <createIndex indexName="users_email_idx" tableName="users">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="Yuri_Zelikov" id="create_emotions_table">
+        <createTable tableName="emotions">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="emotion_name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="emotion_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Yuri_Zelikov" id="create_emotions_emotion_name_index">
+        <createIndex indexName="emotions_emotion_name_idx" tableName="emotions">
+            <column name="emotion_name"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create sub_emotions table -->
+    <changeSet author="Yuri_Zelikov" id="create_sub_emotions_table">
+        <createTable tableName="sub_emotions">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="sub_emotion_name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="emotion_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="suggested_action_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="suggested_action_link_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_sub_emotions_emotion_id"
+                                 baseTableName="sub_emotions" baseColumnNames="emotion_id"
+                                 referencedTableName="emotions" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create triggers table -->
+    <changeSet author="Yuri_Zelikov" id="create_triggers_table">
+        <createTable tableName="triggers">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="trigger_name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="trigger_type" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_triggers_parent_id"
+                                 baseTableName="triggers" baseColumnNames="parent_id"
+                                 referencedTableName="triggers" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create trigger_examples table -->
+    <changeSet author="Yuri_Zelikov" id="create_trigger_examples_table">
+        <createTable tableName="trigger_examples">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="trigger_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="example" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_trigger_examples_trigger_id"
+                                 baseTableName="trigger_examples" baseColumnNames="trigger_id"
+                                 referencedTableName="triggers" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create suggested_actions table -->
+    <changeSet author="Yuri_Zelikov" id="create_suggested_actions_table">
+        <createTable tableName="suggested_actions">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="action_description" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create suggested_action_links table -->
+    <changeSet author="Yuri_Zelikov" id="create_suggested_action_links_table">
+        <createTable tableName="suggested_action_links">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="suggested_action_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_suggested_action_links_suggested_action_id"
+                                 baseTableName="suggested_action_links" baseColumnNames="suggested_action_id"
+                                 referencedTableName="suggested_actions" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create emotion_records table -->
+    <changeSet author="Yuri_Zelikov" id="create_emotion_records_table">
+        <createTable tableName="emotion_records">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="emotion_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_emotion_records_user_id"
+                                 baseTableName="emotion_records" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_emotion_records_emotion_id"
+                                 baseTableName="emotion_records" baseColumnNames="emotion_id"
+                                 referencedTableName="emotions" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create emotion_records_sub_emotions table -->
+    <changeSet author="Yuri_Zelikov" id="create_emotion_records_sub_emotions_table">
+        <createTable tableName="emotion_records_sub_emotions">
+            <column name="emotion_record_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sub_emotion_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_emotion_records_sub_emotions_emotion_record_id"
+                                 baseTableName="emotion_records_sub_emotions" baseColumnNames="emotion_record_id"
+                                 referencedTableName="emotion_records" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_emotion_records_sub_emotions_sub_emotion_id"
+                                 baseTableName="emotion_records_sub_emotions" baseColumnNames="sub_emotion_id"
+                                 referencedTableName="sub_emotions" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create emotion_records_triggers table -->
+    <changeSet author="Yuri_Zelikov" id="create_emotion_records_triggers_table">
+        <createTable tableName="emotion_records_triggers">
+            <column name="emotion_record_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_emotion_records_triggers_emotion_record_id"
+                                 baseTableName="emotion_records_triggers" baseColumnNames="emotion_record_id"
+                                 referencedTableName="emotion_records" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_emotion_records_triggers_trigger_id"
+                                 baseTableName="emotion_records_triggers" baseColumnNames="trigger_id"
+                                 referencedTableName="triggers" referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

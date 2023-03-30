@@ -12,7 +12,14 @@ lazy val root = (project in file("."))
     )
   )
 
+resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
+resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/"
+
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "anorm" % "2.7.0",
-  "mysql" % "mysql-connector-java" % "8.0.32"
+  jdbc,
+  "org.playframework.anorm" %% "anorm" % "2.7.0",
+  "mysql" % "mysql-connector-java" % "8.0.27"
 )
+
+libraryDependencies += "org.liquibase" % "liquibase-core" % "4.6.2"
+
