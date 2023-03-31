@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <!-- Update triggers table -->
+    <changeSet author="Yuri_Zelikov" id="update_triggers_table">
+        <addColumn tableName="triggers">
+            <column name="user_id" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="triggers">
+            <column name="description" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addForeignKeyConstraint constraintName="fk_triggers_user_id"
+                                 baseTableName="triggers" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create notes table -->
+    <changeSet author="Yuri_Zelikov" id="create_notes_table" failOnError="true">
+        <createTable tableName="notes">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="INT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_notes_user_id"
+                                 baseTableName="notes" baseColumnNames="user_id"
+                                 referencedTableName="users" referencedColumnNames="id"/>
+    </changeSet>
+
+    <!-- Create tags table -->
+    <changeSet author="Yuri_Zelikov" id="create_tags_table">
+        <createTable tableName="tags">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="INT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="tag_name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create emotion_record tags table -->
+    <changeSet author="Yuri_Zelikov" id="create_emotion_record_tags_table">
+        <createTable tableName="emotion_record_tags">
+            <column name="emotion_record_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tag_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_emotion_record_tags_emotion_record_id"
+                                 baseTableName="emotion_record_tags" baseColumnNames="emotion_record_id"
+                                 referencedTableName="emotion_records" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_emotion_record_tags_tag_id"
+                                 baseTableName="emotion_record_tags" baseColumnNames="tag_id"
+                                 referencedTableName="tags" referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet author="Yuri_Zelikov" id="create_note_tags_table">
+        <createTable tableName="note_tags">
+            <column name="note_id" type="INT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tag_id" type="INT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="note_id" baseTableName="note_tags" constraintName="fk_note_tags_note_id" referencedColumnNames="id" referencedTableName="notes"/>
+        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="note_tags" constraintName="fk_note_tags_tag_id" referencedColumnNames="id" referencedTableName="tags"/>
+    </changeSet>
+
+    <!-- Add created column to all tables -->
+    <changeSet author="Yuri_Zelikov" id="add_created_column">
+        <addColumn tableName="users">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="emotions">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="sub_emotions">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="emotion_records">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="triggers">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="notes">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="tags">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="emotion_record_tags">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="note_tags">
+            <column name="created" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- Add lastUpdated column to notes table -->
+    <changeSet author="Yuri_Zelikov" id="add_lastUpdated_column">
+        <addColumn tableName="notes">
+            <column name="lastUpdated" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

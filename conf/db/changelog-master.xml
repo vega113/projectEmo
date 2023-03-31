@@ -6,5 +6,6 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
     <include file="conf/db/changelog-create-tables.xml" />
+    <include file="conf/db/changelog-model-updates.xml" />
 
 </databaseChangeLog>

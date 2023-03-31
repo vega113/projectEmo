@@ -126,9 +126,6 @@
         </createTable>
     </changeSet>
 
-
-
-
     <!-- Create emotion_records table -->
     <changeSet author="Yuri_Zelikov" id="create_emotion_records_table">
         <createTable tableName="emotion_records">
@@ -219,5 +216,9 @@
                                  baseTableName="suggested_action_links" baseColumnNames="suggested_action_id"
                                  referencedTableName="suggested_actions" referencedColumnNames="id"/>
     </changeSet>
+
+
+
+
 
 </databaseChangeLog>

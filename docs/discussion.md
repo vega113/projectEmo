@@ -327,3 +327,73 @@ By choosing MySQL and Anorm for your emotion tracking application, you will have
 | Nurture your spiritual practice          |
 | Be open to growth and learning           |
 
+# Tables model for initial stage
+| Table Name          | Column Name       | Data Type    | Constraints                           |
+|---------------------|-------------------|--------------|---------------------------------------|
+| users               | id                | INT          | PRIMARY KEY, NOT NULL, AUTO_INCREMENT |
+| users               | username          | VARCHAR(255) | NOT NULL, UNIQUE                      |
+| users               | email             | VARCHAR(255) | NOT NULL, UNIQUE                      |
+| users               | password          | VARCHAR(255) | NOT NULL                              |
+| users               | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| emotions            | id                | VARCHAR(255) | PRIMARY KEY, NOT NULL                 |
+| emotions            | emotion_name      | VARCHAR(255) | NOT NULL, UNIQUE                      |
+| emotions            | emotion_type      | VARCHAR(255) | NOT NULL                              |
+| emotions            | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| sub_emotions        | id                | INT          | PRIMARY KEY, NOT NULL, AUTO_INCREMENT |
+| sub_emotions        | sub_emotion_name  | VARCHAR(255) | NOT NULL, UNIQUE                      |
+| sub_emotions        | emotion_id        | VARCHAR(255) | FOREIGN KEY, NOT NULL                 |
+| sub_emotions        | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| emotion_records     | id                | INT          | PRIMARY KEY, NOT NULL, AUTO_INCREMENT |
+| emotion_records     | emotion_id        | VARCHAR(255) | FOREIGN KEY, NOT NULL                 |
+| emotion_records     | sub_emotion_id    | INT          | FOREIGN KEY, NOT NULL                 |
+| emotion_records     | intensity         | INT          | NOT NULL                              |
+| emotion_records     | date              | DATE         | NOT NULL                              |
+| emotion_records     | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| triggers            | id                | INT          | PRIMARY KEY, NOT NULL, AUTO_INCREMENT |
+| triggers            | user_id           | INT          | FOREIGN KEY, NULL                     |
+| triggers            | description       | VARCHAR(255) | NULL                                  |
+| triggers            | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| notes               | id                | INT          | PRIMARY KEY, NOT NULL, AUTO_INCREMENT |
+| notes               | title             | VARCHAR(255) | NOT NULL                              |
+| notes               | content           | VARCHAR(255) | NOT NULL                              |
+| notes               | user_id           | INT          | FOREIGN KEY, NULL                     |
+| notes               | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| notes               | lastUpdated       | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| tags                | id                | INT          | PRIMARY KEY, NOT NULL, AUTO_INCREMENT |
+| tags                | user_id           | INT          | NULL                                  |
+| tags                | tag_name          | VARCHAR(255) | NOT NULL, NOT UNIQUE                  |
+| tags                | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| emotion_record_tags | emotion_record_id | INT          | FOREIGN KEY, NOT NULL                 |
+| emotion_record_tags | tag_id            | INT          | FOREIGN KEY, NOT NULL                 |
+| emotion_record_tags | created           | TIMESTAMP    | NOT NULL, DEFAULT CURRENT_TIMESTAMP   |
+| note_tags           | note_id           | INT          | PRIMARY KEY, NOT NULL, FOREIGN KEY    |
+| note_tags           | tag_id            | INT          | PRIMARY KEY, NOT NULL, FOREIGN KEY    |
+
+# Plan to implement the app
+```text
+Now that you have the database model set up, the next steps in building your emotions tracking app in Scala with Play Framework are as follows:
+
+Set up the project: If you haven't already, create a new Play Framework project using SBT or the Play starter projects. Choose the appropriate template for your needs, such as Play Scala Seed.
+
+Configure the database: Add your database configuration to the application.conf file, including the connection details, username, password, and the appropriate JDBC driver.
+
+Integrate Liquibase: Add Liquibase to your project to manage your database schema changes. You can integrate it using sbt-liquibase or another plugin. Make sure to configure it with your database and changelog files.
+
+Create models: Define case classes for each table in your database schema. These should represent the records in your tables and will be used to interact with the data. You should create models for emotions, sub_emotions, triggers, emotion_records, and emotion_records_triggers.
+
+Create Data Access Objects (DAOs): For each model, create a DAO class that will be responsible for querying the database and performing operations such as inserting, updating, deleting, and retrieving records.
+
+Implement the business logic: Create the services layer that will handle the business logic of your application. This may include methods for creating emotion records, adding triggers, and querying for emotions or triggers.
+
+Design the API: Design a RESTful API that will expose the functionality of your services layer. Define the routes, controllers, and request/response data structures for each endpoint.
+
+Implement the API: Implement the API by connecting the controllers to the services layer. Use Play's JSON libraries to parse and generate JSON responses.
+
+Test the application: Write unit tests and integration tests for your models, services, and controllers. Use the Play test framework and libraries such as ScalaTest or specs2.
+
+Build the frontend: If you're planning to build a web or mobile application, design and implement the user interface to interact with your RESTful API.
+
+Deploy the application: Deploy your application to a server or cloud provider such as Heroku, AWS, or Google Cloud Platform.
+
+By following these steps, you will have a solid foundation for your emotions tracking app built with Scala and the Play Framework.
+```
