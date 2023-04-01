@@ -397,3 +397,160 @@ Deploy the application: Deploy your application to a server or cloud provider su
 
 By following these steps, you will have a solid foundation for your emotions tracking app built with Scala and the Play Framework.
 ```
+
+# updated tables definition
+### emotions
+
+| Field        | Type           |
+|--------------|----------------|
+| id           | varchar(255)   |
+| emotion_name | varchar(255)   |
+| emotion_type | varchar(255)   |
+| created      | timestamp      |
+
+### sub_emotions
+
+| Field           | Type           |
+|-----------------|----------------|
+| id              | varchar(255)   |
+| sub_emotion_name| varchar(255)   |
+| emotion_id      | varchar(255)   |
+| created         | timestamp      |
+
+### suggested_actions
+
+| Field            | Type           |
+|------------------|----------------|
+| id               | varchar(255)   |
+| action_description| varchar(255)  |
+
+### sub_emotion_suggested_action
+
+| Field               | Type           |
+|---------------------|----------------|
+| sub_emotion_id      | varchar(255)   |
+| suggested_action_id | varchar(255)   |
+
+### suggested_action_links
+
+| Field               | Type           |
+|---------------------|----------------|
+| id                  | int            |
+| suggested_action_id | varchar(255)   |
+| url                 | varchar(255)   |
+
+### tags
+
+| Field      | Type           |
+|------------|----------------|
+| id         | int            |
+| user_id    | int            |
+| tag_name   | varchar(255)   |
+| created    | timestamp      |
+
+### users
+
+| Field      | Type           |
+|------------|----------------|
+| id         | int            |
+| username   | varchar(255)   |
+| email      | varchar(255)   |
+| password   | varchar(255)   |
+| created    | timestamp      |
+
+### emotion_records
+
+| Field       | Type           |
+|-------------|----------------|
+| id          | int            |
+| user_id     | int            |
+| emotion_id  | varchar(255)   |
+| created     | timestamp      |
+
+### emotion_record_tags
+
+| Field           | Type           |
+|-----------------|----------------|
+| emotion_record_id| int           |
+| tag_id          | int            |
+| created         | timestamp      |
+
+### emotion_records_sub_emotions
+
+| Field           | Type           |
+|-----------------|----------------|
+| emotion_record_id| int           |
+| sub_emotion_id  | varchar(255)   |
+
+### notes
+
+| Field       | Type           |
+|-------------|----------------|
+| id          | int            |
+| title       | varchar(255)   |
+| content     | varchar(255)   |
+| user_id     | int            |
+| created     | timestamp      |
+| lastUpdated | timestamp      |
+
+### note_tags
+
+| Field       | Type           |
+|-------------|----------------|
+| note_id     | int            |
+| tag_id      | int            |
+| created     | timestamp      |
+
+### triggers
+
+| Field       | Type           |
+|-------------|----------------|
+| id          | int            |
+| trigger_name| varchar(255)   |
+| trigger_type| varchar(255)   |
+| parent_id   | int            |
+| user_id     | int            |
+| description | varchar(255)   |
+| created     | timestamp      |
+
+### emotion_records_triggers
+
+| Field           | Type           |
+|-----------------|----------------|
+| emotion_record_id| int           |
+| trigger_id      | int            |
+
+### trigger_examples
+
+| Field       | Type           |
+|-------------|----------------|
+| id          | int            |
+| trigger_id  | int            |
+| example     | varchar(255)   |
+
+
+
+1. **emotion_record_sub_emotions**
+
+| Column Name       | Type | Constraints |
+|-------------------|------|-------------|
+| emotion_record_id | INT  | NOT NULL    |
+| sub_emotion_id    | INT  | NOT NULL    |
+
+- Foreign Key Constraints:
+
+    - `fk_emotion_record_sub_emotions_emotion_record_id`: `emotion_record_id` references `emotion_records(id)`
+    - `fk_emotion_record_sub_emotions_sub_emotion_id`: `sub_emotion_id` references `sub_emotions(id)`
+
+
+2. **emotion_record_triggers**
+
+| Column Name       | Type | Constraints |
+|-------------------|------|-------------|
+| emotion_record_id | INT  | NOT NULL    |
+| trigger_id        | INT  | NOT NULL    |
+
+- Foreign Key Constraints:
+
+    - `fk_emotion_record_triggers_emotion_record_id`: `emotion_record_id` references `emotion_records(id)`
+    - `fk_emotion_record_triggers_trigger_id`: `trigger_id` references `triggers(id)`

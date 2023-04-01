@@ -146,4 +146,34 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet author="Yuri_Zelikov" id="create_emotion_record_triggers_table">
+        <createTable tableName="emotion_record_triggers">
+            <column name="emotion_record_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="trigger_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_emotion_record_triggers_emotion_record_id"
+                                 baseTableName="emotion_record_triggers" baseColumnNames="emotion_record_id"
+                                 referencedTableName="emotion_records" referencedColumnNames="id"/>
+        <addForeignKeyConstraint constraintName="fk_emotion_record_triggers_trigger_id"
+                                 baseTableName="emotion_record_triggers" baseColumnNames="trigger_id"
+                                 referencedTableName="triggers" referencedColumnNames="id"/>
+    </changeSet>
+
+
+    <changeSet id="remove_trigger_type_column" author="Yuri_Zelikov">
+        <dropColumn tableName="triggers" columnName="trigger_type"/>
+    </changeSet>
+
+    <changeSet id="add_intensity_column_in_emotions_record" author="Yuri Zelikov">
+        <addColumn tableName="emotion_records">
+            <column name="intensity" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

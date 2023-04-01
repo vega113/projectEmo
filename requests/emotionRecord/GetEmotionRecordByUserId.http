@@ -1,0 +1,6 @@
+### Get emotion record by user id
+GET http://localhost:9000/emotionRecords/user/:userId
+
+
+
+

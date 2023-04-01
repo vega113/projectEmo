@@ -1,0 +1,2 @@
+### Delete EmotionRecord
+DELETE http://localhost:9000/emotionRecord/{id}

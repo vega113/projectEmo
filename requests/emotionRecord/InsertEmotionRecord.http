@@ -1,0 +1,28 @@
+### Inser EmotionRecord
+POST http://localhost:9000/emotionRecord
+Content-Type: application/json
+
+{
+  "emotionRecord": {
+    "id": 1,
+    "userId": "1",
+    "emotionId": "Joy",
+    "intensity": 5
+  },
+  "subEmotions": [
+    {
+      "id": "Amusement",
+      "subEmotionName": "Amusement",
+      "emotionId": "Joy"
+    }
+  ],
+  "triggers": [
+    {
+      "id": 1,
+      "triggerName": "Person",
+      "parentId": 1,
+      "userId": 1,
+      "description": "Listening to music"
+    }
+  ]
+}

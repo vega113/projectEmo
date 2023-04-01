@@ -10,23 +10,23 @@ import anorm.SqlParser._
 
 // refactor the code, make created field optional
 object model {
-  case class User(id: Int, username: String, email: String, password: String, created: Option[LocalDateTime])
+  case class User(id: Int, username: String, email: String, password: String)
 
-  case class Emotion(id: String, emotionName: String, emotionType: String, created: Option[LocalDateTime])
+  case class Emotion(id: String, emotionName: String, emotionType: String)
 
-  case class SubEmotion(id: String, subEmotionName: String, emotionId: String, created: Option[LocalDateTime])
+  case class SubEmotion(id: String, subEmotionName: String, emotionId: String)
 
-  case class EmotionRecord(id: Int, userId: String, emotionId: String, intensity: Int, created: Option[LocalDateTime])
+  case class EmotionRecord(id: Int, userId: String, emotionId: String, intensity: Int)
 
-  case class Trigger(id: Int, triggerName: String, parentId: Option[Int], userId: Option[Int], description: Option[String], created: Option[LocalDateTime])
+  case class Trigger(id: Int, triggerName: String, parentId: Option[Int], userId: Option[Int], description: Option[String])
 
-  case class Note(id: Int, title: String, content: String, userId: Option[Int], created: Option[LocalDateTime], lastUpdated: Option[LocalDateTime])
+  case class Note(id: Int, title: String, content: String, userId: Option[Int])
 
-  case class Tag(id: Int, userId: Option[Int], tagName: String, created: Option[LocalDateTime])
+  case class Tag(id: Int, userId: Option[Int], tagName: String)
 
-  case class EmotionRecordTag(emotionRecordId: Int, tagId: Int, created: Option[LocalDateTime])
+  case class EmotionRecordTag(emotionRecordId: Int, tagId: Int)
 
-  case class NoteTag(noteId: Int, tagId: Int, created: Option[LocalDateTime])
+  case class NoteTag(noteId: Int, tagId: Int)
 
   case class EmotionRecordWithRelations(emotionRecord: EmotionRecord, subEmotions: List[SubEmotion], triggers: List[Trigger])
 
@@ -38,10 +38,9 @@ object model {
       int("id") ~
         str("username") ~
         str("email") ~
-        str("password") ~
-        get[Option[LocalDateTime]]("created") map {
-        case id ~ username ~ email ~ password ~ created =>
-          User(id, username, email, password, created)
+        str("password") map {
+        case id ~ username ~ email ~ password =>
+          User(id, username, email, password)
       }
     }
   }
@@ -52,10 +51,9 @@ object model {
     val parser: RowParser[Emotion] = {
       str("id") ~
         str("emotion_name") ~
-        str("emotion_type") ~
-        get[Option[LocalDateTime]]("created") map {
-        case id ~ emotionName ~ emotionType ~ created =>
-          Emotion(id, emotionName, emotionType, created)
+        str("emotion_type") map {
+        case id ~ emotionName ~ emotionType =>
+          Emotion(id, emotionName, emotionType)
       }
     }
   }
@@ -67,10 +65,9 @@ object model {
     val parser: RowParser[SubEmotion] = {
       str("id") ~
         str("sub_emotion_name") ~
-        str("emotion_id") ~
-        get[Option[LocalDateTime]]("created")map {
-        case id ~ subEmotionName ~ emotionId ~ created =>
-          SubEmotion(id, subEmotionName, emotionId, created)
+        str("emotion_id") map {
+        case id ~ subEmotionName ~ emotionId =>
+          SubEmotion(id, subEmotionName, emotionId)
       }
     }
   }
@@ -82,10 +79,9 @@ object model {
       int("id") ~
         str("user_id") ~
         str("emotion_id") ~
-        int("intensity") ~
-        get[Option[LocalDateTime]]("created") map {
-        case id ~ userId ~ emotionId  ~ intensity ~ created =>
-          EmotionRecord(id, userId, emotionId, intensity, created)
+        int("intensity") map {
+        case id ~ userId ~ emotionId  ~ intensity =>
+          EmotionRecord(id, userId, emotionId, intensity)
       }
     }
   }
@@ -98,10 +94,9 @@ object model {
         str("trigger_name") ~
         int("user_id") ~
         int("parent_id") ~
-        str("description") ~
-        get[Option[LocalDateTime]]("created") map {
-        case id ~ triggerName ~ parentId ~ userId ~ description ~ created =>
-          Trigger(id, triggerName, Option(parentId), Option(userId), Option(description), created)
+        str("description") map {
+        case id ~ triggerName ~ parentId ~ userId ~ description =>
+          Trigger(id, triggerName, Option(parentId), Option(userId), Option(description))
       }
     }
   }
@@ -113,11 +108,9 @@ object model {
       int("id") ~
         str("title") ~
         str("content") ~
-        int("userId") ~
-        get[Option[LocalDateTime]]("created")~
-        get[Option[LocalDateTime]]("lastUpdated") map {
-        case id ~ title ~ content ~ userId ~ created ~ lastUpdated =>
-          Note(id, title, content, Some(userId), created, lastUpdated)
+        int("userId")  map {
+        case id ~ title ~ content ~ userId =>
+          Note(id, title, content, Some(userId))
       }
     }
   }
@@ -128,10 +121,9 @@ object model {
     val parser: RowParser[Tag] = {
       int("id") ~
         int("userId") ~
-        str("tagName") ~
-        get[Option[LocalDateTime]]("created") map {
-        case id ~ userId ~ tagName ~ created =>
-          Tag(id, Some(userId), tagName, created)
+        str("tagName") map {
+        case id ~ userId ~ tagName =>
+          Tag(id, Some(userId), tagName)
       }
     }
   }

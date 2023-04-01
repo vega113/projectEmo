@@ -18,8 +18,11 @@ resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe
 libraryDependencies ++= Seq(
   jdbc,
   "org.playframework.anorm" %% "anorm" % "2.7.0",
-  "mysql" % "mysql-connector-java" % "8.0.27"
+  "mysql" % "mysql-connector-java" % "8.0.27",
+  "com.zaxxer" % "HikariCP" % "4.0.3",
+
 )
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1"
 
 libraryDependencies += "org.liquibase" % "liquibase-core" % "4.6.2"
 
