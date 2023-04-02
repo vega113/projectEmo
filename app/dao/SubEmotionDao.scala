@@ -16,13 +16,13 @@ class SubEmotionDao {
 
   def insert(subEmotion: SubEmotion)(implicit connection: Connection): Option[Long] = {
     SQL("INSERT INTO sub_emotions (sub_emotion_name, emotion_id) VALUES ({subEmotionName}, {emotionId})")
-      .on("subEmotionName" -> subEmotion.subEmotionName, "emotionId" -> subEmotion.emotionId)
+      .on("subEmotionName" -> subEmotion.subEmotionName, "emotionId" -> subEmotion.parentEmotionId)
       .executeInsert()
   }
 
   def update(subEmotion: SubEmotion)(implicit connection: Connection): Int = {
     SQL("UPDATE sub_emotions SET sub_emotion_name = {subEmotionName}, emotion_id = {emotionId} WHERE id = {id}")
-      .on("id" -> subEmotion.id, "subEmotionName" -> subEmotion.subEmotionName, "emotionId" -> subEmotion.emotionId)
+      .on("id" -> subEmotion.subEmotionId, "subEmotionName" -> subEmotion.subEmotionName, "emotionId" -> subEmotion.parentEmotionId)
       .executeUpdate()
   }
 

@@ -14,13 +14,14 @@ class EmotionRecordDao {
 
 
   def findById(id: Int)(implicit connection: Connection): Option[EmotionRecord] = {
-    SQL("SELECT * FROM emotion_records WHERE id = {id}").on("id" -> id).as(EmotionRecord.parser.singleOpt)
+    SQL("SELECT * FROM emotion_records WHERE id = {id}").on("id" -> id).
+      as(EmotionRecord.parser.singleOpt)
   }
 
   def insert(emotionRecord: EmotionRecord)(implicit connection: Connection): Option[Long] = {
     SQL("""
       INSERT INTO emotion_records (user_id, emotion_id, intensity)
-      VALUES ({emotionId}, {intensity})
+      VALUES ({userId}, {emotionId}, {intensity})
     """).on("userId" -> emotionRecord.userId, "emotionId" -> emotionRecord.emotionId,
       "intensity" -> emotionRecord.intensity)
       .executeInsert()

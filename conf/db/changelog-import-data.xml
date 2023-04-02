@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.10.xsd">
+
+    
+    <changeSet id="load-emotions-data" author="Yuri Zelikov">
+        <loadData file="conf/db/data/emotions.csv" tableName="emotions" separator=","/>
+    </changeSet>
+    <changeSet id="load-sub_emotions-data" author="Yuri Zelikov">
+        <loadData file="conf/db/data/sub_emotions.csv" tableName="sub_emotions" separator=","/>
+    </changeSet>
+    <changeSet id="load-triggers-data" author="Yuri Zelikov">
+        <loadData file="conf/db/data/triggers.csv" tableName="triggers" separator=","/>
+    </changeSet>
+    <changeSet id="load-sub_emotion_suggested_action-data" author="Yuri Zelikov">
+        <loadData file="conf/db/data/sub_emotion_suggested_actions.csv" tableName="sub_emotion_suggested_actions" separator=","/>
+    </changeSet>
+    <changeSet id="load-suggested_actions-data" author="Yuri Zelikov">
+        <loadData file="conf/db/data/suggested_actions.csv" tableName="suggested_actions" separator=","/>
+    </changeSet>
+
+</databaseChangeLog>

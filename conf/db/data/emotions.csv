@@ -1,13 +1,13 @@
-id,emotion_name,emotion_type
-Joy,Joy,Positive
-Trust,Trust,Positive
-Surprise,Surprise,Neutral
-Interest,Interest,Positive
-Fear,Fear,Negative
-Shame,Shame,Negative
-Anger,Anger,Negative
-Sadness,Sadness,Negative
-Disgust,Disgust,Negative
-Love,Love,Positive
-Jealousy,Jealousy,Negative
-Apathy,Apathy,Negative
+id,emotion_name,emotion_type,created
+Anger,Anger,Negative,2023-03-31 07:13:17
+Apathy,Apathy,Negative,2023-03-31 07:13:17
+Disgust,Disgust,Negative,2023-03-31 07:13:17
+Fear,Fear,Negative,2023-03-31 07:13:17
+Interest,Interest,Positive,2023-03-31 07:13:17
+Jealousy,Jealousy,Negative,2023-03-31 07:13:17
+Joy,Joy,Positive,2023-03-31 07:13:17
+Love,Love,Positive,2023-03-31 07:13:17
+Sadness,Sadness,Negative,2023-03-31 07:13:17
+Shame,Shame,Negative,2023-03-31 07:13:17
+Surprise,Surprise,Neutral,2023-03-31 07:13:17
+Trust,Trust,Positive,2023-03-31 07:13:17

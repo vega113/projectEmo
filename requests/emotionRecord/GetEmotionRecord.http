@@ -1,2 +1,2 @@
 ### Get EmotionRecord
-GET http://localhost:9000/emotionRecord/{id}
+GET http://localhost:9000/emotionRecord/9

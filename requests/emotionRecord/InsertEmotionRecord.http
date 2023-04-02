@@ -1,11 +1,10 @@
-### Inser EmotionRecord
+### Insert EmotionRecord
 POST http://localhost:9000/emotionRecord
 Content-Type: application/json
 
 {
   "emotionRecord": {
-    "id": 1,
-    "userId": "1",
+    "userId": 4,
     "emotionId": "Joy",
     "intensity": 5
   },

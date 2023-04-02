@@ -10,19 +10,19 @@ import anorm.SqlParser._
 
 // refactor the code, make created field optional
 object model {
-  case class User(id: Int, username: String, email: String, password: String)
+  case class User(id: Option[Int], username: String, email: String, password: String)
 
   case class Emotion(id: String, emotionName: String, emotionType: String)
 
-  case class SubEmotion(id: String, subEmotionName: String, emotionId: String)
+  case class SubEmotion(subEmotionId: String, subEmotionName: String, parentEmotionId: String)
 
-  case class EmotionRecord(id: Int, userId: String, emotionId: String, intensity: Int)
+  case class EmotionRecord(id: Option[Int], userId: Int, emotionId: String, intensity: Int)
 
-  case class Trigger(id: Int, triggerName: String, parentId: Option[Int], userId: Option[Int], description: Option[String])
+  case class Trigger(triggerId: Option[Int], triggerName: String, parentId: Option[Int], createdByUser: Option[Int], description: Option[String])
 
-  case class Note(id: Int, title: String, content: String, userId: Option[Int])
+  case class Note(id: Option[Int], title: String, content: String, userId: Option[Int])
 
-  case class Tag(id: Int, userId: Option[Int], tagName: String)
+  case class Tag(id: Option[Int], userId: Option[Int], tagName: String)
 
   case class EmotionRecordTag(emotionRecordId: Int, tagId: Int)
 
@@ -33,16 +33,7 @@ object model {
 
   object User {
     implicit val userFormat: Format[User] = Json.format[User]
-
-    val parser: RowParser[User] = {
-      int("id") ~
-        str("username") ~
-        str("email") ~
-        str("password") map {
-        case id ~ username ~ email ~ password =>
-          User(id, username, email, password)
-      }
-    }
+    val parser: RowParser[User] = Macro.namedParser[User]
   }
 
   object Emotion {
@@ -63,11 +54,11 @@ object model {
 
     // update column names to be kebab case
     val parser: RowParser[SubEmotion] = {
-      str("id") ~
+      str("sub_emotion_id") ~
         str("sub_emotion_name") ~
-        str("emotion_id") map {
-        case id ~ subEmotionName ~ emotionId =>
-          SubEmotion(id, subEmotionName, emotionId)
+        str("parent_emotion_id") map {
+        case subEmotionId ~ subEmotionName ~ parentEmotionId =>
+          SubEmotion(subEmotionId, subEmotionName, parentEmotionId)
       }
     }
   }
@@ -76,27 +67,28 @@ object model {
     implicit val emotionRecordFormat: Format[EmotionRecord] = Json.format[EmotionRecord]
 
     val parser: RowParser[EmotionRecord] = {
-      int("id") ~
-        str("user_id") ~
+      get[Option[Int]]("id") ~
+        int("user_id") ~
         str("emotion_id") ~
         int("intensity") map {
         case id ~ userId ~ emotionId  ~ intensity =>
           EmotionRecord(id, userId, emotionId, intensity)
       }
     }
+
   }
 
   object Trigger {
     implicit val triggerFormat: Format[Trigger] = Json.format[Trigger]
 
     val parser: RowParser[Trigger] = {
-      int("id") ~
+      get[Option[Int]]("trigger_id") ~
         str("trigger_name") ~
-        int("user_id") ~
-        int("parent_id") ~
+        get[Option[Int]]("created_by_user") ~
+        get[Option[Int]]("parent_id") ~
         str("description") map {
-        case id ~ triggerName ~ parentId ~ userId ~ description =>
-          Trigger(id, triggerName, Option(parentId), Option(userId), Option(description))
+        case triggerId ~ triggerName ~ parentId ~ userId ~ description =>
+          Trigger(triggerId, triggerName, parentId, userId, Option(description))
       }
     }
   }
@@ -105,10 +97,10 @@ object model {
     implicit val noteFormat: Format[Note] = Json.format[Note]
 
     val parser: RowParser[Note] = {
-      int("id") ~
+      get[Option[Int]]("id") ~
         str("title") ~
         str("content") ~
-        int("userId")  map {
+        int("user_id")  map {
         case id ~ title ~ content ~ userId =>
           Note(id, title, content, Some(userId))
       }
@@ -119,9 +111,9 @@ object model {
     implicit val tagFormat: Format[Tag] = Json.format[Tag]
 
     val parser: RowParser[Tag] = {
-      int("id") ~
-        int("userId") ~
-        str("tagName") map {
+      get[Option[Int]]("id") ~
+        int("user_id") ~
+        str("tag_name") map {
         case id ~ userId ~ tagName =>
           Tag(id, Some(userId), tagName)
       }

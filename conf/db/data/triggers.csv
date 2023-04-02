@@ -1,35 +1,35 @@
-id,trigger_name,trigger_type,parent_id,user_id,description
-1,People,Category,,,
-2,Family,Category,1,,
-3,Friends,Category,1,,
-4,Colleagues,Category,1,,
-5,Strangers,Category,1,,
-6,Romantic_partners,Category,1,,
-7,Authority_figures,Category,1,,
-8,Celebrities,Category,1,,
-9,Situations,Category,,,
-10,Work_stress,Category,9,,
-11,Social_events,Category,9,,
-12,Relationship_conflicts,Category,9,,
-13,Financial_problems,Category,9,,
-14,Health_issues,Category,9,,
-15,Celebrations,Category,9,,
-16,Losses,Category,9,,
-17,Achievements,Category,9,,
-18,Commuting,Category,9,,
-19,Unexpected_news,Category,9,,
-20,Time_pressure,Category,9,,
-21,Deadlines,Category,9,,
-22,Places,Category,,,
-23,Home,Category,22,,
-24,Workplace,Category,22,,
-25,School,Category,22,,
-26,Parks,Category,22,,
-27,Public_transportation,Category,22,,
-28,Restaurants,Category,22,,
-29,Gyms,Category,22,,
-30,Shopping_centers,Category,22,,
-31,Travel_destinations,Category,22,,
-32,Nature,Category,22,,
-33,Social_gatherings,Category,22,,
-34,Places_with_specific_memories,Category,22,,
+trigger_id,trigger_name,trigger_parent_id,created_by_user,description,created
+1,People,,,,2023-03-31 07:13:18
+2,Family,1,,,2023-03-31 07:13:18
+3,Friends,1,,,2023-03-31 07:13:18
+4,Colleagues,1,,,2023-03-31 07:13:18
+5,Strangers,1,,,2023-03-31 07:13:18
+6,Romantic_partners,1,,,2023-03-31 07:13:18
+7,Authority_figures,1,,,2023-03-31 07:13:18
+8,Celebrities,1,,,2023-03-31 07:13:18
+9,Situations,,,,2023-03-31 07:13:18
+10,Work_stress,9,,,2023-03-31 07:13:18
+11,Social_events,9,,,2023-03-31 07:13:18
+12,Relationship_conflicts,9,,,2023-03-31 07:13:18
+13,Financial_problems,9,,,2023-03-31 07:13:18
+14,Health_issues,9,,,2023-03-31 07:13:18
+15,Celebrations,9,,,2023-03-31 07:13:18
+16,Losses,9,,,2023-03-31 07:13:18
+17,Achievements,9,,,2023-03-31 07:13:18
+18,Commuting,9,,,2023-03-31 07:13:18
+19,Unexpected_news,9,,,2023-03-31 07:13:18
+20,Time_pressure,9,,,2023-03-31 07:13:18
+21,Deadlines,9,,,2023-03-31 07:13:18
+22,Places,,,,2023-03-31 07:13:18
+23,Home,22,,,2023-03-31 07:13:18
+24,Workplace,22,,,2023-03-31 07:13:18
+25,School,22,,,2023-03-31 07:13:18
+26,Parks,22,,,2023-03-31 07:13:18
+27,Public_transportation,22,,,2023-03-31 07:13:18
+28,Restaurants,22,,,2023-03-31 07:13:18
+29,Gyms,22,,,2023-03-31 07:13:18
+30,Shopping_centers,22,,,2023-03-31 07:13:18
+31,Travel_destinations,22,,,2023-03-31 07:13:18
+32,Nature,22,,,2023-03-31 07:13:18
+33,Social_gatherings,22,,,2023-03-31 07:13:18
+34,Places_with_specific_memories,22,,,2023-03-31 07:13:18

@@ -16,13 +16,13 @@ class TriggerDao {
 
   def insert(trigger: Trigger)(implicit connection: Connection): Option[Long] = {
     SQL("INSERT INTO triggers (user_id, description) VALUES ({userId}, {description})")
-      .on("userId" -> trigger.userId, "description" -> trigger.description)
+      .on("userId" -> trigger.createdByUser, "description" -> trigger.description)
       .executeInsert()
   }
 
   def update(trigger: Trigger)(implicit connection: Connection): Int = {
     SQL("UPDATE triggers SET user_id = {userId}, description = {description} WHERE id = {id}")
-      .on("id" -> trigger.id, "userId" -> trigger.userId, "description" -> trigger.description)
+      .on("id" -> trigger.triggerId, "userId" -> trigger.createdByUser, "description" -> trigger.description)
       .executeUpdate()
   }
 

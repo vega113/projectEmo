@@ -31,7 +31,7 @@ class EmotionRecordWithRelationsController @Inject()(dbApi: DBApi, cc: Controlle
   
   def insert: Action[JsValue] = Action(parse.json) { request =>
     val emotionRecordWithRelations = request.body.as[EmotionRecordWithRelations]
-    database.withConnection { implicit connection =>
+    database.withTransaction { implicit connection =>
       val id = emotionRecordWithRelationsDao.insert(emotionRecordWithRelations)
       id.map(newId => Created(Json.obj("id" -> newId))).getOrElse(InternalServerError)
     }
@@ -39,14 +39,14 @@ class EmotionRecordWithRelationsController @Inject()(dbApi: DBApi, cc: Controlle
 
   def update(id: Int): Action[JsValue] = Action(parse.json) { request =>
     val emotionRecordWithRelations = request.body.as[EmotionRecordWithRelations]
-    database.withConnection { implicit connection =>
+    database.withTransaction { implicit connection =>
       val updatedRows = emotionRecordWithRelationsDao.update(emotionRecordWithRelations)
       if (updatedRows > 0) NoContent else NotFound
     }
   }
 
   def delete(id: Int): Action[AnyContent] = Action {
-    database.withConnection { implicit connection =>
+    database.withTransaction { implicit connection =>
       val deletedRows = emotionRecordWithRelationsDao.delete(id)
       if (deletedRows > 0) NoContent else NotFound
     }

@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 class ModelJsonSpec extends AnyFlatSpec with Matchers {
 
   "User" should "serialize and deserialize correctly" in {
-    val user = User(1, "testUser", "test@example.com", "password123")
+    val user = User(Option(1), "testUser", "test@example.com", "password123")
     val json = Json.toJson(user)
     val deserializedUser = json.as[User]
     deserializedUser shouldBe user
@@ -26,9 +26,9 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
   // Similar tests for other case classes
 
   "EmotionRecordWithRelations" should "serialize and deserialize correctly" in {
-    val emotionRecord = EmotionRecord(1, "1", "Joy", 5)
+    val emotionRecord = EmotionRecord(Option(1), 1, "Joy", 5)
     val subEmotions = List(SubEmotion("Amusement", "Amusement", "Joy"))
-    val triggers = List(Trigger(1, "Person", Some(1), Some(1), Some("Listening to music")))
+    val triggers = List(Trigger(Option(1), "Person", Some(1), Some(1), Some("Listening to music")))
 
     val emotionRecordWithRelations = EmotionRecordWithRelations(emotionRecord, subEmotions, triggers)
     val json = Json.toJson(emotionRecordWithRelations)
@@ -43,7 +43,7 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
         |{
         |  "emotionRecord": {
         |    "id": 1,
-        |    "userId": "1",
+        |    "userId": 1,
         |    "emotionId": "Joy",
         |    "intensity": 5
         |  },

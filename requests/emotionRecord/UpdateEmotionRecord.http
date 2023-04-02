@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "emotionRecord": {
     "id": 1,
-    "userId": "1",
+    "userId": 1,
     "emotionId": "Joy",
     "intensity": 5
   },
