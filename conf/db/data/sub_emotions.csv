@@ -1,4 +1,4 @@
-id,sub_emotion_name,emotion_id,created
+sub_emotion_id,sub_emotion_name,parent_emotion_id,created
 Abandonment,Abandonment,Sadness,2023-03-31 07:13:17
 Admiration,Admiration,Trust,2023-03-31 07:13:17
 Adoration,Adoration,Love,2023-03-31 07:13:17

@@ -32,7 +32,7 @@ class UserController @Inject()(cc: ControllerComponents, userDao: UserDao, dbExe
       json.validate[User].map { user =>
         dbExecutionContext.withConnection { implicit connection =>
           userDao.insert(user) match {
-            case Some(id) => Future.successful(Created(Json.toJson(user.copy(id = Option(id.toInt)))))
+            case Some(id) => Future.successful(Created(Json.toJson(user.copy(userId = Option(id.toInt)))))
             case None => Future.successful(InternalServerError("Failed to create user"))
           }
         }

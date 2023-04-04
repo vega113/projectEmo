@@ -49,8 +49,4 @@ class LiquibaseRunner @Inject()(env: Environment, config: Configuration, lifecyc
       }
     }
   }
-
-  lifecycle.addStopHook { () =>
-    Future.successful(runMigrations())
-  }
 }

@@ -6,7 +6,7 @@
 
     <changeSet id="create_emotions_table" author="Yuri Zelikov">
         <createTable tableName="emotions">
-            <column name="id" type="varchar(255)">
+            <column name="emotion_id" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="emotion_name" type="varchar(255)">
@@ -26,36 +26,39 @@
 
     <changeSet id="create_sub_emotions_table" author="Yuri Zelikov">
         <createTable tableName="sub_emotions">
-            <column name="id" type="varchar(255)">
+            <column name="sub_emotion_id" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="sub_emotion_name" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="emotion_id" type="varchar(255)"/>
+            <column name="parent_emotion_id" type="varchar(255)"/>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <createIndex indexName="fk_sub_emotions_emotion_id" tableName="sub_emotions">
-            <column name="emotion_id"/>
+            <column name="parent_emotion_id"/>
         </createIndex>
     </changeSet>
 
 
     <changeSet id="create_triggers_table" author="Yuri Zelikov">
         <createTable tableName="triggers">
-            <column name="trigger_id" type="int">
+            <column name="trigger_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="trigger_name" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="trigger_parent_id" type="int">
-                <constraints primaryKey="true" nullable="true"/>
+                <constraints nullable="true"/>
             </column>
             <column name="created_by_user" type="int">
-                <constraints primaryKey="true" nullable="true"/>
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="true"/>
             </column>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
@@ -68,7 +71,7 @@
 
     <changeSet id="create_suggested_actions_table" author="Yuri Zelikov">
         <createTable tableName="suggested_actions">
-            <column name="suggested_action_id" type="int">
+            <column name="suggested_action_id" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="suggested_action_name" type="varchar(255)">
@@ -86,7 +89,7 @@
 
     <changeSet id="create_tags_table" author="Yuri Zelikov">
         <createTable tableName="tags">
-            <column name="tag_id" type="int">
+            <column name="tag_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="tag_name" type="varchar(255)">
@@ -100,16 +103,28 @@
             <column name="tag_name"/>
         </createIndex>
     </changeSet>
-    <!-- create change sets for emotion_records, emotion_record_tags, notes, note_tags, triggers trigger_examples -->
+
     <changeSet id="create_users_table" author="Yuri Zelikov">
         <createTable tableName="users">
-            <column name="user_id" type="int">
+            <column name="user_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="username" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_name" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_name" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="is_password_hashed" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
@@ -119,165 +134,103 @@
         <createIndex indexName="users_username_idx" tableName="users">
             <column name="username"/>
         </createIndex>
+        <createIndex indexName="users_email_idx" tableName="users">
+            <column name="email"/>
+        </createIndex>
     </changeSet>
 
     <changeSet id="create_emotion_records_table" author="Yuri Zelikov">
         <createTable tableName="emotion_records">
-            <column name="id" type="int">
+            <column name="emotion_record_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="emotion_id" type="varchar(255)"/>
-            <column name="sub_emotion_id" type="varchar(255)"/>
-            <column name="user_id" type="int"/>
+            <column name="record_emotion_id" type="varchar(255)"/>
+            <column name="record_user_id" type="int"/>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <createIndex indexName="fk_emotion_records_emotion_id" tableName="emotion_records">
-            <column name="emotion_id"/>
-        </createIndex>
-        <createIndex indexName="fk_emotion_records_sub_emotion_id" tableName="emotion_records">
-            <column name="sub_emotion_id"/>
+            <column name="record_emotion_id"/>
         </createIndex>
         <createIndex indexName="fk_emotion_records_user_id" tableName="emotion_records">
-            <column name="user_id"/>
+            <column name="record_user_id"/>
         </createIndex>
     </changeSet>
 
     <changeSet id="create_emotion_record_tags_table" author="Yuri Zelikov">
         <createTable tableName="emotion_record_tags">
-            <column name="emotion_record_id" type="int"/>
-            <column name="tag_id" type="int"/>
+            <column name="parent_emotion_record_id" type="int"/>
+            <column name="parent_tag_id" type="int"/>
         </createTable>
         <createIndex indexName="fk_emotion_record_tags_emotion_record_id" tableName="emotion_record_tags">
-            <column name="emotion_record_id"/>
+            <column name="parent_emotion_record_id"/>
         </createIndex>
         <createIndex indexName="fk_emotion_record_tags_tag_id" tableName="emotion_record_tags">
-            <column name="tag_id"/>
+            <column name="parent_tag_id"/>
         </createIndex>
     </changeSet>
 
     <changeSet id="create_notes_table" author="Yuri Zelikov">
         <createTable tableName="notes">
-            <column name="id" type="int">
+            <column name="note_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="note_text" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="user_id" type="int"/>
+            <column name="note_user_id" type="int"/>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <createIndex indexName="fk_notes_user_id" tableName="notes">
-            <column name="user_id"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet id="create_note_tags_table" author="Yuri Zelikov">
-        <createTable tableName="note_tags">
-            <column name="note_id" type="int"/>
-            <column name="tag_id" type="int"/>
-        </createTable>
-        <createIndex indexName="fk_note_tags_note_id" tableName="note_tags">
-            <column name="note_id"/>
-        </createIndex>
-        <createIndex indexName="fk_note_tags_tag_id" tableName="note_tags">
-            <column name="tag_id"/>
+            <column name="note_user_id"/>
         </createIndex>
     </changeSet>
 
     <changeSet id="create_sub_emotion_suggested_actions_table" author="Yuri Zelikov">
         <createTable tableName="sub_emotion_suggested_actions">
-            <column name="id" type="int">
+            <column name="sub_emotion_suggested_id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="sub_emotion_id" type="varchar(255)"/>
-            <column name="suggested_action_id" type="int"/>
-            <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
+            <column name="parent_sub_emotion_id" type="varchar(255)"/>
+            <column name="parent_suggested_action_id" type="varchar(255)"/>
         </createTable>
         <createIndex indexName="fk_sub_emotion_suggested_actions_sub_emotion_id"
                      tableName="sub_emotion_suggested_actions">
-            <column name="sub_emotion_id"/>
+            <column name="parent_sub_emotion_id"/>
         </createIndex>
         <createIndex indexName="fk_sub_emotion_suggested_actions_suggested_action_id"
                      tableName="sub_emotion_suggested_actions">
-            <column name="suggested_action_id"/>
-        </createIndex>
-    </changeSet>
-
-
-    <changeSet id="create_trigger_examples_table" author="Yuri Zelikov">
-        <createTable tableName="trigger_examples">
-            <column name="id" type="int">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="trigger_id" type="int"/>
-            <column name="example_text" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <createIndex indexName="fk_trigger_examples_trigger_id" tableName="trigger_examples">
-            <column name="trigger_id"/>
+            <column name="parent_suggested_action_id"/>
         </createIndex>
     </changeSet>
 
     <changeSet id="create_emotion_record_sub_emotions_table" author="Yuri Zelikov">
         <createTable tableName="emotion_record_sub_emotions">
-            <column name="emotion_record_id" type="int"/>
-            <column name="sub_emotion_id" type="varchar(255)"/>
+            <column name="parent_emotion_record_id" type="int"/>
+            <column name="parent_sub_emotion_id" type="varchar(255)"/>
         </createTable>
         <createIndex indexName="fk_emotion_record_sub_emotions_emotion_record_id"
                      tableName="emotion_record_sub_emotions">
-            <column name="emotion_record_id"/>
+            <column name="parent_emotion_record_id"/>
         </createIndex>
         <createIndex indexName="fk_emotion_record_sub_emotions_sub_emotion_id" tableName="emotion_record_sub_emotions">
-            <column name="sub_emotion_id"/>
+            <column name="parent_sub_emotion_id"/>
         </createIndex>
     </changeSet>
 
     <changeSet id="create_emotion_record_triggers_table" author="Yuri Zelikov">
         <createTable tableName="emotion_record_triggers">
-            <column name="emotion_record_id" type="int"/>
-            <column name="trigger_id" type="int"/>
+            <column name="parent_emotion_record_id" type="int"/>
+            <column name="parent_trigger_id" type="int"/>
         </createTable>
         <createIndex indexName="fk_emotion_record_triggers_emotion_record_id" tableName="emotion_record_triggers">
-            <column name="emotion_record_id"/>
+            <column name="parent_emotion_record_id"/>
         </createIndex>
         <createIndex indexName="fk_emotion_record_triggers_trigger_id" tableName="emotion_record_triggers">
-            <column name="trigger_id"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet id="create_emotion_record_triggers_table" author="Yuri Zelikov">
-        <createTable tableName="emotion_record_triggers">
-            <column name="emotion_record_id" type="int"/>
-            <column name="trigger_id" type="int"/>
-        </createTable>
-        <createIndex indexName="fk_emotion_record_triggers_emotion_record_id" tableName="emotion_record_triggers">
-            <column name="emotion_record_id"/>
-        </createIndex>
-        <createIndex indexName="fk_emotion_record_triggers_trigger_id" tableName="emotion_record_triggers">
-            <column name="trigger_id"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet id="create_emotion_record_triggers_table" author="Yuri Zelikov">
-        <createTable tableName="emotion_record_triggers">
-            <column name="emotion_record_id" type="int"/>
-            <column name="trigger_id" type="int"/>
-        </createTable>
-        <createIndex indexName="fk_emotion_record_triggers_emotion_record_id" tableName="emotion_record_triggers">
-            <column name="emotion_record_id"/>
-        </createIndex>
-        <createIndex indexName="fk_emotion_record_triggers_trigger_id" tableName="emotion_record_triggers">
-            <column name="trigger_id"/>
+            <column name="parent_trigger_id"/>
         </createIndex>
     </changeSet>
 </databaseChangeLog>

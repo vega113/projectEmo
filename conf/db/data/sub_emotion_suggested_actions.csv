@@ -1,4 +1,4 @@
-sub_emotion_id,suggested_action_id
+parent_sub_emotion_id,parent_suggested_action_id
 Agitation,accept_your_emotions
 Astonishment,accept_your_emotions
 Calmness,accept_your_emotions

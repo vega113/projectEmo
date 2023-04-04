@@ -26,7 +26,7 @@ class EmotionController @Inject()(cc: ControllerComponents, emotionDao: EmotionD
     }
   }
 
-  def insertEmotion: Action[JsValue] = Action(parse.json).async { implicit request =>
+  def insertEmotion(): Action[JsValue] = Action(parse.json).async { implicit request =>
     dbExecutionContext.withConnection { implicit connection =>
       request.body.validate[Emotion].fold(
         errors => {

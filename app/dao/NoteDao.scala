@@ -13,16 +13,17 @@ class NoteDao @Inject() (dateTimeService: DateTimeService) {
   }
 
   def findById(id: Int)(implicit connection: Connection): Option[Note] = {
-    SQL("SELECT * FROM notes WHERE id = {id}").on("id" -> id).as(Note.parser.singleOpt)
+    SQL("SELECT * FROM notes WHERE noteId = {id}").on("id" -> id).as(Note.parser.singleOpt)
   }
 
   def insert(note: Note)(implicit connection: Connection): Option[Long] = {
     SQL("""
-      INSERT INTO notes (title, content, user_id)
-      VALUES ({title}, {content}, {userId})
+      INSERT INTO notes (title, note_text, note_user_id, created)
+      VALUES ({title}, {noteText}, {noteUserId}, {created})
     """).on("title" -> note.title,
-      "content" -> note.content,
-      "userId" -> note.userId)
+      "note_text" -> note.noteText,
+      "note_user_id" -> note.noteUserId,
+      "created" -> dateTimeService.now())
       .executeInsert()
   }
 
@@ -31,15 +32,15 @@ class NoteDao @Inject() (dateTimeService: DateTimeService) {
       UPDATE notes
       SET title = {title}, content = {content}, user_id = {userId}, last_updated = {lastUpdated}
       WHERE id = {id}
-    """).on("id" -> note.id,
+    """).on("note_id" -> note.noteId,
       "title" -> note.title,
-      "content" -> note.content,
-      "userId" -> note.userId,
-      "lastUpdated" -> dateTimeService.now())
+      "note_text" -> note.noteText,
+      "note_user_id" -> note.noteUserId,
+      "created" -> dateTimeService.now())
       .executeUpdate()
   }
 
   def delete(id: Int)(implicit connection: Connection): Int = {
-    SQL("DELETE FROM notes WHERE id = {id}").on("id" -> id).executeUpdate()
+    SQL("DELETE FROM notes WHERE note_id = {note_id}").on("note_id" -> id).executeUpdate()
   }
 }

@@ -1,4 +1,4 @@
-id,emotion_name,emotion_type,created
+emotion_id,emotion_name,emotion_type,created
 Anger,Anger,Negative,2023-03-31 07:13:17
 Apathy,Apathy,Negative,2023-03-31 07:13:17
 Disgust,Disgust,Negative,2023-03-31 07:13:17
