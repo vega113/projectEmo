@@ -4,6 +4,7 @@ ThisBuild / version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
+  .aggregate(systemTests)
   .settings(
     name := """projectEmo""",
     libraryDependencies ++= Seq(
@@ -11,6 +12,12 @@ lazy val root = (project in file("."))
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
     )
   )
+
+lazy val systemTests = (project in file("system-test"))
+  .settings(
+    // system-tests project settings here
+  )
+
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
 resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/"

@@ -7,19 +7,13 @@
 GET           /                                  controllers.HomeController.index()
 
 # EmotionRecordWithRelations routes
-GET           /emotionRecord                     controllers.EmotionRecordWithRelationsController.getAll()
-GET           /emotionRecord/:id                 controllers.EmotionRecordWithRelationsController.getById(id: Int)
-POST          /emotionRecord                     controllers.EmotionRecordWithRelationsController.insert()
-PUT           /emotionRecord/:id                 controllers.EmotionRecordWithRelationsController.update(id: Int)
-DELETE        /emotionRecord/:id                 controllers.EmotionRecordWithRelationsController.delete(id: Int)
-GET           /emotionRecord/user/:userId        controllers.EmotionRecordWithRelationsController.getAllByUserId(userId: Int)
+GET           /emotionRecord                     controllers.EmotionRecordController.findAll()
+GET           /emotionRecord/:id                 controllers.EmotionRecordController.findById(id: Int)
+POST          /emotionRecord                     controllers.EmotionRecordController.insert()
+PUT           /emotionRecord/:id                 controllers.EmotionRecordController.update(id: Int)
+DELETE        /emotionRecord/:id                 controllers.EmotionRecordController.delete(id: Int)
+GET           /emotionRecord/user/:userId        controllers.EmotionRecordController.findAllByUserId(userId: Int)
 
-# Emotion routes
-GET           /emotion                           controllers.EmotionController.getAllEmotions()
-GET           /emotion/:id                       controllers.EmotionController.getEmotionById(id: String)
-POST          /emotion                           controllers.EmotionController.insertEmotion()
-PUT           /emotion/:id                       controllers.EmotionController.updateEmotion(id: String)
-DELETE        /emotion/:id                       controllers.EmotionController.deleteEmotion(id: String)
 
 # User routes
 GET           /user                              controllers.UserController.getAllUsers()

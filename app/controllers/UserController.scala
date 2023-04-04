@@ -29,15 +29,15 @@ class UserController @Inject()(cc: ControllerComponents, userDao: UserDao, dbExe
 
   def createUser: Action[AnyContent] = Action.async { implicit request =>
     request.body.asJson.map { json =>
-      json.validate[User].map { user =>
-        dbExecutionContext.withConnection { implicit connection =>
+      json.validate[User] match {
+        case JsSuccess(user, _) => dbExecutionContext.withConnection { implicit connection =>
           userDao.insert(user) match {
             case Some(id) => Future.successful(Created(Json.toJson(user.copy(userId = Option(id.toInt)))))
             case None => Future.successful(InternalServerError("Failed to create user"))
           }
         }
-      }.recoverTotal { e =>
-        Future.successful(BadRequest("Invalid user format"))
+        case JsError(errors) =>
+          Future.failed(new IllegalArgumentException("Invalid user format: " + errors.mkString(", ")))
       }
     }.getOrElse {
       Future.successful(BadRequest("Expecting application/json request body"))
@@ -46,15 +46,14 @@ class UserController @Inject()(cc: ControllerComponents, userDao: UserDao, dbExe
 
   def updateUser(id: Int): Action[AnyContent] = Action.async { implicit request =>
     request.body.asJson.map { json =>
-      json.validate[User].map { user =>
-        dbExecutionContext.withConnection { implicit connection =>
+      json.validate[User] match {
+        case JsSuccess(user, _) => dbExecutionContext.withConnection { implicit connection =>
           userDao.update(user) match {
             case 1 => Future.successful(Ok(Json.toJson(user)))
             case _ => Future.successful(NotFound(s"User with id $id not found"))
           }
         }
-      }.recoverTotal { e =>
-        Future.successful(BadRequest("Invalid user format"))
+        case JsError(errors) => Future.failed(new IllegalArgumentException("Invalid user format: " + errors.mkString(", ")))
       }
     }.getOrElse {
       Future.successful(BadRequest("Expecting application/json request body"))

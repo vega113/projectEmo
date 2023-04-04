@@ -18,6 +18,11 @@ class EmotionRecordDao {
       as(EmotionRecord.parser.singleOpt)
   }
 
+  def findAllByUserId(userId: Int)(implicit connection: Connection): List[EmotionRecord] = {
+    SQL("SELECT * FROM emotion_records WHERE user_id = {userId}").on("userId" -> userId).
+      as(EmotionRecord.parser.*)
+  }
+
   def insert(emotionRecord: EmotionRecord)(implicit connection: Connection): Option[Long] = {
     SQL("""
       INSERT INTO emotion_records (user_id, emotion_id, intensity)

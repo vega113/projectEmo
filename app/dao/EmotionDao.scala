@@ -18,9 +18,9 @@ class EmotionDao {
         VALUES ({id}, {emotionName}, {emotionType})
       """
     ).on(
-      Symbol("id") -> emotion.id,
-      Symbol("emotionName") -> emotion.emotionName,
-      Symbol("emotionType") -> emotion.emotionType,
+      "id" -> emotion.id,
+      "emotionName" -> emotion.emotionName,
+      "emotionType" -> emotion.emotionType,
     ).executeInsert()
   }
 
@@ -33,9 +33,9 @@ class EmotionDao {
         WHERE id = {id}
       """
     ).on(
-      Symbol("id") -> emotion.id,
-      Symbol("emotionName") -> emotion.emotionName,
-      Symbol("emotionType") -> emotion.emotionType,
+      "id" -> emotion.id,
+      "emotionName" -> emotion.emotionName,
+      "emotionType" -> emotion.emotionType,
     ).executeUpdate()
   }
 

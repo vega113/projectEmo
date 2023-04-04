@@ -25,7 +25,7 @@ object model {
   case class SubEmotion(
                          subEmotionId: Option[String],
                          subEmotionName: String,
-                         parentEmotionId: Option[String]
+                         parentEmotionId: String
                        )
 
   case class EmotionRecord(
@@ -33,6 +33,8 @@ object model {
                             userId: Int,
                             emotionId: String,
                             intensity: Int,
+                            subEmotions: List[SubEmotion],
+                            triggers: List[Trigger],
                             created: LocalDateTime
                           )
 
@@ -63,10 +65,6 @@ object model {
 
   case class NoteTag(noteId: Int, tagId: Int)
 
-  case class EmotionRecordWithRelations(
-                                         emotionRecord: EmotionRecord,
-                                         subEmotions: List[SubEmotion]
-                                       )
 
   object User {
     implicit val userFormat: Format[User] = Json.format[User]
@@ -105,7 +103,7 @@ object model {
     implicit val parser: RowParser[SubEmotion] = {
       get[Option[String]]("sub_emotion_id") ~
         str("sub_emotion_name") ~
-        get[Option[String]]("parent_emotion_id") map {
+        str("parent_emotion_id") map {
         case subEmotionId ~ subEmotionName ~ parentEmotionId =>
           SubEmotion(subEmotionId, subEmotionName, parentEmotionId)
       }
@@ -116,13 +114,13 @@ object model {
     implicit val emotionRecordFormat: Format[EmotionRecord] = Json.format[EmotionRecord]
 
     implicit val parser: RowParser[EmotionRecord] = {
-      get[Option[Int]]("id") ~
+      get[Option[Int]]("emotion_record_id") ~
         int("user_id") ~
         str("emotion_id") ~
         int("intensity") ~
         get[LocalDateTime]("created") map {
         case id ~ userId ~ emotionId ~ intensity ~ created =>
-          EmotionRecord(id, userId, emotionId, intensity, created)
+          EmotionRecord(id, userId, emotionId, intensity, List(), List(), created)
       }
     }
 
@@ -168,21 +166,6 @@ object Note {
         get[LocalDateTime]("created") map {
         case noteId ~ title ~ noteText ~ noteUserId ~ created =>
           Note(noteId, title, noteText, noteUserId, created)
-      }
-    }
-  }
-
-  object EmotionRecordWithRelations {
-    implicit val emotionRecordWithRelationsFormat: Format[EmotionRecordWithRelations] = Json.format[EmotionRecordWithRelations]
-
-    val parser: RowParser[EmotionRecordWithRelations] = {
-      EmotionRecord.parser ~
-        get[Option[String]]("sub_emotion_id") ~
-        str("sub_emotion_name") ~
-        get[Option[String]]("parent_emotion_id") map {
-        case emotionRecord ~ subEmotionId ~ subEmotionName ~ parentEmotionId =>
-          val subEmotion = SubEmotion(subEmotionId, subEmotionName, parentEmotionId)
-          EmotionRecordWithRelations(emotionRecord, List(subEmotion))
       }
     }
   }
