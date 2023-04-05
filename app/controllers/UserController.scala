@@ -1,40 +1,43 @@
 package controllers
 
-import dao.{DatabaseExecutionContext, UserDao}
+import dao.{DatabaseExecutionContext, UserDaoImpl}
 import dao.model.User
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 
 import javax.inject.Inject
 import scala.concurrent.Future
-import play.api.libs.json._
+import play.api.libs.json.{Json, _}
+import service.UserService
 
-class UserController @Inject()(cc: ControllerComponents, userDao: UserDao, dbExecutionContext: DatabaseExecutionContext)
+import scala.concurrent.ExecutionContext.Implicits.global
+
+class UserController @Inject()(cc: ControllerComponents, userService: UserService)
   extends AbstractController(cc) {
 
-  def getAllUsers: Action[AnyContent] = Action.async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      val users = userDao.findAll()
-      Future.successful(Ok(Json.toJson(users)))
+  def findAllUsers: Action[AnyContent] = Action.async { implicit request =>
+    userService.findAll().map(users => Ok(Json.toJson(users)))
+  }
+
+  def findUser(id: Int): Action[AnyContent] = Action.async { implicit request =>
+    userService.findById(id).map {
+      case Some(user) => Ok(Json.toJson(user))
+      case None => NotFound(s"User with id $id not found")
     }
   }
 
-  def getUser(id: Int): Action[AnyContent] = Action.async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      userDao.findById(id) match {
-        case Some(user) => Future.successful(Ok(Json.toJson(user)))
-        case None => Future.successful(NotFound(s"User with id $id not found"))
-      }
+  def findUserByUsername(username: String): Action[AnyContent] = Action.async { implicit request =>
+    userService.findByUsername(username).map {
+      case Some(user) => Ok(Json.toJson(user))
+      case None => NotFound(s"User with username $username not found")
     }
   }
 
   def createUser: Action[AnyContent] = Action.async { implicit request =>
     request.body.asJson.map { json =>
       json.validate[User] match {
-        case JsSuccess(user, _) => dbExecutionContext.withConnection { implicit connection =>
-          userDao.insert(user) match {
-            case Some(id) => Future.successful(Created(Json.toJson(user.copy(userId = Option(id.toInt)))))
-            case None => Future.successful(InternalServerError("Failed to create user"))
-          }
+        case JsSuccess(user, _) => userService.insert(user).map {
+          case Some(id) => Created(Json.toJson(user.copy(userId = Some(id.toInt))))
+          case None => InternalServerError("Failed to create user")
         }
         case JsError(errors) =>
           Future.failed(new IllegalArgumentException("Invalid user format: " + errors.mkString(", ")))
@@ -47,11 +50,9 @@ class UserController @Inject()(cc: ControllerComponents, userDao: UserDao, dbExe
   def updateUser(id: Int): Action[AnyContent] = Action.async { implicit request =>
     request.body.asJson.map { json =>
       json.validate[User] match {
-        case JsSuccess(user, _) => dbExecutionContext.withConnection { implicit connection =>
-          userDao.update(user) match {
-            case 1 => Future.successful(Ok(Json.toJson(user)))
-            case _ => Future.successful(NotFound(s"User with id $id not found"))
-          }
+        case JsSuccess(user, _) => userService.update(user).map {
+          case 1 => Ok(Json.toJson(user))
+          case _ => NotFound(s"User with id $id not found")
         }
         case JsError(errors) => Future.failed(new IllegalArgumentException("Invalid user format: " + errors.mkString(", ")))
       }
@@ -61,11 +62,9 @@ class UserController @Inject()(cc: ControllerComponents, userDao: UserDao, dbExe
   }
 
   def deleteUser(id: Int): Action[AnyContent] = Action.async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      userDao.delete(id) match {
-        case 1 => Future.successful(Ok(s"User with id $id deleted"))
-        case _ => Future.successful(NotFound(s"User with id $id not found"))
-      }
+    userService.delete(id).map {
+      case 1 => Ok(s"User with id $id deleted")
+      case _ => NotFound(s"User with id $id not found")
     }
   }
 }

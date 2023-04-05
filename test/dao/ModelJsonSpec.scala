@@ -10,13 +10,33 @@ import java.time.LocalDateTime
 class ModelJsonSpec extends AnyFlatSpec with Matchers {
 
   "User" should "serialize and deserialize correctly" in {
-    val user = User(Option(1), "testUser", "password123", Option("John"), Option("Doe"), "test@example.com", false, LocalDateTime.now())
-
-
-
+    val user = User(None, "example_user2", "password123", Option("John"), Option("Doe"), "test@example.com", isPasswordHashed = false, None)
     val json = Json.toJson(user)
     val deserializedUser = json.as[User]
     deserializedUser shouldBe user
+  }
+
+  it should "deserialize correctly existing json string" in {
+    val jsonStr =
+      """
+        |{
+        |  "username": "example_user2",
+        |  "password": "secure_password",
+        |  "firstName": "John",
+        |  "lastName": "Doe",
+        |  "email": "example2@email.com",
+        |  "isPasswordHashed": false
+        |}
+        |""".stripMargin
+        val json = Json.parse(jsonStr)
+    val deserializedUser = json.as[User]
+
+    deserializedUser.username shouldBe "example_user2"
+    deserializedUser.email shouldBe "example2@email.com"
+    deserializedUser.password shouldBe "secure_password"
+    deserializedUser.firstName shouldBe Option("John")
+    deserializedUser.lastName shouldBe Option("Doe")
+    deserializedUser.isPasswordHashed shouldBe false
   }
 
   "Emotion" should "serialize and deserialize correctly" in {
@@ -30,14 +50,13 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
 
   "EmotionRecord" should "serialize and deserialize correctly" in {
     val subEmotions = List(SubEmotion(Option("Amusement"), "Amusement", "Joy"))
-    val triggers = List(Trigger(Option(1), "Person", Some(1), Some(1), Some("Listening to music"), LocalDateTime.now()))
-    val emotionRecord = EmotionRecord(Option(1), 1, "Joy", 5, subEmotions, triggers, LocalDateTime.now())
+    val triggers = List(Trigger(Option(1), "Person", Some(1), Some(1), Some("Listening to music")))
+    val emotionRecord = EmotionRecord(Option(1), 1, "Joy", 5, subEmotions, triggers)
 
-    val emotionRecordWithRelations = EmotionRecord(Option(1), 1, "Joy", 5, subEmotions, triggers, LocalDateTime.now())
-    val json = Json.toJson(emotionRecordWithRelations)
+    val json = Json.toJson(emotionRecord)
     println("emotionRecordWithRelations:" + json.toString())
     val deserializedEmotionRecord = json.as[EmotionRecord]
-    deserializedEmotionRecord shouldBe emotionRecordWithRelations
+    deserializedEmotionRecord shouldBe emotionRecord
   }
 
   it should "deserialize correctly existing json" in {
@@ -48,12 +67,16 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
         |    "id": 1,
         |    "userId": 1,
         |    "emotionId": "Joy",
-        |    "intensity": 5
-        |  },
-        |  "subEmotions": [
+        |    "intensity": 5,
+        |    "subEmotions": [
         |    {
         |      "id": "Amusement",
         |      "subEmotionName": "Amusement",
+        |      "emotionId": "Joy"
+        |    },
+        |    {
+        |      "id": "Amusement",
+        |      "subEmotionName": "Charm",
         |      "emotionId": "Joy"
         |    }
         |  ],
@@ -66,11 +89,12 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
         |      "description": "Listening to music"
         |    }
         |  ]
+        |  }
         |}
         |""".stripMargin)
 
     val deserializedEmotionRecord = json.as[EmotionRecord]
-    deserializedEmotionRecord shouldNot(be(null))
+    deserializedEmotionRecord shouldNot be(null)
   }
 }
 

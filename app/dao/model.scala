@@ -17,7 +17,7 @@ object model {
                    lastName: Option[String],
                    email: String,
                    isPasswordHashed: Boolean,
-                   created: LocalDateTime
+                   created: Option[LocalDateTime] = None
                  )
 
   case class Emotion(id: String, emotionName: String, emotionType: String)
@@ -35,7 +35,7 @@ object model {
                             intensity: Int,
                             subEmotions: List[SubEmotion],
                             triggers: List[Trigger],
-                            created: LocalDateTime
+                            created: Option[LocalDateTime] = None
                           )
 
   case class Trigger(
@@ -44,7 +44,7 @@ object model {
                       parentId: Option[Int],
                       createdByUser: Option[Int],
                       description: Option[String],
-                      created: LocalDateTime
+                      created: Option[LocalDateTime] = None
                     )
 
   case class Note(
@@ -52,13 +52,13 @@ object model {
                    title: Option[String],
                    noteText: String,
                    noteUserId: Int,
-                   created: LocalDateTime
+                   created: Option[LocalDateTime] = None
                  )
 
   case class Tag(
                   tagId: Option[Int],
                   tagName: String,
-                  created: LocalDateTime
+                  created: Option[LocalDateTime] = None
                 )
 
   case class EmotionRecordTag(emotionRecordId: Int, tagId: Int)
@@ -77,7 +77,7 @@ object model {
         get[Option[String]]("last_name") ~
         str("email") ~
         bool("is_password_hashed") ~
-        get[LocalDateTime]("created") map {
+        get[Option[LocalDateTime]]("created") map {
         case userId ~ username ~ password ~ firstName ~ lastName ~ email ~ isPasswordHashed ~ created =>
           User(userId, username, password, firstName, lastName, email, isPasswordHashed, created)
       }
@@ -118,7 +118,7 @@ object model {
         int("user_id") ~
         str("emotion_id") ~
         int("intensity") ~
-        get[LocalDateTime]("created") map {
+        get[Option[LocalDateTime]]("created") map {
         case id ~ userId ~ emotionId ~ intensity ~ created =>
           EmotionRecord(id, userId, emotionId, intensity, List(), List(), created)
       }
@@ -135,7 +135,7 @@ object model {
         get[Option[Int]]("parent_id") ~
         get[Option[Int]]("created_by_user") ~
         get[Option[String]]("description") ~
-        get[LocalDateTime]("created") map {
+        get[Option[LocalDateTime]]("created")map {
         case triggerId ~ triggerName ~ parentId ~ createdByUser ~ description ~ created =>
           Trigger(triggerId, triggerName, parentId, createdByUser, description, created)
       }
@@ -148,7 +148,7 @@ object model {
     implicit val parser: RowParser[Tag] = {
       get[Option[Int]]("tag_id") ~
         str("tag_name") ~
-        get[LocalDateTime]("created") map {
+        get[Option[LocalDateTime]]("created") map {
         case tagId ~ tagName ~ created =>
           Tag(tagId, tagName, created)
       }
@@ -163,7 +163,7 @@ object Note {
         get[Option[String]]("title") ~
         str("note_text") ~
         int("note_user_id") ~
-        get[LocalDateTime]("created") map {
+        get[Option[LocalDateTime]]("created") map {
         case noteId ~ title ~ noteText ~ noteUserId ~ created =>
           Note(noteId, title, noteText, noteUserId, created)
       }

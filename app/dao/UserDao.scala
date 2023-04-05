@@ -1,13 +1,25 @@
 package dao
 
 import anorm._
+import com.google.inject.ImplementedBy
 import dao.model.User
 import dao.model.User._
 
 import java.sql.Connection
 import javax.inject.Inject
 
-class UserDao @Inject()() {
+@ImplementedBy(classOf[UserDaoImpl])
+trait UserDao {
+  def findByUsername(username: String)(implicit conn: Connection): Option[User]
+  def findById(userId: Int)(implicit conn: Connection): Option[User]
+  def findByEmail(email: String)(implicit conn: Connection): Option[User]
+  def findAll()(implicit conn: Connection): List[User]
+  def insert(user: User)(implicit conn: Connection): Option[Long]
+  def update(user: User)(implicit conn: Connection): Int
+  def delete(userId: Int)(implicit conn: Connection): Int
+}
+
+class UserDaoImpl @Inject()() extends UserDao {
 
   def findByUsername(username: String)(implicit conn: Connection): Option[User] = {
     SQL("SELECT * FROM users WHERE username = {username}")
@@ -66,3 +78,4 @@ class UserDao @Inject()() {
       .executeUpdate()
   }
 }
+
