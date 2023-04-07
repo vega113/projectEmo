@@ -49,8 +49,8 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
   // Similar tests for other case classes
 
   "EmotionRecord" should "serialize and deserialize correctly" in {
-    val subEmotions = List(SubEmotion(Option("Amusement"), "Amusement", Option("Joy")))
-    val triggers = List(Trigger(Option(1), "Person", Some(1), Some(1), Some("Listening to music")))
+    val subEmotions = List(SubEmotion(Option("Amusement"), Option("Amusement"), Option("Joy")))
+    val triggers = List(Trigger(Option(1), Some("Person"), Some(1), Some(1), Some("Listening to music")))
     val emotionRecord = EmotionRecord(Option(1), 1, "Joy", 5, subEmotions, triggers)
 
     val json = Json.toJson(emotionRecord)
@@ -96,15 +96,15 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
     deserializedEmotionRecord.subEmotions shouldNot be(null)
     deserializedEmotionRecord.subEmotions.size shouldBe 2
     deserializedEmotionRecord.subEmotions.head.subEmotionId shouldBe Option("Amusement")
-    deserializedEmotionRecord.subEmotions.head.subEmotionName shouldBe "Amusement"
+    deserializedEmotionRecord.subEmotions.head.subEmotionName shouldBe Option("Amusement")
     deserializedEmotionRecord.subEmotions.head.parentEmotionId shouldBe Option("Joy")
     deserializedEmotionRecord.subEmotions(1).subEmotionId shouldBe Option("Charm")
-    deserializedEmotionRecord.subEmotions(1).subEmotionName shouldBe "Charm"
+    deserializedEmotionRecord.subEmotions(1).subEmotionName shouldBe Option("Charm")
     deserializedEmotionRecord.subEmotions(1).parentEmotionId shouldBe Option("Joy")
     deserializedEmotionRecord.triggers shouldNot be(null)
     deserializedEmotionRecord.triggers.size shouldBe 1
     deserializedEmotionRecord.triggers.head.triggerId shouldBe Option(1)
-    deserializedEmotionRecord.triggers.head.triggerName shouldBe "Person"
+    deserializedEmotionRecord.triggers.head.triggerName shouldBe Option("Person")
     deserializedEmotionRecord.triggers.head.parentId shouldBe Option(1)
     deserializedEmotionRecord.triggers.head.createdByUser shouldBe Option(1)
     deserializedEmotionRecord.triggers.head.description shouldBe Option("Listening to music")
