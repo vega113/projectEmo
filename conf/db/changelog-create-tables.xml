@@ -141,20 +141,21 @@
 
     <changeSet id="create_emotion_records_table" author="Yuri Zelikov">
         <createTable tableName="emotion_records">
-            <column name="emotion_record_id" type="int" autoIncrement="true">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="record_emotion_id" type="varchar(255)"/>
-            <column name="record_user_id" type="int"/>
+            <column name="emotion_id" type="varchar(255)"/>
+            <column name="user_id" type="int"/>
+            <column name="intensity" type="int"/>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <createIndex indexName="fk_emotion_records_emotion_id" tableName="emotion_records">
-            <column name="record_emotion_id"/>
+            <column name="emotion_id"/>
         </createIndex>
         <createIndex indexName="fk_emotion_records_user_id" tableName="emotion_records">
-            <column name="record_user_id"/>
+            <column name="user_id"/>
         </createIndex>
     </changeSet>
 

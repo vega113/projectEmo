@@ -3,25 +3,20 @@ POST http://localhost:9000/emotionRecord
 Content-Type: application/json
 
 {
-  "emotionRecord": {
-    "userId": 4,
-    "emotionId": "Joy",
-    "intensity": 5
-  },
+  "userId": 1,
+  "emotionId": "Joy",
+  "intensity": 7,
   "subEmotions": [
     {
-      "id": "Amusement",
-      "subEmotionName": "Amusement",
-      "emotionId": "Joy"
+      "subEmotionId": "Amusement"
+    },
+    {
+      "subEmotionId": "Charm"
     }
   ],
   "triggers": [
     {
-      "id": 1,
-      "triggerName": "Person",
-      "parentId": 1,
-      "userId": 1,
-      "description": "Listening to music"
+      "triggerId": 1
     }
   ]
 }

@@ -44,6 +44,6 @@ class EmotionDao {
   }
 
   def findById(id: String)(implicit connection: Connection): Option[Emotion] = {
-    SQL("SELECT * FROM emotions WHERE id = {id}").on(Symbol("id") -> id).as(Emotion.parser.singleOpt)
+    SQL("SELECT * FROM emotions WHERE id = {id}").on("id" -> id).as(Emotion.parser.singleOpt)
   }
 }

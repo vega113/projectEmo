@@ -1,10 +1,11 @@
 package dao
 
 import java.time.LocalDateTime
-
 import anorm._
 import anorm.SqlParser._
 import play.api.libs.json.{Format, Json}
+
+import scala.annotation.unused
 import scala.language.postfixOps
 
 object model {
@@ -24,12 +25,12 @@ object model {
 
   case class SubEmotion(
                          subEmotionId: Option[String],
-                         subEmotionName: String,
-                         parentEmotionId: String
+                         subEmotionName: Option[String],
+                         parentEmotionId: Option[String]
                        )
 
   case class EmotionRecord(
-                            id: Option[Int],
+                            id: Option[Long],
                             userId: Int,
                             emotionId: String,
                             intensity: Int,
@@ -40,7 +41,7 @@ object model {
 
   case class Trigger(
                       triggerId: Option[Int],
-                      triggerName: String,
+                      triggerName: Option[String],
                       parentId: Option[Int],
                       createdByUser: Option[Int],
                       description: Option[String],
@@ -61,8 +62,9 @@ object model {
                   created: Option[LocalDateTime] = None
                 )
 
+  @unused
   case class EmotionRecordTag(emotionRecordId: Int, tagId: Int)
-
+  @unused
   case class NoteTag(noteId: Int, tagId: Int)
 
 
@@ -102,8 +104,8 @@ object model {
 
     implicit val parser: RowParser[SubEmotion] = {
       get[Option[String]]("sub_emotion_id") ~
-        str("sub_emotion_name") ~
-        str("parent_emotion_id") map {
+        get[Option[String]]("sub_emotion_name") ~
+        get[Option[String]]("parent_emotion_id") map {
         case subEmotionId ~ subEmotionName ~ parentEmotionId =>
           SubEmotion(subEmotionId, subEmotionName, parentEmotionId)
       }
@@ -114,7 +116,7 @@ object model {
     implicit val emotionRecordFormat: Format[EmotionRecord] = Json.format[EmotionRecord]
 
     implicit val parser: RowParser[EmotionRecord] = {
-      get[Option[Int]]("emotion_record_id") ~
+      get[Option[Long]]("id") ~
         int("user_id") ~
         str("emotion_id") ~
         int("intensity") ~
@@ -123,7 +125,6 @@ object model {
           EmotionRecord(id, userId, emotionId, intensity, List(), List(), created)
       }
     }
-
   }
 
   object Trigger {
@@ -131,7 +132,7 @@ object model {
 
     implicit val parser: RowParser[Trigger] = {
       get[Option[Int]]("trigger_id") ~
-        str("trigger_name") ~
+        get[Option[String]]("trigger_name") ~
         get[Option[Int]]("parent_id") ~
         get[Option[Int]]("created_by_user") ~
         get[Option[String]]("description") ~
@@ -142,6 +143,7 @@ object model {
     }
   }
 
+  @unused
   object Tag {
     implicit val tagFormat: Format[Tag] = Json.format[Tag]
 

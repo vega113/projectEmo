@@ -50,7 +50,7 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
   def updateUser(id: Int): Action[AnyContent] = Action.async { implicit request =>
     request.body.asJson.map { json =>
       json.validate[User] match {
-        case JsSuccess(user, _) => userService.update(user).map {
+        case JsSuccess(user, _) => userService.update(user.copy(userId = Option(id))).map {
           case 1 => Ok(Json.toJson(user))
           case _ => NotFound(s"User with id $id not found")
         }

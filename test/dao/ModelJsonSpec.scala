@@ -49,7 +49,7 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
   // Similar tests for other case classes
 
   "EmotionRecord" should "serialize and deserialize correctly" in {
-    val subEmotions = List(SubEmotion(Option("Amusement"), "Amusement", "Joy"))
+    val subEmotions = List(SubEmotion(Option("Amusement"), "Amusement", Option("Joy")))
     val triggers = List(Trigger(Option(1), "Person", Some(1), Some(1), Some("Listening to music")))
     val emotionRecord = EmotionRecord(Option(1), 1, "Joy", 5, subEmotions, triggers)
 
@@ -63,38 +63,51 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
     val json = Json.parse(
       """
         |{
-        |  "emotionRecord": {
-        |    "id": 1,
-        |    "userId": 1,
-        |    "emotionId": "Joy",
-        |    "intensity": 5,
-        |    "subEmotions": [
+        |  "id": 1,
+        |  "userId": 1,
+        |  "emotionId": "Joy",
+        |  "intensity": 5,
+        |  "subEmotions": [
         |    {
-        |      "id": "Amusement",
+        |      "subEmotionId": "Amusement",
         |      "subEmotionName": "Amusement",
-        |      "emotionId": "Joy"
+        |      "parentEmotionId": "Joy"
         |    },
         |    {
-        |      "id": "Amusement",
+        |      "subEmotionId": "Charm",
         |      "subEmotionName": "Charm",
-        |      "emotionId": "Joy"
+        |      "parentEmotionId": "Joy"
         |    }
         |  ],
         |  "triggers": [
         |    {
-        |      "id": 1,
+        |      "triggerId": 1,
         |      "triggerName": "Person",
         |      "parentId": 1,
-        |      "userId": 1,
+        |      "createdByUser": 1,
         |      "description": "Listening to music"
         |    }
         |  ]
-        |  }
-        |}
-        |""".stripMargin)
-
+        |}""".stripMargin)
+    println("json:" + json.toString())
     val deserializedEmotionRecord = json.as[EmotionRecord]
+    println("deserializedEmotionRecord:" + deserializedEmotionRecord.toString)
     deserializedEmotionRecord shouldNot be(null)
+    deserializedEmotionRecord.subEmotions shouldNot be(null)
+    deserializedEmotionRecord.subEmotions.size shouldBe 2
+    deserializedEmotionRecord.subEmotions.head.subEmotionId shouldBe Option("Amusement")
+    deserializedEmotionRecord.subEmotions.head.subEmotionName shouldBe "Amusement"
+    deserializedEmotionRecord.subEmotions.head.parentEmotionId shouldBe Option("Joy")
+    deserializedEmotionRecord.subEmotions(1).subEmotionId shouldBe Option("Charm")
+    deserializedEmotionRecord.subEmotions(1).subEmotionName shouldBe "Charm"
+    deserializedEmotionRecord.subEmotions(1).parentEmotionId shouldBe Option("Joy")
+    deserializedEmotionRecord.triggers shouldNot be(null)
+    deserializedEmotionRecord.triggers.size shouldBe 1
+    deserializedEmotionRecord.triggers.head.triggerId shouldBe Option(1)
+    deserializedEmotionRecord.triggers.head.triggerName shouldBe "Person"
+    deserializedEmotionRecord.triggers.head.parentId shouldBe Option(1)
+    deserializedEmotionRecord.triggers.head.createdByUser shouldBe Option(1)
+    deserializedEmotionRecord.triggers.head.description shouldBe Option("Listening to music")
   }
 }
 
