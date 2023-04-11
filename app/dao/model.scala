@@ -136,7 +136,7 @@ object model {
     implicit val parser: RowParser[Trigger] = {
       get[Option[Int]]("trigger_id") ~
         get[Option[String]]("trigger_name") ~
-        get[Option[Int]]("parent_id") ~
+        get[Option[Int]]("trigger_parent_id") ~
         get[Option[Int]]("created_by_user") ~
         get[Option[String]]("description") ~
         get[Option[LocalDateTime]]("created")map {

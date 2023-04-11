@@ -1,7 +1,7 @@
 package controllers
 
 import dao._
-import dao.model.{Emotion, EmotionRecord}
+import dao.model.EmotionRecord
 import play.api.libs.json._
 import play.api.mvc._
 

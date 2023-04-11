@@ -1,6 +1,5 @@
 package controllers
 
-import play.api.mvc.Flash
 import auth.JwtService
 import auth.model.LoginData
 import play.api.libs.json.Json
@@ -11,6 +10,7 @@ import javax.inject._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class LoginController @Inject() (
                                   userService: UserService,
                                   cc: ControllerComponents,

@@ -1,7 +1,7 @@
 @(title: String)(implicit request: RequestHeader)
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>@title</title>
     </head>
@@ -11,9 +11,13 @@
             <div class="alert alert-danger">@errorMessage</div>
         }
         <form method="POST" action="@routes.LoginController.login()">
-            <input type="text" name="username" placeholder="Username" required>
+            <label>
+                <input type="text" name="username" placeholder="Username" required>
+            </label>
             <br>
-            <input type="password" name="password" placeholder="Password" required>
+            <label>
+                <input type="password" name="password" placeholder="Password" required>
+            </label>
             <br>
             <button type="submit">Login</button>
         </form>

@@ -4,13 +4,14 @@ import dao.{DatabaseExecutionContext, UserDaoImpl}
 import dao.model.User
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 import play.api.libs.json.{Json, _}
 import service.UserService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
+@Singleton
 class UserController @Inject()(cc: ControllerComponents, userService: UserService)
   extends AbstractController(cc) {
 
