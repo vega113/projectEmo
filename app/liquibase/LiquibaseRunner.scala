@@ -1,33 +1,26 @@
 package liquibase
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-import javax.inject.Inject
-import play.api.{Configuration, Environment}
-import play.api.inject.ApplicationLifecycle
-import liquibase.{Contexts, Liquibase}
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.FileSystemResourceAccessor
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
+import play.api.{Configuration, Environment}
 
-import scala.concurrent.Future
+import javax.inject.Inject
 
-class LiquibaseRunner @Inject()(env: Environment, config: Configuration, lifecycle: ApplicationLifecycle) {
+class LiquibaseRunner @Inject()(env: Environment, config: Configuration) {
 
-  private val logger: Logger = LoggerFactory.getLogger("LiquibaseRunner")
+  private val logger: Logger = LoggerFactory.getLogger(classOf[LiquibaseRunner])
 
   runMigrations()
 
-  def runMigrations(): Unit = {
+  private def runMigrations(): Unit = {
     val dbConf = config.get[Configuration]("db.default")
     val liquibaseConf = config.get[Configuration]("liquibase")
 
     val url = dbConf.get[String]("url")
     val username = dbConf.get[String]("username")
     val password = dbConf.get[String]("password")
-    val driver = dbConf.get[String]("driver")
 
     val changeLogFile = liquibaseConf.get[String]("changeLogFile")
 

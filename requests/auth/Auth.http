@@ -1,0 +1,8 @@
+### Login User
+POST http://localhost:9000/login
+Content-Type: application/json
+
+{
+  "username": "example_user3",
+  "password": "secure_password"
+}

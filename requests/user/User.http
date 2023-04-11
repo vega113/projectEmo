@@ -3,9 +3,9 @@ POST http://localhost:9000/user
 Content-Type: application/json
 
 {
-  "username": "example_user3",
-  "email": "example3@email.com",
-  "password": "secure_password",
+  "username": "FiftyoneAdminUser1",
+  "email": "FiftyoneAdminUser1@email.com",
+  "password": "FiftyoneAdminUser1",
   "firstName": "Yuri",
   "lastName": "User",
   "isPasswordHashed": false

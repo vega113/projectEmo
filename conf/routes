@@ -3,6 +3,9 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+# Login
+POST           /login                             controllers.LoginController.login()
+
 # An example controller showing a sample home page
 GET           /                                  controllers.HomeController.index()
 

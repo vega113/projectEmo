@@ -2,7 +2,7 @@ package dao
 
 import anorm._
 import dao.model._
-import services.DateTimeService
+import service.DateTimeService
 
 import java.sql.Connection
 import javax.inject.Inject

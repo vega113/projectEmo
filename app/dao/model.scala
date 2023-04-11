@@ -3,6 +3,7 @@ package dao
 import java.time.LocalDateTime
 import anorm._
 import anorm.SqlParser._
+import auth.model.TokenData
 import play.api.libs.json.{Format, Json}
 
 import scala.annotation.unused
@@ -19,7 +20,9 @@ object model {
                    email: String,
                    isPasswordHashed: Boolean,
                    created: Option[LocalDateTime] = None
-                 )
+                 ) {
+    def toTokenData: TokenData = TokenData(username, email, firstName.getOrElse(""), lastName.getOrElse(""))
+  }
 
   case class Emotion(id: String, emotionName: String, emotionType: String)
 
