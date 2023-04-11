@@ -1,5 +1,6 @@
 package controllers
 
+import akka.util.Timeout
 import auth.JwtService
 import auth.model.LoginData
 import dao.model.User
@@ -16,7 +17,9 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
 class LoginControllerSpec extends PlaySpec with MockitoSugar {
-
+  trait TestData {
+    implicit val timeout = Timeout(1.second)
+  }
 
   private val mockUserService = mock[UserService]
   private val mockJwtService = mock[JwtService]
@@ -30,7 +33,7 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(Some(user)))
       when(mockJwtService.createToken(user, 1.hour)).thenReturn(token)
 
-      val controller = new LoginController(mockUserService, stubControllerComponents(), mockJwtService)
+      val controller = new LoginController(stubControllerComponents(), mockUserService, mockJwtService)
       val fakeRequest = FakeRequest(GET, "/login").withBody(loginData)
       val login = controller.login().apply(fakeRequest)
 
@@ -44,12 +47,12 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
 
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(None))
 
-      val controller = new LoginController(mockUserService, stubControllerComponents(), mockJwtService)
+      val controller = new controllers.LoginController(stubControllerComponents(), mockUserService, mockJwtService)
       val fakeRequest = FakeRequest(GET, "/login").withBody(loginData)
       val login = controller.login().apply(fakeRequest)
 
       val result = Await.result(login, 1.second)
-      result.header.status mustEqual BAD_REQUEST
+      result.header.status mustEqual UNAUTHORIZED
       contentAsJson(login) mustEqual Json.obj("message" -> "Invalid username or password")
     }
 
@@ -59,12 +62,12 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
 
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(Some(user)))
 
-      val controller = new LoginController(mockUserService, stubControllerComponents(), mockJwtService)
+      val controller = new LoginController(stubControllerComponents(), mockUserService, mockJwtService)
       val fakeRequest = FakeRequest(GET, "/login").withBody(loginData)
       val login = controller.login().apply(fakeRequest)
 
       val result = Await.result(login, 1.second)
-      result.header.status mustEqual BAD_REQUEST
+      result.header.status mustEqual UNAUTHORIZED
       contentAsJson(login) mustEqual Json.obj("message" -> "Invalid username or password")
     }
   }

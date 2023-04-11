@@ -4,14 +4,14 @@
 # ~~~~
 
 # Login
-POST           /login                             controllers.LoginController.login()
+POST          /login                             controllers.LoginController.login()
 
 # An example controller showing a sample home page
 GET           /                                  controllers.HomeController.index()
 
 # EmotionRecordWithRelations routes
-GET           /emotionRecord                     controllers.EmotionRecordController.findAll()
-GET           /emotionRecord/:id                 controllers.EmotionRecordController.findById(id: Int)
+#GET           /emotionRecord                     controllers.EmotionRecordController.findAll()
+#GET           /emotionRecord/:id                 controllers.EmotionRecordController.findById(id: Int)
 POST          /emotionRecord                     controllers.EmotionRecordController.insert()
 PUT           /emotionRecord/:id                 controllers.EmotionRecordController.update(id: Int)
 DELETE        /emotionRecord/:id                 controllers.EmotionRecordController.delete(id: Int)
@@ -19,12 +19,12 @@ GET           /emotionRecord/user/:userId        controllers.EmotionRecordContro
 
 
 # User routes
-GET           /user                              controllers.UserController.findAllUsers()
-GET           /user/:id                          controllers.UserController.findUser(id: Int)
+#GET           /user                              controllers.UserController.findAllUsers()
+#GET           /user/:id                          controllers.UserController.findUser(id: Int)
 POST          /user                              controllers.UserController.createUser()
-PUT           /user/:id                          controllers.UserController.updateUser(id: Int)
-DELETE        /user/:id                          controllers.UserController.deleteUser(id: Int)
-GET        /user/username/:username           controllers.UserController.findUserByUsername(username: String)
+#PUT           /user/:id                          controllers.UserController.updateUser(id: Int)
+#DELETE        /user/:id                          controllers.UserController.deleteUser(id: Int)
+#GET           /user/username/:username           controllers.UserController.findUserByUsername(username: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)

@@ -12,7 +12,7 @@ import scala.concurrent.Future
 trait UserService {
   def findByUsername(username: String): Future[Option[User]]
 
-  def findById(userId: Int): Future[Option[User]]
+  def findById(userId: Long): Future[Option[User]]
 
   def findByEmail(email: String): Future[Option[User]]
 
@@ -22,7 +22,7 @@ trait UserService {
 
   def update(user: User): Future[Int]
 
-  def delete(userId: Int): Future[Int]
+  def delete(userId: Long): Future[Int]
 }
 
 class UserServiceImpl @Inject()(userDao: UserDao, dbExecutionContext: DatabaseExecutionContext) extends UserService {
@@ -32,7 +32,7 @@ class UserServiceImpl @Inject()(userDao: UserDao, dbExecutionContext: DatabaseEx
     })
   }
 
-  override def findById(userId: Int): Future[Option[User]] = {
+  override def findById(userId: Long): Future[Option[User]] = {
     Future(dbExecutionContext.withConnection { implicit connection =>
       userDao.findById(userId)
     })
@@ -52,7 +52,11 @@ class UserServiceImpl @Inject()(userDao: UserDao, dbExecutionContext: DatabaseEx
 
   override def insert(user: User): Future[Option[Long]] = {
     Future(dbExecutionContext.withConnection { implicit connection =>
-      userDao.insert(user)
+      if (userDao.checkUserExists(user.username, user.email)) {
+        None
+      } else {
+        userDao.insert(user)
+      }
     })
   }
 
@@ -62,7 +66,7 @@ class UserServiceImpl @Inject()(userDao: UserDao, dbExecutionContext: DatabaseEx
     })
   }
 
-  override def delete(userId: Int): Future[Int] = {
+  override def delete(userId: Long): Future[Int] = {
     Future(dbExecutionContext.withConnection { implicit connection =>
       userDao.delete(userId)
     })

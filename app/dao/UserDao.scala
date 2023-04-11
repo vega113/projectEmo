@@ -11,12 +11,16 @@ import javax.inject.Inject
 @ImplementedBy(classOf[UserDaoImpl])
 trait UserDao {
   def findByUsername(username: String)(implicit conn: Connection): Option[User]
-  def findById(userId: Int)(implicit conn: Connection): Option[User]
+  def findById(userId: Long)(implicit conn: Connection): Option[User]
   def findByEmail(email: String)(implicit conn: Connection): Option[User]
   def findAll()(implicit conn: Connection): List[User]
   def insert(user: User)(implicit conn: Connection): Option[Long]
   def update(user: User)(implicit conn: Connection): Int
-  def delete(userId: Int)(implicit conn: Connection): Int
+  def delete(userId: Long)(implicit conn: Connection): Int
+
+  def checkUserExists(username: String, email: String)(implicit conn: Connection): Boolean = {
+    findByUsername(username).isDefined || findByEmail(email).isDefined
+  }
 }
 
 class UserDaoImpl @Inject()() extends UserDao {
@@ -27,7 +31,7 @@ class UserDaoImpl @Inject()() extends UserDao {
       .as(parser.singleOpt)
   }
 
-  def findById(userId: Int)(implicit conn: Connection): Option[User] = {
+  def findById(userId: Long)(implicit conn: Connection): Option[User] = {
     SQL("SELECT * FROM users WHERE user_id = {userId}")
       .on("userId" -> userId)
       .as(parser.singleOpt)
@@ -72,7 +76,7 @@ class UserDaoImpl @Inject()() extends UserDao {
       .executeUpdate()
   }
 
-  def delete(userId: Int)(implicit conn: Connection): Int = {
+  def delete(userId: Long)(implicit conn: Connection): Int = {
     SQL("DELETE FROM users WHERE user_id = {userId}")
       .on("userId" -> userId)
       .executeUpdate()

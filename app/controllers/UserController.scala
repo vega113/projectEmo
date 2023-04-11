@@ -1,5 +1,6 @@
 package controllers
 
+import auth.AuthenticatedAction
 import dao.{DatabaseExecutionContext, UserDaoImpl}
 import dao.model.User
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
@@ -12,15 +13,17 @@ import service.UserService
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class UserController @Inject()(cc: ControllerComponents, userService: UserService)
+class UserController @Inject()(cc: ControllerComponents,
+                               userService: UserService,
+                               authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc) {
 
   def findAllUsers: Action[AnyContent] = Action.async { implicit request =>
     userService.findAll().map(users => Ok(Json.toJson(users)))
   }
 
-  def findUser(id: Int): Action[AnyContent] = Action.async { implicit request =>
-    userService.findById(id).map {
+  def findUser(id: Int): Action[AnyContent] = Action andThen authenticatedAction async{ implicit token =>
+    userService.findById(token.user.userId).map {
       case Some(user) => Ok(Json.toJson(user))
       case None => NotFound(s"User with id $id not found")
     }
@@ -38,7 +41,7 @@ class UserController @Inject()(cc: ControllerComponents, userService: UserServic
       json.validate[User] match {
         case JsSuccess(user, _) => userService.insert(user).map {
           case Some(id) => Created(Json.toJson(user.copy(userId = Some(id.toInt))))
-          case None => InternalServerError("Failed to create user")
+          case None => InternalServerError("Failed to create user, probably due to duplicate username or email")
         }
         case JsError(errors) =>
           Future.failed(new IllegalArgumentException("Invalid user format: " + errors.mkString(", ")))

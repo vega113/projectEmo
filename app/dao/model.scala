@@ -12,7 +12,7 @@ import scala.language.postfixOps
 object model {
 
   case class User(
-                   userId: Option[Int],
+                   userId: Option[Long],
                    username: String,
                    password: String,
                    firstName: Option[String],
@@ -21,7 +21,9 @@ object model {
                    isPasswordHashed: Boolean,
                    created: Option[LocalDateTime] = None
                  ) {
-    def toTokenData: TokenData = TokenData(username, email, firstName.getOrElse(""), lastName.getOrElse(""))
+    def toTokenData: TokenData = TokenData(userId.
+      getOrElse(throw new RuntimeException(s"No user Id found, username: $username")),
+      username, email, firstName.getOrElse(""), lastName.getOrElse(""))
   }
 
   case class Emotion(id: String, emotionName: String, emotionType: String)
@@ -75,7 +77,7 @@ object model {
     implicit val userFormat: Format[User] = Json.format[User]
 
     implicit val parser: RowParser[User] = {
-      get[Option[Int]]("user_id") ~
+      get[Option[Long]]("user_id") ~
         str("username") ~
         str("password") ~
         get[Option[String]]("first_name") ~

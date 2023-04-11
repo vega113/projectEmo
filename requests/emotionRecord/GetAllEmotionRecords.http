@@ -1,2 +1,4 @@
 ### List EmotionRecords
 GET http://localhost:9000/emotionRecord
+Authorization: Bearer {{auth_token}}
+

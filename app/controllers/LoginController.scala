@@ -5,28 +5,25 @@ import auth.model.LoginData
 import play.api.libs.json.Json
 import play.api.mvc._
 import service.UserService
-
 import javax.inject._
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class LoginController @Inject() (
-                                  userService: UserService,
-                                  cc: ControllerComponents,
-                                  jwtService: JwtService
-                                )(implicit ec: ExecutionContext) extends AbstractController(cc) {
+class LoginController @Inject()(
+                                 val cc: ControllerComponents,
+                                 userService: UserService,
+                                 jwtService: JwtService
+                               ) extends AbstractController(cc) {
 
 
   def login: Action[LoginData] = Action.async(parse.json[LoginData]) { implicit request =>
     val loginData = request.body
-    userService.findByUsername(loginData.username).flatMap {
+    userService.findByUsername(loginData.username).map {
       case Some(user) if user.password == loginData.password =>
-        val token = jwtService.createToken(user, 1.hour)
-        Future.successful(Ok(Json.obj("token" -> token)))
-      case _ =>
-        Future.successful(Forbidden(Json.obj("error" -> "invalid token"))
-        )
+        val token = jwtService.createToken(user, 365.days) // TODO make expiration configurable
+        Ok(Json.obj("token" -> token))
+      case _ => Unauthorized(Json.obj("message" -> "Invalid username or password"))
     }
   }
 }

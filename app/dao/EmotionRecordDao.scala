@@ -22,13 +22,13 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
     )
   }
 
-  def findById(id: Int)(implicit connection: Connection): Option[EmotionRecord] = {
+  def findById(id: Long)(implicit connection: Connection): Option[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records WHERE id = {id}").on("id" -> id).
       as(EmotionRecord.parser.singleOpt)
     populateSubEmotionsTriggersByEmotionRecord(List(emotionRecords).flatten).headOption
   }
 
-  def findAllByUserId(userId: Int)(implicit connection: Connection): List[EmotionRecord] = {
+  def findAllByUserId(userId: Long)(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records WHERE user_id = {userId}").on("userId" -> userId).
       as(EmotionRecord.parser.*)
     populateSubEmotionsTriggersByEmotionRecord(emotionRecords)
@@ -93,7 +93,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
     insertedCount
   }
 
-  def delete(id: Int)(implicit connection: Connection): Int = {
+  def delete(id: Long)(implicit connection: Connection): Int = {
     SQL("DELETE FROM emotion_records WHERE id = {id}").on("id" -> id).executeUpdate()
   }
 }

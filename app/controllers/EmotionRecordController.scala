@@ -1,78 +1,68 @@
 package controllers
 
-import dao._
+import auth.AuthenticatedAction
 import dao.model.EmotionRecord
 import play.api.libs.json._
 import play.api.mvc._
+import service.EmotionRecordService
 
 import javax.inject._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-@Singleton
-class EmotionRecordController @Inject()(cc: ControllerComponents, emotionRecordDao: EmotionRecordDao, dbExecutionContext: DatabaseExecutionContext)
+
+class EmotionRecordController @Inject()(cc: ControllerComponents,
+                                        emotionRecordService: EmotionRecordService,
+                                        authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc) {
 
-  def findAll(): Action[AnyContent] = Action.async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      val emotions = emotionRecordDao.findAll()
-      Future.successful(Ok(Json.toJson(emotions)))
+  def findAll(): Action[AnyContent] = Action andThen authenticatedAction async { // TODO allow only for admins
+    emotionRecordService.findAll().map(emotionRecords => Ok(Json.toJson(emotionRecords)))
+  }
+
+  def findById(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
+    emotionRecordService.findById(token.user.userId).map {
+      case Some(emotionRecord) => Ok(Json.toJson(emotionRecord))
+      case None => NotFound
     }
   }
 
-  def findById(id: Int): Action[AnyContent] = Action.async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      val emotion = emotionRecordDao.findById(id)
-      Future.successful(emotion.map(e => Ok(Json.toJson(e))).getOrElse(NotFound))
-    }
-  }
-
-  def insert(): Action[JsValue] = Action(parse.json).async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      request.body.validate[EmotionRecord].fold(
-        errors => {
-          Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
-        },
-        emotionRecord => {
-          emotionRecordDao.insert(emotionRecord)
-          Future.successful(Created(Json.toJson(emotionRecord)))
+  def insert(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+    token.body.validate[EmotionRecord].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
+      },
+      emotionRecord => {
+        emotionRecordService.insert(emotionRecord).map {
+          case Some(id) => Created(Json.toJson(emotionRecord.copy(id = Option(id))))
+          case None => InternalServerError
         }
-      )
-    }
-  }
-
-  def update(id: Int): Action[JsValue] = Action(parse.json).async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      request.body.validate[EmotionRecord].fold(
-        errors => {
-          Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
-        },
-        emotionRecord => {
-          val affectedRows = emotionRecordDao.update(emotionRecord.copy(id = Option(id)))
-          if (affectedRows > 0) {
-            Future.successful(Ok(Json.toJson(emotionRecord)))
-          } else {
-            Future.successful(NotFound)
-          }
-        }
-      )
-    }
-  }
-
-  def delete(id: Int): Action[AnyContent] = Action.async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      val affectedRows = emotionRecordDao.delete(id)
-      if (affectedRows > 0) {
-        Future.successful(Ok(Json.obj("message" -> s"Emotion with id $id has been deleted.")))
-      } else {
-        Future.successful(NotFound)
       }
+    )
+  }
+
+  def update(id: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+    token.body.validate[EmotionRecord].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
+      },
+      emotionRecord => {
+        emotionRecordService.update(emotionRecord.copy(id = Option(token.user.userId))).map {
+          case 1 => Ok(Json.toJson(emotionRecord))
+          case _ => NotFound
+        }
+      }
+    )
+  }
+
+  def delete(id: Long): Action[AnyContent] = Action andThen authenticatedAction async  { implicit token =>
+    emotionRecordService.delete(token.user.userId).map {
+      case 1 => Ok
+      case _ => NotFound
     }
   }
 
-  def findAllByUserId(userId: Int): Action[AnyContent] = Action.async { implicit request =>
-    dbExecutionContext.withConnection { implicit connection =>
-      val emotions = emotionRecordDao.findAllByUserId(userId)
-      Future.successful(Ok(Json.toJson(emotions)))
-    }
+  def findAllByUserId(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
+    emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
 }

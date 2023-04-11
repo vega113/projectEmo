@@ -2,18 +2,15 @@ package auth
 
 import auth.model.TokenData
 import com.google.inject.{ImplementedBy, Inject}
-
-import java.time.Clock
 import com.typesafe.config.ConfigFactory
 import dao.model.User
 import org.slf4j.LoggerFactory
 import pdi.jwt.{JwtAlgorithm, JwtClaim, JwtJson}
 import play.api.libs.json.Json
-import play.api.mvc._
 import service.DateTimeService
 
+import java.time.Clock
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
 
@@ -65,22 +62,3 @@ class JwtServiceImpl @Inject()(dateTimeService: DateTimeService) extends JwtServ
 
   }
 }
-
-class JwtAuthAction(jwtService: JwtService, parser: BodyParser[AnyContent])(implicit val ec: ExecutionContext)
-  extends ActionBuilderImpl(parser) {
-
-  override def invokeBlock[A](request: Request[A], block: Request[A] => Future[Result]): Future[Result] = {
-    request.headers.get("Authorization") match {
-      case Some(token) if token.startsWith("Bearer ") =>
-        jwtService.validateToken(token.stripPrefix("Bearer ")) match {
-          case Some(user) => block(new AuthenticatedRequest(user, request))
-          case None => Future.successful(Results.Unauthorized("Invalid token"))
-        }
-      case _ => Future.successful(Results.Unauthorized("Authorization token not found"))
-    }
-  }
-}
-
-class AuthenticatedRequest[A](val user: TokenData, request: Request[A]) extends WrappedRequest[A](request)
-
-
