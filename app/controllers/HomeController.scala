@@ -1,5 +1,7 @@
 package controllers
 
+import play.api.libs.json.Json
+
 import javax.inject._
 import play.api.mvc._
 
@@ -17,7 +19,12 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index())
+
+  def appSummary = Action {
+    Ok(Json.obj("content" -> "Scala Play Angular Seed"))
+  }
+
+  def postTest = Action {
+    Ok(Json.obj("content" -> "Post Request Test => Data Sending Success"))
   }
 }

@@ -4,27 +4,25 @@
 # ~~~~
 
 # Login
-POST          /login                             controllers.LoginController.login()
+POST          /api/login                             controllers.LoginController.login()
 
 # An example controller showing a sample home page
-GET           /                                  controllers.HomeController.index()
+GET     /                           controllers.FrontendController.index()
+
+# An example route (Prefix all API routes with apiPrefix defined in application.conf)
+GET     /api/summary                controllers.HomeController.appSummary
+
+# Serve static assets under public directory
+GET     /*file                      controllers.FrontendController.assetOrDefault(file)
 
 # EmotionRecordWithRelations routes
-#GET           /emotionRecord                     controllers.EmotionRecordController.findAll()
-#GET           /emotionRecord/:id                 controllers.EmotionRecordController.findById(id: Int)
-POST          /emotionRecord                     controllers.EmotionRecordController.insert()
-PUT           /emotionRecord/:id                 controllers.EmotionRecordController.update(id: Int)
-DELETE        /emotionRecord/:id                 controllers.EmotionRecordController.delete(id: Int)
-GET           /emotionRecord/user/:userId        controllers.EmotionRecordController.findAllByUserId(userId: Int)
+POST          /api/emotionRecord                     controllers.EmotionRecordController.insert()
+PUT           /api/emotionRecord/:id                 controllers.EmotionRecordController.update(id: Int)
+DELETE        /api/emotionRecord/:id                 controllers.EmotionRecordController.delete(id: Int)
+GET           /api/emotionRecord/user/:userId        controllers.EmotionRecordController.findAllByUserId(userId: Int)
 
 
 # User routes
-#GET           /user                              controllers.UserController.findAllUsers()
-#GET           /user/:id                          controllers.UserController.findUser(id: Int)
-POST          /user                              controllers.UserController.createUser()
-#PUT           /user/:id                          controllers.UserController.updateUser(id: Int)
-#DELETE        /user/:id                          controllers.UserController.deleteUser(id: Int)
-#GET           /user/username/:username           controllers.UserController.findUserByUsername(username: String)
 
-# Map static resources from the /public folder to the /assets URL path
-GET           /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
+POST          /api/user                              controllers.UserController.createUser()
+
