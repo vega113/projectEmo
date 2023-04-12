@@ -1,3 +1,4 @@
+[![Scala CI](https://github.com/vega113/projectEmo/actions/workflows/scala.yml/badge.svg)](https://github.com/vega113/projectEmo/actions/workflows/scala.yml)
 # Emotion Tracker
 
 Emotion Tracker is a web application that allows users to track and analyze their emotions over time. Users can log in and record their emotions, including the intensity of the emotion, sub-emotions, and triggers that contributed to the emotion. They can also view their emotion history and analyze trends in their emotions over time.
@@ -56,4 +57,4 @@ Contributions to Emotion Tracker are welcome and encouraged! To contribute, plea
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-[![Scala CI](https://github.com/vega113/projectEmo/actions/workflows/scala.yml/badge.svg)](https://github.com/vega113/projectEmo/actions/workflows/scala.yml)
+
