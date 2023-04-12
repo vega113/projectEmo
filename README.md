@@ -55,3 +55,5 @@ Contributions to Emotion Tracker are welcome and encouraged! To contribute, plea
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+[![Scala CI](https://github.com/vega113/projectEmo/actions/workflows/scala.yml/badge.svg)](https://github.com/vega113/projectEmo/actions/workflows/scala.yml)
