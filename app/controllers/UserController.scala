@@ -36,7 +36,7 @@ class UserController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def createUser: Action[AnyContent] = Action.async { implicit request =>
+  def createUser(): Action[AnyContent] = Action.async { implicit request =>
     request.body.asJson.map { json =>
       json.validate[User] match {
         case JsSuccess(user, _) => userService.insert(user).map {

@@ -34,7 +34,6 @@ class JwtServiceImpl @Inject()(dateTimeService: DateTimeService) extends JwtServ
       issuedAt = Option(clock.instant().getEpochSecond),
       expiration = Option(clock.instant().plusSeconds(expiration.toSeconds).getEpochSecond)
     )
-
     JwtJson.encode(claim, secretKey, algorithm)
   }
 
@@ -59,6 +58,5 @@ class JwtServiceImpl @Inject()(dateTimeService: DateTimeService) extends JwtServ
         logger.error("Error validating token", failure)
         None
     }
-
   }
 }
