@@ -4,7 +4,7 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.FrontendController.index()
+GET           /                                      controllers.FrontendController.index()
 
 # Login
 POST          /api/login                             controllers.LoginController.login()
@@ -15,6 +15,11 @@ PUT           /api/emotionRecord/:id                 controllers.EmotionRecordCo
 DELETE        /api/emotionRecord/:id                 controllers.EmotionRecordController.delete(id: Int)
 GET           /api/emotionRecord/user/:userId        controllers.EmotionRecordController.findAllByUserId(userId: Int)
 
+GET           /api/emotion                           controllers.EmotionController.findAll()
+GET           /api/trigger                           controllers.TriggerController.findAll()
+GET           /api/subemotion/:id                    controllers.SubEmotionController.findAllByEmotionId(id: String)
+GET           /api/suggestion/:id                    controllers.SuggestedActionController.findAllBySubEmotionId(id: String)
+
 
 # User routes
 
@@ -22,9 +27,9 @@ POST          /api/user                              controllers.UserController.
 
 # Emotion cache routes
 
-GET /api/emotionCache                      controllers.EmotionDataController.fetchEmotionData()
+GET           /api/emotionCache                      controllers.EmotionDataController.fetchEmotionData()
 
 
 # Serve static assets under public directory
-GET     /*file                      controllers.FrontendController.assetOrDefault(file)
+GET           /*file                                 controllers.FrontendController.assetOrDefault(file)
 

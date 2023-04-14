@@ -30,4 +30,5 @@ class TriggerDao {
     SQL("DELETE FROM triggers WHERE id = {id}").on("id" -> id).executeUpdate()
   }
 
+
 }
