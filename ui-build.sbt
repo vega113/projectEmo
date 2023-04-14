@@ -42,14 +42,14 @@ def executeProdBuild(implicit dir: File): Int = ifNodeModulesInstalled(runOnComm
 lazy val `ui-test` = taskKey[Unit]("Run UI tests when testing application.")
 
 `ui-test` := {
-  implicit val userInterfaceRoot = baseDirectory.value / "ui" / "emo-app"
+  implicit val userInterfaceRoot = baseDirectory.value / "ui"
   if (executeUiTests != Success) throw new Exception("UI tests failed!")
 }
 
 lazy val `ui-prod-build` = taskKey[Unit]("Run UI build when packaging the application.")
 
 `ui-prod-build` := {
-  implicit val userInterfaceRoot = baseDirectory.value / "ui" / "emo-app"
+  implicit val userInterfaceRoot = baseDirectory.value / "ui"
   if (executeProdBuild != Success) throw new Exception("Oops! UI Build crashed.")
 }
 

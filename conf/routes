@@ -3,17 +3,17 @@
 # https://www.playframework.com/documentation/latest/ScalaRouting
 # ~~~~
 
+# Home page
+GET     /                           controllers.FrontendController.index()
+
 # Login
 POST          /api/login                             controllers.LoginController.login()
 
-# An example controller showing a sample home page
-GET     /                           controllers.FrontendController.index()
+
+
 
 # An example route (Prefix all API routes with apiPrefix defined in application.conf)
 GET     /api/summary                controllers.HomeController.appSummary
-
-# Serve static assets under public directory
-GET     /*file                      controllers.FrontendController.assetOrDefault(file)
 
 # EmotionRecordWithRelations routes
 POST          /api/emotionRecord                     controllers.EmotionRecordController.insert()
@@ -25,4 +25,8 @@ GET           /api/emotionRecord/user/:userId        controllers.EmotionRecordCo
 # User routes
 
 POST          /api/user                              controllers.UserController.createUser()
+
+
+# Serve static assets under public directory
+GET     /*file                      controllers.FrontendController.assetOrDefault(file)
 

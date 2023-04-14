@@ -30,7 +30,7 @@ object FrontendRunHook {
         * Run npm install if node modules are not installed.
         */
       override def beforeStarted(): Unit = {
-        if (!(base / "ui" / "emo-app"/ "node_modules").exists()) Process(install, base / "ui"/ "emo-app").!
+        if (!(base / "ui" / "node_modules").exists()) Process(install, base / "ui").!
       }
 
       /**
@@ -39,7 +39,7 @@ object FrontendRunHook {
         */
       override def afterStarted(): Unit = {
         process = Option(
-          Process(run, base / "ui" / "emo-app").run
+          Process(run, base / "ui").run
         )
       }
 
