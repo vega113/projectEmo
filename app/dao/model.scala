@@ -72,6 +72,12 @@ object model {
   @unused
   case class NoteTag(noteId: Int, tagId: Int)
 
+  case class SuggestedAction(
+                              id: Option[String],
+                              name: String,
+                              created: Option[LocalDateTime] = None
+                            )
+
 
   object User {
     implicit val userFormat: Format[User] = Json.format[User]
@@ -95,7 +101,7 @@ object model {
     implicit val emotionFormat: Format[Emotion] = Json.format[Emotion]
 
     implicit val parser: RowParser[Emotion] = {
-      str("id") ~
+      str("emotion_id") ~
         str("emotion_name") ~
         str("emotion_type") map {
         case id ~ emotionName ~ emotionType =>
@@ -173,6 +179,19 @@ object Note {
         get[Option[LocalDateTime]]("created") map {
         case noteId ~ title ~ noteText ~ noteUserId ~ created =>
           Note(noteId, title, noteText, noteUserId, created)
+      }
+    }
+  }
+
+  object SuggestedAction {
+    implicit val suggestedActionFormat: Format[SuggestedAction] = Json.format[SuggestedAction]
+
+    implicit val parser: RowParser[SuggestedAction] = {
+      get[Option[String]]("suggested_action_id") ~
+        str("suggested_action_name") ~
+        get[Option[LocalDateTime]]("created") map {
+        case id ~ name ~ created =>
+          SuggestedAction(id, name, created)
       }
     }
   }

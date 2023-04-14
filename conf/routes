@@ -9,12 +9,6 @@ GET     /                           controllers.FrontendController.index()
 # Login
 POST          /api/login                             controllers.LoginController.login()
 
-
-
-
-# An example route (Prefix all API routes with apiPrefix defined in application.conf)
-GET     /api/summary                controllers.HomeController.appSummary
-
 # EmotionRecordWithRelations routes
 POST          /api/emotionRecord                     controllers.EmotionRecordController.insert()
 PUT           /api/emotionRecord/:id                 controllers.EmotionRecordController.update(id: Int)
@@ -25,6 +19,10 @@ GET           /api/emotionRecord/user/:userId        controllers.EmotionRecordCo
 # User routes
 
 POST          /api/user                              controllers.UserController.createUser()
+
+# Emotion cache routes
+
+GET /api/emotionCache                      controllers.EmotionDataController.fetchEmotionData()
 
 
 # Serve static assets under public directory

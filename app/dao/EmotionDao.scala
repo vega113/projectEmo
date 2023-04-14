@@ -14,7 +14,7 @@ class EmotionDao {
   def insert(emotion: Emotion)(implicit connection: Connection): Option[Long] = {
     SQL(
       """
-        INSERT INTO emotions (id, emotion_name, emotion_type)
+        INSERT INTO emotions (emotion_id, emotion_name, emotion_type)
         VALUES ({id}, {emotionName}, {emotionType})
       """
     ).on(
@@ -30,7 +30,7 @@ class EmotionDao {
         UPDATE emotions SET
           emotion_name = {emotionName},
           emotion_type = {emotionType}
-        WHERE id = {id}
+        WHERE emotion_id = {id}
       """
     ).on(
       "id" -> emotion.id,
@@ -40,10 +40,10 @@ class EmotionDao {
   }
 
   def delete(id: String)(implicit connection: Connection): Int = {
-    SQL("DELETE FROM emotions WHERE id = {id}").on(Symbol("id") -> id).executeUpdate()
+    SQL("DELETE FROM emotions WHERE emotion_id = {id}").on(Symbol("id") -> id).executeUpdate()
   }
 
   def findById(id: String)(implicit connection: Connection): Option[Emotion] = {
-    SQL("SELECT * FROM emotions WHERE id = {id}").on("id" -> id).as(Emotion.parser.singleOpt)
+    SQL("SELECT * FROM emotions WHERE emotion_id = {id}").on("id" -> id).as(Emotion.parser.singleOpt)
   }
 }

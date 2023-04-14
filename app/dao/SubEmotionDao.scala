@@ -29,4 +29,10 @@ class SubEmotionDao {
   def delete(id: Int)(implicit connection: Connection): Int = {
     SQL("DELETE FROM sub_emotions WHERE id = {id}").on("id" -> id).executeUpdate()
   }
+
+  def findAllByEmotionId(emotionId: String)(implicit connection: Connection): List[SubEmotion] = {
+    SQL("SELECT * FROM sub_emotions WHERE parent_emotion_id = {emotionId}")
+      .on("emotionId" -> emotionId)
+      .as(SubEmotion.parser.*)
+  }
 }

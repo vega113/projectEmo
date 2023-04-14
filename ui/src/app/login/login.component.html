@@ -1,11 +1,12 @@
-<form (submit)="onSubmit()">
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
   <div>
     <label for="username">Username</label>
-    <input type="text" id="username" [(ngModel)]="username" name="username" required />
+    <input formControlName="username" type="text" id="username" required />
   </div>
   <div>
     <label for="password">Password</label>
-    <input type="password" id="password" [(ngModel)]="password" name="password" required />
+    <input formControlName="password" type="password" id="password" required />
   </div>
-  <button type="submit">Login</button>
+  <button type="submit" [disabled]="!loginForm.valid">Login</button>
 </form>
+

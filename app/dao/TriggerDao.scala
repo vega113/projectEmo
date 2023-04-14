@@ -29,4 +29,5 @@ class TriggerDao {
   def delete(id: Int)(implicit connection: Connection): Int = {
     SQL("DELETE FROM triggers WHERE id = {id}").on("id" -> id).executeUpdate()
   }
+
 }
