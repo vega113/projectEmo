@@ -8,12 +8,12 @@ import javax.inject.Inject
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-@ImplementedBy(classOf[EmotionServiceImpl])
+@ImplementedBy(classOf[EmotionDataServiceImpl])
 trait EmotionDataService {
   def fetchEmotionData(): Future[EmotionData]
 }
 
-class EmotionServiceImpl @Inject()(emotionDao: EmotionDao,
+class EmotionDataServiceImpl @Inject()(emotionDao: EmotionDao,
                                    subEmotionDao: SubEmotionDao,
                                    triggerDao: TriggerDao,
                                    suggestedActionDao: SuggestedActionDao,
