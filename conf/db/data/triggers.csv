@@ -1,35 +1,35 @@
 trigger_id,trigger_name,trigger_parent_id,created_by_user,description,created
-1,People,,,,2023-03-31 07:13:18
-2,Family,1,,,2023-03-31 07:13:18
-3,Friends,1,,,2023-03-31 07:13:18
-4,Colleagues,1,,,2023-03-31 07:13:18
-5,Strangers,1,,,2023-03-31 07:13:18
-6,Romantic_partners,1,,,2023-03-31 07:13:18
-7,Authority_figures,1,,,2023-03-31 07:13:18
-8,Celebrities,1,,,2023-03-31 07:13:18
-9,Situations,,,,2023-03-31 07:13:18
-10,Work_stress,9,,,2023-03-31 07:13:18
-11,Social_events,9,,,2023-03-31 07:13:18
-12,Relationship_conflicts,9,,,2023-03-31 07:13:18
-13,Financial_problems,9,,,2023-03-31 07:13:18
-14,Health_issues,9,,,2023-03-31 07:13:18
-15,Celebrations,9,,,2023-03-31 07:13:18
-16,Losses,9,,,2023-03-31 07:13:18
-17,Achievements,9,,,2023-03-31 07:13:18
-18,Commuting,9,,,2023-03-31 07:13:18
-19,Unexpected_news,9,,,2023-03-31 07:13:18
-20,Time_pressure,9,,,2023-03-31 07:13:18
-21,Deadlines,9,,,2023-03-31 07:13:18
-22,Places,,,,2023-03-31 07:13:18
-23,Home,22,,,2023-03-31 07:13:18
-24,Workplace,22,,,2023-03-31 07:13:18
-25,School,22,,,2023-03-31 07:13:18
-26,Parks,22,,,2023-03-31 07:13:18
-27,Public_transportation,22,,,2023-03-31 07:13:18
-28,Restaurants,22,,,2023-03-31 07:13:18
-29,Gyms,22,,,2023-03-31 07:13:18
-30,Shopping_centers,22,,,2023-03-31 07:13:18
-31,Travel_destinations,22,,,2023-03-31 07:13:18
-32,Nature,22,,,2023-03-31 07:13:18
-33,Social_gatherings,22,,,2023-03-31 07:13:18
-34,Places_with_specific_memories,22,,,2023-03-31 07:13:18
+1,People,,,People,2023-03-31 07:13:18
+2,Family,1,,Family,2023-03-31 07:13:18
+3,Friends,1,,Friends,2023-03-31 07:13:18
+4,Colleagues,1,,Colleagues,2023-03-31 07:13:18
+5,Strangers,1,,Strangers,2023-03-31 07:13:18
+6,Romantic_partners,1,,Romantic partners,2023-03-31 07:13:18
+7,Authority_figures,1,,Authority figures,2023-03-31 07:13:18
+8,Celebrities,1,,Celebrities,2023-03-31 07:13:18
+9,Situations,,,Situations,2023-03-31 07:13:18
+10,Work_stress,9,,Work stress,2023-03-31 07:13:18
+11,Social_events,9,,Social events,2023-03-31 07:13:18
+12,Relationship_conflicts,9,,Relationship conflicts,2023-03-31 07:13:18
+13,Financial_problems,9,,Financial problems,2023-03-31 07:13:18
+14,Health_issues,9,,Health issues,2023-03-31 07:13:18
+15,Celebrations,9,,Celebrations,2023-03-31 07:13:18
+16,Losses,9,,Losses,2023-03-31 07:13:18
+17,Achievements,9,,Achievements,2023-03-31 07:13:18
+18,Commuting,9,,Commuting,2023-03-31 07:13:18
+19,Unexpected_news,9,,Unexpected news,2023-03-31 07:13:18
+20,Time_pressure,9,,Time pressure,2023-03-31 07:13:18
+21,Deadlines,9,,Deadlines,2023-03-31 07:13:18
+22,Places,,,Places,2023-03-31 07:13:18
+23,Home,22,,Home,2023-03-31 07:13:18
+24,Workplace,22,,Workplace,2023-03-31 07:13:18
+25,School,22,,School,2023-03-31 07:13:18
+26,Parks,22,,Parks,2023-03-31 07:13:18
+27,Public_transportation,22,,Public transportation,2023-03-31 07:13:18
+28,Restaurants,22,,Restaurants,2023-03-31 07:13:18
+29,Gyms,22,,Gyms,2023-03-31 07:13:18
+30,Shopping_centers,22,,Shopping centers,2023-03-31 07:13:18
+31,Travel_destinations,22,,Travel destinations,2023-03-31 07:13:18
+32,Nature,22,,Nature,2023-03-31 07:13:18
+33,Social_gatherings,22,,Social gatherings,2023-03-31 07:13:18
+34,Places_with_specific_memories,22,,Places with specific memories,2023-03-31 07:13:1

@@ -1,0 +1,15 @@
+### List EmotionRecords
+GET http://localhost:9000/api/emotionCache
+
+
+### List Emotions
+GET http://localhost:9000/api/emotion
+
+### List Triggers
+GET http://localhost:9000/api/trigger
+
+### Fetch SubEmotions for an Emotion
+GET http://localhost:9000/api/emotion/Joy/subEmotions
+
+### Fetch Suggested Actions for a SubEmotion
+GET http://localhost:9000/api/subEmotion/Excitement/suggestedActions

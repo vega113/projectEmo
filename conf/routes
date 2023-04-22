@@ -4,32 +4,33 @@
 # ~~~~
 
 # Home page
-GET           /                                      controllers.FrontendController.index()
+GET           /                                           controllers.FrontendController.index
 
 # Login
-POST          /api/login                             controllers.LoginController.login()
+POST          /api/login                                  controllers.LoginController.login
 
 # EmotionRecordWithRelations routes
-POST          /api/emotionRecord                     controllers.EmotionRecordController.insert()
-PUT           /api/emotionRecord/:id                 controllers.EmotionRecordController.update(id: Int)
-DELETE        /api/emotionRecord/:id                 controllers.EmotionRecordController.delete(id: Int)
-GET           /api/emotionRecord/user/:userId        controllers.EmotionRecordController.findAllByUserId(userId: Int)
+POST          /api/emotionRecord                          controllers.EmotionRecordController.insert()
+PUT           /api/emotionRecord/:id                      controllers.EmotionRecordController.update(id: Int)
+DELETE        /api/emotionRecord/:id                      controllers.EmotionRecordController.delete(id: Int)
+GET           /api/emotionRecord/user/:userId             controllers.EmotionRecordController.findAllByUserId(userId: Int)
 
-GET           /api/emotion                           controllers.EmotionController.findAll()
-GET           /api/trigger                           controllers.TriggerController.findAll()
-GET           /api/subemotion/:id                    controllers.SubEmotionController.findAllByEmotionId(id: String)
-GET           /api/suggestion/:id                    controllers.SuggestedActionController.findAllBySubEmotionId(id: String)
+# Cache routes
+GET           /api/emotion                                controllers.EmotionController.findAll()
+GET           /api/trigger                                controllers.TriggerController.findAll()
+GET           /api/emotion/:id/subEmotions                controllers.SubEmotionController.findAllByEmotionId(id: String)
+GET           /api/subEmotion/:id/suggestedActions        controllers.SuggestedActionController.findAllBySubEmotionId(id: String)
 
 
 # User routes
 
-POST          /api/user                              controllers.UserController.createUser()
+POST          /api/user                                   controllers.UserController.createUser()
 
 # Emotion cache routes
 
-GET           /api/emotionCache                      controllers.EmotionDataController.fetchEmotionData()
+GET           /api/emotionCache                           controllers.EmotionDataController.fetchEmotionData()
 
 
 # Serve static assets under public directory
-GET           /*file                                 controllers.FrontendController.assetOrDefault(file)
+GET           /*file                                      controllers.FrontendController.assetOrDefault(file)
 

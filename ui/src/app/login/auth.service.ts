@@ -6,7 +6,7 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:9000/api';
+  private apiUrl = 'http://localhost:4200/api';
 
   constructor(private http: HttpClient) {}
 
@@ -18,6 +18,5 @@ export class AuthService {
           localStorage.setItem('auth_token', response.token);
         })
       )
-      .subscribe();
   }
 }

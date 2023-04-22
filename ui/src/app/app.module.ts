@@ -7,20 +7,25 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
+
 import { HttpClientModule } from '@angular/common/http';
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import { LandingPageComponent } from './landing-page/landing-page.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent
+    LoginComponent,
+    LandingPageComponent
   ],
     imports: [
         BrowserModule,
         AppRoutingModule,
         FormsModule,
       HttpClientModule,
-      ReactiveFormsModule
+      ReactiveFormsModule,
+      BrowserAnimationsModule
     ],
   providers: [],
   bootstrap: [AppComponent]

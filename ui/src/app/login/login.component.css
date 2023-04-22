@@ -1,0 +1,47 @@
+/* Small devices (portrait tablets and large phones) */
+@media (max-width: 767.98px) {
+  .login-card {
+    width: 90%;
+    padding: 15px;
+  }
+
+  input {
+    font-size: 12px;
+  }
+
+  button.btn-login {
+    font-size: 14px;
+  }
+}
+
+/* Medium devices (landscape tablets and small laptops) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .login-card {
+    width: 80%;
+    padding: 20px;
+  }
+
+  input {
+    font-size: 14px;
+  }
+
+  button.btn-login {
+    font-size: 16px;
+  }
+}
+
+/* Large devices (laptops and desktops) */
+@media (min-width: 992px) {
+  .login-card {
+    width: 50%;
+    padding: 30px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  button.btn-login {
+    font-size: 18px;
+  }
+}
