@@ -57,7 +57,7 @@ class UserDaoImpl @Inject()() extends UserDao {
         "firstName" -> user.firstName,
         "lastName" -> user.lastName,
         "email" -> user.email,
-        "isPasswordHashed" -> user.isPasswordHashed,
+        "isPasswordHashed" -> Some(false),
         "created" -> user.created)
       .executeInsert()
   }

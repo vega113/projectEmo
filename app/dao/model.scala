@@ -18,7 +18,7 @@ object model {
                    firstName: Option[String],
                    lastName: Option[String],
                    email: String,
-                   isPasswordHashed: Boolean,
+                   isPasswordHashed: Option[Boolean],
                    created: Option[LocalDateTime] = None
                  ) {
     def toTokenData: TokenData = TokenData(userId.
@@ -89,7 +89,7 @@ object model {
         get[Option[String]]("first_name") ~
         get[Option[String]]("last_name") ~
         str("email") ~
-        bool("is_password_hashed") ~
+        get[Option[Boolean]]("is_password_hashed") ~
         get[Option[LocalDateTime]]("created") map {
         case userId ~ username ~ password ~ firstName ~ lastName ~ email ~ isPasswordHashed ~ created =>
           User(userId, username, password, firstName, lastName, email, isPasswordHashed, created)

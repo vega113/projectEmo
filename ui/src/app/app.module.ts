@@ -11,13 +11,15 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { HttpClientModule } from '@angular/common/http';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import { LandingPageComponent } from './landing-page/landing-page.component';
+import { SignupComponent } from './signup/signup.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    LandingPageComponent
+    LandingPageComponent,
+    SignupComponent
   ],
     imports: [
         BrowserModule,
