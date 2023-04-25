@@ -1,0 +1,18 @@
+.signup-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.signup-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px;
+}
+
+.form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}

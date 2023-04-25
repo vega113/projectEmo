@@ -20,4 +20,11 @@ describe('LandingPageComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+
+  it('should have a header with the app name and logo', () => {
+    const compiled = fixture.nativeElement;
+    const header = compiled.querySelector('header h1');
+    expect(header.textContent).toContain('Emotion Tracker');
+  });
 });
