@@ -10,17 +10,28 @@ main {
   align-items: center;
   justify-content: center;
   flex-grow: 1;
-  /*background-image: url('assets/emo_logo.png');*/
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
 }
 
 .value-proposition {
-  width: 100%;
-  max-width: 800px;
-  margin-bottom: 32px;
+  text-align: center;
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border-radius: 5px;
+  color: #000; /* Add this line to set the text color to black */
 }
+
+.value-proposition mat-card-title {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 5px;
+  border-radius: 5px;
+  color: #333;
+}
+
 
 .cta {
   display: flex;
@@ -65,8 +76,14 @@ main {
 }
 
 main {
-  background: linear-gradient(-45deg, #f06, #00f, #0f0, #ff0, #f90, #f06);
+  background: linear-gradient(-45deg, #00f, #0f0);
   background-size: 300% 300%;
   animation: gradientChange 20s ease infinite;
+}
+.benefit-card {
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border-radius: 5px;
 }
 

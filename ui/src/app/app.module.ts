@@ -17,6 +17,7 @@ import {MatCardModule} from "@angular/material/card";
 import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
 import {MatIconModule} from "@angular/material/icon";
+import { MainLayoutComponent } from './main-layout/main-layout.component';
 
 
 @NgModule({
@@ -24,7 +25,8 @@ import {MatIconModule} from "@angular/material/icon";
     AppComponent,
     LoginComponent,
     LandingPageComponent,
-    SignupComponent
+    SignupComponent,
+    MainLayoutComponent
   ],
   imports: [
     BrowserModule,

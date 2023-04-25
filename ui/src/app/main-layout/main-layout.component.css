@@ -1,0 +1,38 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+
+.content {
+  flex-grow: 1;
+}
+
+.footer {
+  flex-shrink: 0;
+}
+
+.app-name {
+  text-decoration: none;
+  color: inherit;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+}

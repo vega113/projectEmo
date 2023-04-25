@@ -1,0 +1,21 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <a routerLink="/" class="app-name">Emotion Tracker</a>
+    <span class="spacer"></span>
+    <div *ngIf="(isAuthenticated | async) === false" class="button-container">
+      <button mat-stroked-button color="accent" routerLink="/login">Login</button>
+      <button mat-raised-button color="primary" routerLink="/signup">Sign up</button>
+    </div>
+    <button *ngIf="(isAuthenticated | async) === true" mat-stroked-button color="accent" (click)="logout()">Sign out</button>
+  </mat-toolbar-row>
+</mat-toolbar>
+
+<div class="content">
+  <router-outlet></router-outlet>
+</div>
+
+<mat-toolbar color="primary" class="footer">
+  <mat-toolbar-row>
+    <!-- Add relevant links and contact information here -->
+  </mat-toolbar-row>
+</mat-toolbar>
