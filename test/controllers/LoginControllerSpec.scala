@@ -18,7 +18,7 @@ import scala.concurrent.{Await, Future}
 
 class LoginControllerSpec extends PlaySpec with MockitoSugar {
   trait TestData {
-    implicit val timeout = Timeout(1.second)
+    implicit val timeout: Timeout = Timeout(1.second)
   }
 
   private val mockUserService = mock[UserService]
@@ -27,7 +27,7 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
   "LoginController" should {
     "return a token for a valid user" in {
       val loginData = LoginData("test-user", "test-password")
-      val user = User(Some(1), "test-user", "test-password", Some("Test"), Some("User"), "testuser@test.com", isPasswordHashed = true)
+      val user = User(Some(1), "test-user", "test-password", Some("Test"), Some("User"), "testuser@test.com", isPasswordHashed = Some(true))
       val token = "test-token"
 
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(Some(user)))
@@ -58,7 +58,7 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
 
     "return a bad request for an invalid password" in {
       val loginData = LoginData("test-user", "test-password")
-      val user = User(Some(1), "test-user", "invalid-password", Some("Test"), Some("User"), "testuser@test.com", isPasswordHashed = true)
+      val user = User(Some(1), "test-user", "invalid-password", Some("Test"), Some("User"), "testuser@test.com", isPasswordHashed = Option(true))
 
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(Some(user)))
 

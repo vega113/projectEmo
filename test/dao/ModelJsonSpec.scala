@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 class ModelJsonSpec extends AnyFlatSpec with Matchers {
 
   "User" should "serialize and deserialize correctly" in {
-    val user = User(None, "example_user2", "password123", Option("John"), Option("Doe"), "test@example.com", isPasswordHashed = false, None)
+    val user = User(None, "example_user2", "password123", Option("John"), Option("Doe"), "test@example.com", isPasswordHashed = Option(false), None)
     val json = Json.toJson(user)
     val deserializedUser = json.as[User]
     deserializedUser shouldBe user

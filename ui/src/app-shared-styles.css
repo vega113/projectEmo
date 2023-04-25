@@ -1,0 +1,30 @@
+/* Dynamic background */
+@keyframes gradientChange {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+body {
+  background: linear-gradient(-45deg, #f06, #00f, #0f0, #ff0, #f90, #f06);
+  background-size: 300% 300%;
+  animation: gradientChange 20s ease infinite;
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* Global header and footer styles */
+mat-toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+mat-toolbar button {
+  color: white;
+}

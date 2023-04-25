@@ -10,6 +10,10 @@ main {
   align-items: center;
   justify-content: center;
   flex-grow: 1;
+  /*background-image: url('assets/emo_logo.png');*/
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .value-proposition {
@@ -35,3 +39,34 @@ main {
 .features {
   /* Add styles for features section */
 }
+.spacer {
+  flex: 1;
+}
+
+/*.login-button {*/
+/*  color: #ffffff; !* Change this to your desired color *!*/
+/*}*/
+.logo {
+  width: 30px; /* Adjust the width as needed */
+  height: auto; /* Maintain aspect ratio */
+  /* Add additional CSS rules for positioning, margins, etc. */
+}
+
+@keyframes gradientChange {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+main {
+  background: linear-gradient(-45deg, #f06, #00f, #0f0, #ff0, #f90, #f06);
+  background-size: 300% 300%;
+  animation: gradientChange 20s ease infinite;
+}
+

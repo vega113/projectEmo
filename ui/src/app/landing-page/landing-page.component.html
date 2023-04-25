@@ -1,32 +1,70 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
     <span>Emotion Tracker</span>
-    <!-- Add logo here -->
+    <span class="spacer"></span>
+    <button mat-stroked-button color="accent" routerLink="/login">Login</button>
+    <button mat-raised-button color="primary" routerLink="/signup">Sign up</button>
   </mat-toolbar-row>
 </mat-toolbar>
 
 <main>
+  <ul class="circles">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
   <section class="value-proposition">
     <mat-card>
       <mat-card-title>Understand your emotions, manage stress, and improve well-being</mat-card-title>
     </mat-card>
   </section>
 
+  <section class="benefits">
+    <mat-card class="benefit-card">
+      <mat-card-header>
+        <mat-card-title>Comprehensive Emotion Tracking</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Track emotions and sub-emotions, as well as triggers like people, places, and situations to gain a deeper understanding of your emotional landscape.</p>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="benefit-card">
+      <mat-card-header>
+        <mat-card-title>Add Notes and Context</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Enter notes to provide context for your emotions and triggers, helping you to better understand and analyze your emotional patterns over time.</p>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="benefit-card">
+      <mat-card-header>
+        <mat-card-title>Personalized Suggestions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Receive suggested actions based on your emotional input, empowering you to take proactive steps towards emotional well-being and personal growth.</p>
+      </mat-card-content>
+    </mat-card>
+    <mat-card class="benefit-card">
+      <mat-card-header>
+        <mat-card-title>AI-Enhanced Insights</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Upcoming features include AI-powered insights, charts, and feedback, helping you make more informed decisions and optimize your emotional health.</p>
+      </mat-card-content>
+    </mat-card>
+  </section>
+
   <section class="cta">
+    <h3>Start tracking your emotions today!</h3>
     <button mat-raised-button color="accent" routerLink="/login">Login</button>
     <button mat-button color="primary" routerLink="/signup">Sign up</button>
-  </section>
-
-  <section class="visuals">
-    <!-- Add images or illustrations here -->
-  </section>
-
-  <section class="testimonials">
-    <!-- Add testimonials carousel or grid here -->
-  </section>
-
-  <section class="features">
-    <!-- Add feature icons and descriptions here -->
   </section>
 </main>
 

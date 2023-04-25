@@ -27,7 +27,7 @@ class AuthenticatedActionSpec extends PlaySpec with MockitoSugar {
   val validToken = "Bearer validToken"
   val invalidToken = "invalidToken"
 
-  private val fakeUser = User(Option(1L), "fakeUserName", "fakePassword", Option("fakeFirstName"), Option("fakeLastName"),  "fake_email@gmail.com", isPasswordHashed = false)
+  private val fakeUser = User(Option(1L), "fakeUserName", "fakePassword", Option("fakeFirstName"), Option("fakeLastName"),  "fake_email@gmail.com", isPasswordHashed = Some(false))
   val fakeTokenData: TokenData = fakeUser.toTokenData
 
   "AuthenticatedAction" should {

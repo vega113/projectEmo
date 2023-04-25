@@ -30,7 +30,7 @@ class JwtServiceSpec extends PlaySpec with MockitoSugar {
 
   "JwtService" should {
     "create and validate a token successfully" in new Data {
-      private val user = User(Some(1), "test-user", "test-password", Some("Test"), Some("User"), "testuser@test.com", isPasswordHashed = true)
+      private val user = User(Some(1), "test-user", "test-password", Some("Test"), Some("User"), "testuser@test.com", isPasswordHashed = Some(true))
       private val token = jwtService.createToken(user, 1.hour)
 
       jwtService.validateToken(token) mustBe Some(user.toTokenData)
