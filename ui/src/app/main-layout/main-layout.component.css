@@ -1,13 +1,31 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
+/* Default styles for small screens */
+mat-toolbar {
+  height: 64px;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
+mat-sidenav-container {
+  height: calc(100vh - 128px); /* Subtract the heights of header and footer */
 }
+
+mat-sidenav {
+  width: 200px;
+}
+
+/* Styles for medium and large screens */
+@media (min-width: 768px) {
+  mat-toolbar {
+    height: 80px;
+  }
+
+  mat-sidenav-container {
+    height: calc(100vh - 160px); /* Subtract the heights of header and footer */
+  }
+
+  mat-sidenav {
+    width: 250px;
+  }
+}
+
 
 .main-container {
   display: flex;
@@ -36,3 +54,11 @@ body {
   display: flex;
   align-items: center;
 }
+
+.sidenav {
+  background-color: rgba(63, 81, 181, 0.1); /* You can adjust the color and opacity according to your preference */
+  color: rgba(0, 0, 0, 0.87);
+  width: 250px;
+}
+
+

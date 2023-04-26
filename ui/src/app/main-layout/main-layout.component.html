@@ -1,6 +1,6 @@
 <mat-toolbar color="primary">
   <mat-toolbar-row>
-    <a routerLink="/" class="app-name">Emotion Tracker</a>
+    <a [routerLink]="(isAuthenticated | async) ? '/dashboard' : '/'" class="app-name">Emotion Tracker</a>
     <span class="spacer"></span>
     <div *ngIf="(isAuthenticated | async) === false" class="button-container">
       <button mat-stroked-button color="accent" routerLink="/login">Login</button>
@@ -10,9 +10,16 @@
   </mat-toolbar-row>
 </mat-toolbar>
 
-<div class="content">
-  <router-outlet></router-outlet>
-</div>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened="true" *ngIf="(isAuthenticated | async) === true" class="sidenav">
+  <app-navigation></app-navigation>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
 
 <mat-toolbar color="primary" class="footer">
   <mat-toolbar-row>

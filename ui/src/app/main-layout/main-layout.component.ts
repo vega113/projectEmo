@@ -5,7 +5,7 @@ import {AuthService} from "../services/auth.service";
 @Component({
   selector: 'app-main-layout',
   templateUrl: './main-layout.component.html',
-  styleUrls: ['./main-layout.component.css', './landing-page-background.css']
+  styleUrls: ['./main-layout.component.css', './main-layout-background.css']
 })
 export class MainLayoutComponent {
   public isAuthenticated: Observable<boolean>;

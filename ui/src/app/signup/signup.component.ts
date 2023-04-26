@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { User } from '../models/user.model';
+import { User } from '../models/emotion.model';
 import { AuthService } from '../services/auth.service';
 import { switchMap, first } from 'rxjs/operators';
 import {firstValueFrom} from "rxjs";

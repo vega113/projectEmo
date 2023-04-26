@@ -1,7 +1,7 @@
 // src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { User } from '../models/user.model';
+import { User } from '../models/emotion.model';
 import {tap} from "rxjs/operators";
 import { BehaviorSubject, Observable } from 'rxjs';
 

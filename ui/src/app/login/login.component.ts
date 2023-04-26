@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {Router} from "@angular/router";
 import {AuthService} from "../services/auth.service";
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -19,22 +20,20 @@ export class LoginComponent {
     });
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.loginForm.valid) {
       const { username, password } = this.loginForm.value;
-      this.authService.login(username, password).subscribe(
-        (response: any) => {
-          // Store the JWT token in localStorage or another secure place
-          localStorage.setItem('auth_token', response.token);
+      try {
+        const response = await lastValueFrom(this.authService.login(username, password));
+        // Store the JWT token in localStorage or another secure place
+        localStorage.setItem('auth_token', response.token);
 
-          // Redirect the user to the main app or another desired route
-          this.router.navigate(['/']);
-        },
-        (error) => {
-          // Handle any errors from the API, such as incorrect credentials
-          console.error('Login failed:', error);
-        }
-      );
+        // Redirect the user to the main app or another desired route
+        this.router.navigate(['/']);
+      } catch (error) {
+        // Handle any errors from the API, such as incorrect credentials
+        console.error('Login failed:', error);
+      }
     }
   }
 }

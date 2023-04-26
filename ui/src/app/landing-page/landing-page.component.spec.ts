@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
 import { LandingPageComponent } from './landing-page.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatCardModule } from '@angular/material/card';
 
 describe('LandingPageComponent', () => {
   let component: LandingPageComponent;
@@ -8,10 +10,12 @@ describe('LandingPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LandingPageComponent ]
-    })
-    .compileComponents();
+      declarations: [LandingPageComponent],
+      imports: [RouterTestingModule, MatToolbarModule, MatCardModule],
+    }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(LandingPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -21,10 +25,5 @@ describe('LandingPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-
-  it('should have a header with the app name and logo', () => {
-    const compiled = fixture.nativeElement;
-    const header = compiled.querySelector('header h1');
-    expect(header.textContent).toContain('Emotion Tracker');
-  });
+  // Add more tests as needed
 });

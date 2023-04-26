@@ -18,6 +18,15 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatInputModule} from "@angular/material/input";
 import {MatIconModule} from "@angular/material/icon";
 import { MainLayoutComponent } from './main-layout/main-layout.component';
+import { NavigationComponent } from './navigation/navigation.component';
+import { CreateEmotionComponent } from './create-emotion/create-emotion.component';
+import { DisplayEmotionComponent } from './display-emotion/display-emotion.component';
+import { EmotionsTimelineComponent } from './emotions-timeline/emotions-timeline.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import {MatListModule} from "@angular/material/list";
+import { MatSidenavModule } from '@angular/material/sidenav';
+
+
 
 
 @NgModule({
@@ -26,7 +35,12 @@ import { MainLayoutComponent } from './main-layout/main-layout.component';
     LoginComponent,
     LandingPageComponent,
     SignupComponent,
-    MainLayoutComponent
+    MainLayoutComponent,
+    NavigationComponent,
+    CreateEmotionComponent,
+    DisplayEmotionComponent,
+    EmotionsTimelineComponent,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -39,7 +53,10 @@ import { MainLayoutComponent } from './main-layout/main-layout.component';
     MatCardModule,
     MatButtonModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
+    MatListModule,
+    MatSidenavModule
+
   ],
   providers: [],
   bootstrap: [AppComponent]
