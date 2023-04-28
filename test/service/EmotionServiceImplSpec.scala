@@ -3,7 +3,7 @@ package service
 import scala.concurrent.{Await, Future}
 import org.scalatestplus.play._
 import org.scalatestplus.mockito.MockitoSugar
-import controllers.model.{EmotionData, EmotionWithSubEmotions, SubEmotionWithActions}
+import controllers.model.{EmotionData, EmotionTypesWithEmotions, EmotionWithSubEmotions, SubEmotionWithActions}
 import dao.model.{Emotion, SubEmotion, SuggestedAction, Trigger}
 import dao.{DatabaseExecutionContext, EmotionDao, SubEmotionDao, SuggestedActionDao, TriggerDao}
 import org.mockito.Mockito.when
@@ -36,7 +36,6 @@ class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
       when(mockSuggestedActionDao.findAllBySubEmotionId("Content")(connection)).thenReturn(suggestedActions)
       when(mockTriggerDao.findAll()(connection)).thenReturn(triggers)
 
-
       val subEmotionWithActions: SubEmotionWithActions = SubEmotionWithActions(
         subEmotions.head, suggestedActions)
       val emotionWithSubEmotions1: EmotionWithSubEmotions = EmotionWithSubEmotions(
@@ -45,7 +44,9 @@ class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
       val emotionWithSubEmotions2: EmotionWithSubEmotions = EmotionWithSubEmotions(
         emotions.last, List()
       )
-      val expectedEmotionData = EmotionData(List(emotionWithSubEmotions1, emotionWithSubEmotions2),triggers)
+      val emotionType1 = EmotionTypesWithEmotions("Positive", List(emotionWithSubEmotions1))
+      val emotionType2 = EmotionTypesWithEmotions("Negative", List(emotionWithSubEmotions2))
+      val expectedEmotionData = EmotionData(List(emotionType2, emotionType1),triggers)
 
       val actual: Future[EmotionData] = emotionServiceImpl.fetchEmotionData()
 

@@ -1,21 +1,21 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpErrorResponse} from '@angular/common/http';
 import { User } from '../models/emotion.model';
-import {tap} from "rxjs/operators";
-import { BehaviorSubject, Observable } from 'rxjs';
-
+import { tap, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { ErrorService } from './error.service';
+import {JwtHelperService} from "@auth0/angular-jwt";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = 'http://localhost:4200/api';
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+  public isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
 
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private errorService: ErrorService) {
     const token = localStorage.getItem('auth_token');
     this.isAuthenticatedSubject.next(!!token);
   }
@@ -38,12 +38,30 @@ export class AuthService {
           this.isAuthenticatedSubject.next(true);
           console.log('User logged in successfully', response);
           localStorage.setItem('auth_token', response.token);
-        })
-      )
+        }),
+        catchError((error: HttpErrorResponse) => this.errorService.handleError(error, 'Login failed'))
+      );
   }
 
   logout() {
     localStorage.removeItem('auth_token');
     this.isAuthenticatedSubject.next(false);
+  }
+
+  getAuthorizationHeader(): HttpHeaders {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      return new HttpHeaders({
+        Authorization: `Bearer ${token}`,
+      });
+    } else {
+      return new HttpHeaders();
+    }
+  }
+
+  fetchDecodedToken() {
+    const helper = new JwtHelperService();
+    const encodedToken = localStorage.getItem('token');
+    return new JwtHelperService().decodeToken(encodedToken!);
   }
 }

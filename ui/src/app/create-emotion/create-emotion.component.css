@@ -1,0 +1,98 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 1rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 500px;
+  width: 100%;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+button {
+  width: 100%;
+}
+.create-emotion-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mat-form-field {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 16px;
+}
+
+.mat-slider {
+  width: 100%;
+  max-width: 300px;
+}
+.create-emotion-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mat-form-field {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 16px;
+}
+
+.intensity-container {
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 16px;
+}
+
+.intensity-label {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.mat-slider {
+  width: 100%;
+  max-width: 300px;
+}
+
+.intensity-color {
+  width: 100%;
+  max-width: 300px;
+  height: 5px;
+  margin-top: 8px;
+  border-radius: 3px;
+}
+#container-1 /deep/ .mat-accent .mat-slider-track-fill {
+  background: red!important;
+}
+#container-2 /deep/ .mat-accent .mat-slider-track-fill {
+  background: blue!important;
+}
+#container-3 /deep/ .mat-accent .mat-slider-track-fill {
+  background: green!important;
+}
+#container-4 /deep/ .mat-accent .mat-slider-track-fill {
+  background: yellow!important;
+}
+#container-5 /deep/ .mat-accent .mat-slider-track-fill {
+  background: purple!important;
+}
+

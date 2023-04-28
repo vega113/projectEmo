@@ -1,7 +1,7 @@
 package service
 
 import com.google.inject.ImplementedBy
-import controllers.model.EmotionData
+import controllers.model._
 import dao.{DatabaseExecutionContext, EmotionDao, SubEmotionDao, SuggestedActionDao, TriggerDao}
 
 import javax.inject.Inject
@@ -30,7 +30,12 @@ class EmotionDataServiceImpl @Inject()(emotionDao: EmotionDao,
         val emotionSubEmotions = emotions.map(emotion => controllers.model.EmotionWithSubEmotions(emotion,
           subEmotionsWithSuggestedActions.filter(_.subEmotion.parentEmotionId.
             getOrElse(throw new RuntimeException("EmotionId is null")) == emotion.id)))
-        EmotionData(emotionSubEmotions, triggers)
+
+        val emotionTypes = emotionSubEmotions.groupBy(_.emotion.emotionType).map {
+          case (emotionType, emotionWithSubEmotions) => EmotionTypesWithEmotions(emotionType,
+            emotionWithSubEmotions)
+        }.toList
+        EmotionData(emotionTypes, triggers)
       }
     }
   }

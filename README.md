@@ -28,6 +28,16 @@ Emotion Tracker is a web application that allows users to track and analyze thei
 - Docker
 
 ### Installation
+```agsl
+npm install karma-jasmine --save-dev                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+npm install --save-dev karma                                                                                                                                                         
+npm install -g karma-cli                                                                                                                                                             
+npm install jasmine-core --save-dev                                                                                                                                                  
+npm install karma-coverage-istanbul-reporter --save-dev   
+npm install @auth0/angular-jwt
+npm install @angular/material
+```
+
 
 1. Clone the repository: `git clone https://github.com/<username>/emotion-tracker.git`
 2. Change into the project directory: `cd emotion-tracker`

@@ -6,6 +6,15 @@ export interface User {
   firstName?: string;
   lastName?: string;
 }
+export interface EmotionData {
+  emotionTypes: EmotionTypesWithEmotions[];
+  triggers: Trigger[];
+}
+
+interface EmotionTypesWithEmotions {
+  emotionType: string;
+  emotions: EmotionWithSubEmotions[];
+}
 
 export interface EmotionWithSubEmotions {
   emotion: Emotion;
