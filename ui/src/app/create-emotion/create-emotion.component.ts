@@ -1,9 +1,15 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
-import {EmotionData, EmotionRecord} from "../models/emotion.model";
+import {
+  EmotionData,
+  EmotionRecord,
+  EmotionTypesWithEmotions,
+  EmotionWithSubEmotions, SubEmotionWithActions, Trigger
+} from "../models/emotion.model";
 import {AuthService} from "../services/auth.service";
-import {filter} from "rxjs";
+import {filter, from} from "rxjs";
+import {tap} from "rxjs/operators";
 
 
 @Component({
@@ -13,18 +19,21 @@ import {filter} from "rxjs";
 })
 export class CreateEmotionComponent implements OnInit {
   emotionForm: FormGroup;
-  emotionIntensityValue: number = 0;
+  emotionIntensityValue: number = 1;
   sliderColor = 'rgba(75, 192, 192, 0.2)';
 
   emotionCache: EmotionData | undefined;
+
+  emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
+  emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService) {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
-      emotionId: [''],
-      triggerId: [''],
-      subEmotionId: ['']
+      emotion: [''],
+      trigger: [''],
+      subEmotion: ['']
     });
   }
 
@@ -42,14 +51,23 @@ export class CreateEmotionComponent implements OnInit {
     });
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.emotionForm.valid) {
       const emotionFromData = this.emotionForm.value;
       const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
-      this.emotionService.insertEmotionRecord(emotionRecord).subscribe(response => {
-        // Handle success
-        console.log(response);
-      });
+      console.log(`Emotion record to be inserted: ${JSON.stringify(emotionRecord)}`);
+      try {
+        await from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
+          (response) => {
+            console.log('Emotion record inserted successfully', response);
+          },
+          (error) => {
+            console.error('Error inserting emotion record', error);
+          }
+        )
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 
@@ -57,10 +75,10 @@ export class CreateEmotionComponent implements OnInit {
     const decodedToken = this.authService.fetchDecodedToken();
     return {
       userId: decodedToken.userId,
-      emotionId: emotionFromData.emotionId,
-      intensity: emotionFromData.intensity,
-      subEmotions: [emotionFromData.subEmotionId],
-      triggers: [emotionFromData.triggerId],
+      emotionId: emotionFromData.emotion.emotion.id,
+      intensity: this.emotionIntensityValue,
+      subEmotions: [{"subEmotionId": emotionFromData.subEmotion.subEmotionId}],
+      triggers: [{"triggerId": emotionFromData.trigger.triggerId}],
     };
   }
 
@@ -69,8 +87,53 @@ export class CreateEmotionComponent implements OnInit {
     const r = Math.round(255 * (intensity / 10));
     const g = Math.round(255 * (1 - intensity / 10));
     this.sliderColor = `rgb(${r}, ${g}, 0)`;
-    this.emotionIntensityValue = intensity;
+    if (intensity) {
+      this.emotionIntensityValue = intensity;
+    }
   }
 
-  // protected readonly filter = filter;
+  makeEmotionTypesList(): string[] {
+    if (this.emotionCache) {
+      this.emotionTypesWithEmotions = this.emotionCache.emotionTypes;
+      return this.emotionCache.emotionTypes.map(emotionTypeObject => emotionTypeObject.emotionType);
+    } else {
+      return [];
+    }
+  }
+
+  makeEmotionsList(): EmotionWithSubEmotions[] {
+    if (this.emotionCache && this.emotionTypesWithEmotions) {
+      const selectedEmotionType = this.emotionForm.get('emotionType')?.value;
+      const emotionTypeObject = this.emotionTypesWithEmotions.find(emotionTypeObject => emotionTypeObject.emotionType === selectedEmotionType);
+      if (emotionTypeObject) {
+        this.emotionWithSubEmotions = emotionTypeObject.emotions;
+        return emotionTypeObject.emotions;
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
+  }
+
+  makeSubEmotionsList(): SubEmotionWithActions[] {
+    if (this.emotionCache) {
+      const selectedEmotionObject = this.emotionForm.get('emotion')?.value as EmotionWithSubEmotions;
+      if (selectedEmotionObject) {
+        return selectedEmotionObject.subEmotions;
+      } else {
+        return [];
+      }
+    } else {
+      return [];
+    }
+  }
+
+  makeTriggersList(): Trigger[] {
+    if (this.emotionCache) {
+      return this.emotionCache.triggers;
+    } else {
+      return [];
+    }
+  }
 }

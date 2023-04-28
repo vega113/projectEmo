@@ -3,7 +3,7 @@
     <mat-form-field>
       <mat-label>Emotion Type</mat-label>
       <mat-select formControlName="emotionType">
-        <mat-option *ngFor="let emotion of emotionCache?.emotionTypes" [value]="emotion.emotionType">{{ emotion.emotionType }}</mat-option>
+        <mat-option *ngFor="let emotionType of makeEmotionTypesList()" [value]="emotionType">{{ emotionType }}</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -24,24 +24,22 @@
 
     <mat-form-field>
       <mat-label>Emotion</mat-label>
-      <mat-select formControlName="emotionId">
-        <mat-option *ngFor="let emotion of emotionCache?.emotionTypes" [value]="emotion.emotions.id" [hidden]="emotionForm.get('emotionType').value !== emotion.emotion.emotionType">{{ emotion.emotion.emotionName }}</mat-option>
+      <mat-select formControlName="emotion">
+        <mat-option *ngFor="let emotionWithSubEmotion of makeEmotionsList()" [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Sub-Emotion</mat-label>
-      <mat-select formControlName="subEmotionId">
-        <ng-container *ngFor="let emotion of emotionCache?.emotions">
-          <mat-option *ngFor="let subEmotion of emotion.subEmotions" [value]="subEmotion.subEmotion.subEmotionId" [hidden]="emotionForm.get('emotionId').value !== subEmotion.subEmotion.parentEmotionId">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
-        </ng-container>
+      <mat-select formControlName="subEmotion">
+        <mat-option *ngFor="let subEmotion of makeSubEmotionsList()" [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
       </mat-select>
     </mat-form-field>
 
     <mat-form-field>
       <mat-label>Trigger</mat-label>
-      <mat-select formControlName="triggerId">
-        <mat-option *ngFor="let trigger of emotionCache?.triggers" [value]="trigger.triggerId">{{ trigger.triggerName }}</mat-option>
+      <mat-select formControlName="trigger">
+        <mat-option *ngFor="let trigger of makeTriggersList()" [value]="trigger">{{ trigger.description }}</mat-option>
       </mat-select>
     </mat-form-field>
 

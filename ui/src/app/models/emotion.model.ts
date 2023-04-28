@@ -11,7 +11,7 @@ export interface EmotionData {
   triggers: Trigger[];
 }
 
-interface EmotionTypesWithEmotions {
+export interface EmotionTypesWithEmotions {
   emotionType: string;
   emotions: EmotionWithSubEmotions[];
 }

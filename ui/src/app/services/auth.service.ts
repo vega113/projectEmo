@@ -61,7 +61,7 @@ export class AuthService {
 
   fetchDecodedToken() {
     const helper = new JwtHelperService();
-    const encodedToken = localStorage.getItem('token');
+    const encodedToken = localStorage.getItem('auth_token');
     return new JwtHelperService().decodeToken(encodedToken!);
   }
 }

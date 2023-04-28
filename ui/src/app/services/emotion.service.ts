@@ -22,7 +22,8 @@ export class EmotionService {
   }
 
   insertEmotionRecord(emotionRecord: Omit<EmotionRecord, 'id'>) {
-    const headers = this.authService.getAuthorizationHeader();
+    const headers: HttpHeaders = this.authService.getAuthorizationHeader();
+    headers.set('Content-Type', 'application/json');
     return this.http
       .post<EmotionRecord>(`${this.apiUrl}/emotionRecord`, emotionRecord, { headers })
       .pipe(catchError(resp => this.errorService.handleError(resp)));
