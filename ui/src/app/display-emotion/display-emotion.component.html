@@ -1,1 +1,37 @@
-<p>display-emotion works!</p>
+<div class="display-emotion-container">
+  <h2>Emotion Details</h2>
+  <div>
+    <strong>Emotion:</strong> {{ emotion.emotionId }}
+  </div>
+  <div>
+    <strong>Intensity:</strong> {{ emotion.intensity }}
+  </div>
+  <div>
+    <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0].subEmotionName }}
+  </div>
+  <div>
+    <strong>Trigger:</strong> {{ emotion.triggers[0].description }}
+  </div>
+  <div>
+    <strong>Created:</strong> {{ emotion.created }}
+  </div>
+
+
+  <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
+    <div class="note-container">
+      <label for="note">Add a note:</label>
+      <textarea id="note" formControlName="note" rows="4"></textarea>
+    </div>
+    <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid">Submit Note</button>
+  </form>
+
+  <div class="actions-container">
+    <button (click)="getSuggestedActions()">Get Suggested Actions</button>
+    <div *ngIf="suggestedActions">
+      <h3>Suggested Actions:</h3>
+      <ul>
+        <li *ngFor="let action of suggestedActions">{{ action.name }}</li>
+      </ul>
+    </div>
+  </div>
+</div>
