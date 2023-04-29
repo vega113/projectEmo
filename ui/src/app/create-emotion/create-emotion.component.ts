@@ -10,6 +10,8 @@ import {
 import {AuthService} from "../services/auth.service";
 import {filter, from} from "rxjs";
 import {tap} from "rxjs/operators";
+import {EmotionStateService} from "../services/emotion-state.service";
+import {Router} from "@angular/router";
 
 
 @Component({
@@ -27,7 +29,8 @@ export class CreateEmotionComponent implements OnInit {
   emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
-  constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService) {
+  constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
+      private emotionStateService: EmotionStateService, private router: Router) {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
@@ -60,6 +63,8 @@ export class CreateEmotionComponent implements OnInit {
         await from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
           (response) => {
             console.log('Emotion record inserted successfully', response);
+            this.emotionStateService.updateNewEmotion(emotionRecord);
+            this.router.navigate(['/display-emotion']);
           },
           (error) => {
             console.error('Error inserting emotion record', error);
