@@ -21,9 +21,23 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def findById(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
-    emotionRecordService.findById(token.user.userId).map {
+    emotionRecordService.findByIdForUser(id, token.user.userId).map {
       case Some(emotionRecord) => Ok(Json.toJson(emotionRecord))
       case None => NotFound
+    }
+  }
+
+  private def validateUserId(bodyUserId: Option[Long], tokenUserId: Long): Boolean = {
+    bodyUserId match {
+      case Some(id) => id == tokenUserId
+      case None => true
+    }
+  }
+
+  private def fetchRecord(id: Long, userId: Long): Future[EmotionRecord] = {
+    emotionRecordService.findByIdForUser(id, userId).map {
+      case Some(emotionRecord) => emotionRecord
+      case None => throw new RuntimeException(s"Record not found recordId: $id userId: $userId")
     }
   }
 
@@ -33,9 +47,13 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
-        emotionRecordService.insert(emotionRecord).map {
-          case Some(id) => Created(Json.toJson(emotionRecord.copy(id = Option(id))))
-          case None => InternalServerError
+        if (!validateUserId(emotionRecord.userId, token.user.userId)) {
+          Future.successful(BadRequest(Json.obj("message" -> "Invalid user id")))
+        } else {
+          emotionRecordService.insert(emotionRecord).flatMap {
+            case Some(id) => fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))
+            case None => Future.successful(InternalServerError)
+          }
         }
       }
     )

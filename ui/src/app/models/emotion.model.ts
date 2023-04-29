@@ -51,7 +51,7 @@ export interface SubEmotion {
 
 export interface EmotionRecord {
   id?: number;
-  userId: number;
+  userId?: number;
   emotionId: string;
   intensity: number;
   subEmotions: SubEmotion[];

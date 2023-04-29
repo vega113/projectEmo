@@ -49,7 +49,7 @@ class EmotionRecordControllerSpec extends PlaySpec with MockitoSugar with GuiceO
 
       val subEmotions = List(SubEmotion(Option("Amusement"), Option("Amusement"), Option("Joy")))
       val triggers = List(Trigger(Option(1), Some("Person"), Some(1), Some(1), Some("Listening to music")))
-      val emotionRecord = EmotionRecord(None, 1, "Joy", 5, subEmotions, triggers)
+      val emotionRecord = EmotionRecord(None, Option(1L), "Joy", 5, subEmotions, triggers)
 
       val jsonFromObj = Json.toJson(emotionRecord)
       println("emotionRecordWithRelations from object:" + jsonFromObj.toString())

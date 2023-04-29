@@ -1,14 +1,13 @@
 ### insert EmotionRecord
-POST http://localhost:9000/emotionRecord
+POST http://localhost:9000/api/emotionRecord
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTI3NzY5MzksImlhdCI6MTY4MTI0MDkzOSwidXNlcklkIjozLCJ1c2VybmFtZSI6IkZpZnR5b25lQWRtaW5Vc2VyMSIsImVtYWlsIjoiRmlmdHlvbmVBZG1pblVzZXIxQGVtYWlsLmNvbSIsImZpcnN0bmFtZSI6Ill1cmkiLCJsYXN0bmFtZSI6IlVzZXIiLCJyb2xlIjoidXNlciJ9.brtjzMVjEv_h_MiZkCjuexDovZFBkm-eYlQdSAXR1n4
 Content-Type: application/json
 
 {
   "emotionRecord": {
-    "id": 1,
     "userId": "1",
     "emotionId": "Joy",
-    "intensity": 5,
-    "created": "2023-04-01T13:04:47.271"
+    "intensity": 5
   },
   "subEmotions": [
     {
@@ -34,8 +33,8 @@ Content-Type: application/json
 
 # curl --location 'http://localhost:9000/emotionRecord'
 # Get all EmotionRecords
-GET http://localhost:9000/emotionRecord
-
+GET http://localhost:9000/emotionRecord/4
+Content-Type: application/json
 ###
 
 

@@ -14,6 +14,7 @@ POST          /api/emotionRecord                          controllers.EmotionRec
 PUT           /api/emotionRecord/:id                      controllers.EmotionRecordController.update(id: Int)
 DELETE        /api/emotionRecord/:id                      controllers.EmotionRecordController.delete(id: Int)
 GET           /api/emotionRecord/user/:userId             controllers.EmotionRecordController.findAllByUserId(userId: Int)
+GET           /api/emotionRecord/id                       controllers.EmotionRecordController.findById(id: Int)
 
 # Cache routes
 GET           /api/emotion                                controllers.EmotionController.findAll()

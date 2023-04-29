@@ -9,7 +9,7 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[EmotionRecordServiceImpl])
 trait EmotionRecordService {
   def findAll(): Future[List[EmotionRecord]]
-  def findById(id: Long): Future[Option[EmotionRecord]]
+  def findByIdForUser(recordId: Long, userId: Long): Future[Option[EmotionRecord]]
   def findAllByUserId(userId: Long): Future[List[EmotionRecord]]
   def insert(emotionRecord: EmotionRecord): Future[Option[Long]]
   def update(emotionRecord: EmotionRecord): Future[Int]
@@ -26,9 +26,9 @@ class EmotionRecordServiceImpl @Inject()(
     })
   }
 
-  override def findById(id: Long): Future[Option[EmotionRecord]] = {
+  override def findByIdForUser(recordId: Long, userId: Long): Future[Option[EmotionRecord]]= {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.findById(id)
+      emotionRecordDao.findByIdForUser(recordId, userId)
     }))
   }
 

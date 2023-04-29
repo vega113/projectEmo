@@ -36,7 +36,7 @@ object model {
 
   case class EmotionRecord(
                             id: Option[Long],
-                            userId: Int,
+                            userId: Option[Long],
                             emotionId: String,
                             intensity: Int,
                             subEmotions: List[SubEmotion],
@@ -128,7 +128,7 @@ object model {
 
     implicit val parser: RowParser[EmotionRecord] = {
       get[Option[Long]]("id") ~
-        int("user_id") ~
+        get[Option[Long]]("user_id") ~
         str("emotion_id") ~
         int("intensity") ~
         get[Option[LocalDateTime]]("created") map {
