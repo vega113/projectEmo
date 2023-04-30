@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -7,8 +7,15 @@ import { CreateEmotionComponent } from './create-emotion.component';
 import { EmotionService } from '../services/emotion.service';
 
 import { of } from 'rxjs';
-import {EmotionRecord} from "../models/emotion.model";
+import {Emotion, EmotionRecord, SubEmotion} from "../models/emotion.model";
 import {MatSliderModule} from "@angular/material/slider";
+import {HttpClientModule} from "@angular/common/http";
+import {MatSelectModule} from "@angular/material/select";
+import {MatOptionModule, MatRippleModule} from "@angular/material/core";
+import {MatCardModule} from "@angular/material/card";
+import { RouterTestingModule } from '@angular/router/testing';
+import { routes } from '../app-routing.module';
+import {AuthService} from "../services/auth.service";
 
 // Mock EmotionService
 class MockEmotionService {
@@ -23,6 +30,15 @@ class MockEmotionService {
   }
 }
 
+class MockAuthService {
+  fetchDecodedToken() {
+    return {
+      userId: 1,
+      username: 'testuser',
+    }
+  }
+}
+
 describe('CreateEmotionComponent', () => {
   let component: CreateEmotionComponent;
   let fixture: ComponentFixture<CreateEmotionComponent>;
@@ -31,14 +47,20 @@ describe('CreateEmotionComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
+        FormsModule, MatRippleModule, MatCardModule,
         ReactiveFormsModule,
         MatFormFieldModule,
         MatInputModule,
         BrowserAnimationsModule,
-        MatSliderModule
+        MatSliderModule,
+        HttpClientModule,
+        MatSelectModule,
+        MatOptionModule,
+        RouterTestingModule.withRoutes(routes),
       ],
       declarations: [CreateEmotionComponent],
-      providers: [{ provide: EmotionService, useClass: MockEmotionService }],
+      providers: [{ provide: EmotionService, useClass: MockEmotionService },
+        { provide: AuthService, useClass: MockAuthService }]
     }).compileComponents();
   });
 
@@ -65,6 +87,7 @@ describe('CreateEmotionComponent', () => {
   });
 
   it('should submit the form successfully', () => {
+    localStorage.setItem('auth_token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTI3NzY5MzksImlhdCI6MTY4MTI0MDkzOSwidXNlcklkIjozLCJ1c2VybmFtZSI6IkZpZnR5b25lQWRtaW5Vc2VyMSIsImVtYWlsIjoiRmlmdHlvbmVBZG1pblVzZXIxQGVtYWlsLmNvbSIsImZpcnN0bmFtZSI6Ill1cmkiLCJsYXN0bmFtZSI6IlVzZXIiLCJyb2xlIjoidXNlciJ9.brtjzMVjEv_h_MiZkCjuexDovZFBkm-eYlQdSAXR1n4');
     spyOn(emotionService, 'insertEmotionRecord').and.callThrough();
 
     component.emotionForm.controls["emotionType"].setValue('positive');
@@ -84,26 +107,28 @@ describe('CreateEmotionComponent', () => {
 
     component.changeSliderColor(event);
 
-    expect(component.sliderColor).toBe('rgb(127, 127, 0)');
+    expect(component.sliderColor).toBe('rgb(128, 128, 0)');
     expect(component.emotionIntensityValue).toBe(5);
   });
 
   it('should submit the form with all optional values', () => {
     spyOn(emotionService, 'insertEmotionRecord').and.callThrough();
 
-    component.emotionForm.controls["emotionType"].setValue("positive");
-    component.emotionForm.controls["intensity"].setValue(5);
-    component.emotionForm.controls["emotionId"].setValue("Joy");
-    component.emotionForm.controls["triggerId"].setValue(2);
-    component.emotionForm.controls["subEmotionId"].setValue("Gratitude");
+    component.emotionForm.controls['emotionType'].setValue("positive");
+    component.emotionForm.controls['intensity'].setValue(5);
+    component.emotionForm.controls['emotion'].setValue({"id": "Joy", "emotionType": "positive", "emotionName": "Joy"} as Emotion);
+    component.emotionForm.controls['trigger'].setValue({"id": 2, "triggerName": "Family"});
+    component.emotionForm.controls['subEmotion'].setValue({"subEmotionId": "Gratitude", "subEmotionName": "Gratitude"} as SubEmotion);
+    component.changeSliderColor({ target: { valueAsNumber: 5 } })
+
     component.onSubmit();
 
     const expectedData: any = {
-      emotionType: "positive",
+      userId: 1,
       intensity: 5,
-      emotionId: "Joy",
-      triggerId: 2,
-      subEmotionId: "Gratitude",
+      emotion: {"id": "Joy", "emotionType": "positive", "emotionName": "Joy"},
+      triggers: [{ id: 2, triggerName: 'Family' }],
+      subEmotions: [{ subEmotionId: 'Gratitude', subEmotionName: 'Gratitude' }],
     };
 
     expect(emotionService.insertEmotionRecord).toHaveBeenCalledWith(expectedData);

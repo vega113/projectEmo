@@ -27,7 +27,6 @@ import {MatListModule} from "@angular/material/list";
 import { MatSidenavModule } from '@angular/material/sidenav';
 import {MatSelectModule} from "@angular/material/select";
 import {MatSliderModule} from "@angular/material/slider";
-import {FilterPipe} from "./services/filter.pipe";
 
 @NgModule({
   declarations: [
@@ -40,8 +39,7 @@ import {FilterPipe} from "./services/filter.pipe";
     CreateEmotionComponent,
     DisplayEmotionComponent,
     EmotionsTimelineComponent,
-    DashboardComponent,
-    FilterPipe
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

@@ -15,7 +15,7 @@ class AuthenticatedAction @Inject()(userService: UserService, jwtService: JwtSer
       case Some(token) if token.startsWith("Bearer ") =>
         jwtService.validateToken(token.stripPrefix("Bearer ")) match {
           case Some(user) =>
-            userService.findByUsername(user.username) flatMap  {
+            userService.findById(user.userId) flatMap  {
               case Some(user) => Future.successful(Right(new AuthenticatedRequest(user.toTokenData, request)))
               case None => Future.successful(Left(Results.Unauthorized("Invalid token")))
             }

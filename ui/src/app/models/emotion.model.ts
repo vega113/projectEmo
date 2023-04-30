@@ -39,8 +39,9 @@ export interface User {
 
 export interface Emotion {
   id: string;
-  emotionName: string;
+  emotionName?: string;
   emotionType: string;
+  description?: string;
 }
 
 export interface SubEmotion {
@@ -52,7 +53,7 @@ export interface SubEmotion {
 export interface EmotionRecord {
   id?: number;
   userId?: number;
-  emotionId: string;
+  emotion: Emotion,
   intensity: number;
   subEmotions: SubEmotion[];
   triggers: Trigger[];

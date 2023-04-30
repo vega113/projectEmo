@@ -49,7 +49,7 @@ class AuthenticatedActionSpec extends PlaySpec with MockitoSugar {
     "return Ok when a valid token is present in the headers" in {
       val request: Request[AnyContent] = FakeRequest("GET", "/", FakeHeaders(Seq("Authorization" -> validToken)), AnyContentAsEmpty)
       when(mockJwtService.validateToken(any())).thenReturn(Some(fakeTokenData))
-      when(mockUserService.findByUsername(fakeUser.username)).thenReturn(Future.successful(Some(fakeUser)))
+      when(mockUserService.findById(fakeUser.userId.get)).thenReturn(Future.successful(Some(fakeUser)))
       val result: Future[Result] = testAuthenticatedAction.invokeBlock(request, (_: AuthenticatedRequest[AnyContent]) => Future.successful(Results.Ok))
       val response: Result = await(result)
       response mustBe Results.Ok

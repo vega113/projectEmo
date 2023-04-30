@@ -80,19 +80,4 @@ button {
   margin-top: 8px;
   border-radius: 3px;
 }
-#container-1 /deep/ .mat-accent .mat-slider-track-fill {
-  background: red!important;
-}
-#container-2 /deep/ .mat-accent .mat-slider-track-fill {
-  background: blue!important;
-}
-#container-3 /deep/ .mat-accent .mat-slider-track-fill {
-  background: green!important;
-}
-#container-4 /deep/ .mat-accent .mat-slider-track-fill {
-  background: yellow!important;
-}
-#container-5 /deep/ .mat-accent .mat-slider-track-fill {
-  background: purple!important;
-}
 

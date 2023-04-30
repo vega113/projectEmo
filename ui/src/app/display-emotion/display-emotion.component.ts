@@ -22,7 +22,11 @@ export class DisplayEmotionComponent {
   emotion: any = {
     id: 17,
     userId: 4,
-    emotionId: "Interest",
+    emotion: {
+      emotionId: "Interest",
+      emotionName: "Interest",
+      description: "Interest"
+    },
     intensity: 4,
     subEmotions: [
       {

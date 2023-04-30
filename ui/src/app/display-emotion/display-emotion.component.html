@@ -1,7 +1,7 @@
 <div class="display-emotion-container">
   <h2>Emotion Details</h2>
   <div>
-    <strong>Emotion:</strong> {{ emotion.name }}
+    <strong>Emotion:</strong> {{ emotion.emotion.emotionName }}
   </div>
   <div>
     <strong>Intensity:</strong> {{ emotion.intensity }}
@@ -18,7 +18,7 @@
 
 
   <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
-    <div class="note-container">
+  <div class="note-container">
       <label for="note">Add a note:</label>
       <textarea id="note" formControlName="note" rows="4"></textarea>
     </div>

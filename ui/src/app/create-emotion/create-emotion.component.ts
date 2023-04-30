@@ -2,14 +2,14 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {
+  Emotion,
   EmotionData,
   EmotionRecord,
   EmotionTypesWithEmotions,
   EmotionWithSubEmotions, SubEmotionWithActions, Trigger
 } from "../models/emotion.model";
 import {AuthService} from "../services/auth.service";
-import {filter, from} from "rxjs";
-import {tap} from "rxjs/operators";
+import {from} from "rxjs";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {Router} from "@angular/router";
 
@@ -61,13 +61,15 @@ export class CreateEmotionComponent implements OnInit {
       console.log(`Emotion record to be inserted: ${JSON.stringify(emotionRecord)}`);
       try {
         await from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
-          (response) => {
-            console.log('Emotion record inserted successfully', response);
-            this.emotionStateService.updateNewEmotion(emotionRecord);
-            this.router.navigate(['/display-emotion']);
-          },
-          (error) => {
-            console.error('Error inserting emotion record', error);
+          {
+            next: (response) => {
+              console.log('Emotion record inserted successfully', response);
+              this.emotionStateService.updateNewEmotion(emotionRecord);
+              this.router.navigate(['/display-emotion']);
+            },
+            error: (error) => {
+              console.error('Error inserting emotion record', error);
+            }
           }
         )
       } catch (error) {
@@ -78,13 +80,14 @@ export class CreateEmotionComponent implements OnInit {
 
   convertEmotionFromDataToEmotionRecord(emotionFromData: any): EmotionRecord {
     const decodedToken = this.authService.fetchDecodedToken();
-    return {
+    const emotionRecord: EmotionRecord = {
       userId: decodedToken.userId,
-      emotionId: emotionFromData.emotion.emotion.id,
       intensity: this.emotionIntensityValue,
-      subEmotions: [{"subEmotionId": emotionFromData.subEmotion.subEmotionId}],
-      triggers: [{"triggerId": emotionFromData.trigger.triggerId}],
+      emotion: emotionFromData.emotion,
+      subEmotions: [emotionFromData.subEmotion],
+      triggers: [emotionFromData.trigger],
     };
+    return emotionRecord;
   }
 
   changeSliderColor(event: any) {
@@ -98,7 +101,7 @@ export class CreateEmotionComponent implements OnInit {
   }
 
   makeEmotionTypesList(): string[] {
-    if (this.emotionCache) {
+    if (this.emotionCache && this.emotionCache.emotionTypes) {
       this.emotionTypesWithEmotions = this.emotionCache.emotionTypes;
       return this.emotionCache.emotionTypes.map(emotionTypeObject => emotionTypeObject.emotionType);
     } else {

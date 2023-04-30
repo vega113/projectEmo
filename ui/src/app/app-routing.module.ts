@@ -9,8 +9,9 @@ import {EmotionsTimelineComponent} from "./emotions-timeline/emotions-timeline.c
 import {DashboardComponent} from "./dashboard/dashboard.component";
 import { AuthGuard } from './services/auth.guard';
 import {DisplayEmotionComponent} from "./display-emotion/display-emotion.component";
+import { MatListModule } from '@angular/material/list';
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: '',
@@ -27,7 +28,7 @@ const routes: Routes = [
   },
 ];
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes), MatListModule],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}

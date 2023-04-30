@@ -48,7 +48,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       },
       emotionRecord => {
         if (!validateUserId(emotionRecord.userId, token.user.userId)) {
-          Future.successful(BadRequest(Json.obj("message" -> "Invalid user id")))
+          Future.successful(BadRequest(Json.obj("message" -> s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
         } else {
           emotionRecordService.insert(emotionRecord).flatMap {
             case Some(id) => fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))

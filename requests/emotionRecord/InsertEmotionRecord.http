@@ -5,7 +5,10 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTI3NzY5M
 
 {
   "userId": 3,
-  "emotionId": "Joy",
+  "emotion": {
+    "id": "Joy",
+    "emotionType": "Positive"
+  },
   "intensity": 7,
   "subEmotions": [
     {

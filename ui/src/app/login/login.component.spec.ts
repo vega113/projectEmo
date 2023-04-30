@@ -4,6 +4,11 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { LoginComponent } from './login.component';
+import {MatCardModule} from "@angular/material/card";
+import {MatButtonModule} from "@angular/material/button";
+import {MatInputModule} from "@angular/material/input";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -17,7 +22,9 @@ describe('LoginComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [ LoginComponent ],
-      imports: [ ReactiveFormsModule ],
+      imports: [ ReactiveFormsModule, MatCardModule,  MatFormFieldModule, MatInputModule,
+        MatButtonModule, BrowserAnimationsModule
+      ],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy }
@@ -40,8 +47,8 @@ describe('LoginComponent', () => {
     const username = 'testuser';
     const password = 'testpassword';
 
-    component.loginForm.controls[username].setValue(username);
-    component.loginForm.controls[password].setValue(password);
+    component.loginForm.controls['username'].setValue(username);
+    component.loginForm.controls['password'].setValue(password);
 
     authServiceSpy.login.and.returnValue(of({ token: 'testtoken' }));
 

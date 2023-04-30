@@ -5,6 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { of } from 'rxjs';
 
 describe('MainLayoutComponent', () => {
@@ -18,7 +19,8 @@ describe('MainLayoutComponent', () => {
         RouterTestingModule,
         MatButtonModule,
         MatToolbarModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        MatSidenavModule
       ],
       declarations: [MainLayoutComponent],
       providers: [
