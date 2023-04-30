@@ -26,18 +26,19 @@ object model {
       username, email, firstName.getOrElse(""), lastName.getOrElse(""))
   }
 
-  case class Emotion(id: String, emotionName: String, emotionType: String)
+  case class Emotion(id: String, emotionName: String, emotionType: String, description: Option[String] = None)
 
   case class SubEmotion(
                          subEmotionId: Option[String],
                          subEmotionName: Option[String],
+                         description: Option[String],
                          parentEmotionId: Option[String]
                        )
 
   case class EmotionRecord(
                             id: Option[Long],
                             userId: Option[Long],
-                            emotionId: String,
+                            emotion: Emotion,
                             intensity: Int,
                             subEmotions: List[SubEmotion],
                             triggers: List[Trigger],
@@ -116,9 +117,10 @@ object model {
     implicit val parser: RowParser[SubEmotion] = {
       get[Option[String]]("sub_emotion_id") ~
         get[Option[String]]("sub_emotion_name") ~
+        get[Option[String]]("description") ~
         get[Option[String]]("parent_emotion_id") map {
-        case subEmotionId ~ subEmotionName ~ parentEmotionId =>
-          SubEmotion(subEmotionId, subEmotionName, parentEmotionId)
+        case subEmotionId ~ subEmotionName ~ description ~ parentEmotionId =>
+          SubEmotion(subEmotionId, subEmotionName, description, parentEmotionId)
       }
     }
   }
@@ -133,7 +135,7 @@ object model {
         int("intensity") ~
         get[Option[LocalDateTime]]("created") map {
         case id ~ userId ~ emotionId ~ intensity ~ created =>
-          EmotionRecord(id, userId, emotionId, intensity, List(), List(), created)
+          EmotionRecord(id, userId, Emotion(emotionId, emotionId, "", Some("")), intensity, List(), List(), created) // TODO: Fix fetch emotion details and populate
       }
     }
   }

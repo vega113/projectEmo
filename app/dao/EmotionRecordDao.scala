@@ -6,7 +6,7 @@ import dao.model._
 import java.sql.Connection
 import javax.inject.Inject
 
-class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmotionDao, emotionRecordTriggerDao: EmotionRecordTriggerDao) {
+class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmotionDao, emotionRecordTriggerDao: EmotionRecordTriggerDao, emotionDao: EmotionDao) {
   def findAll()(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records").as(EmotionRecord.parser.*)
     populateSubEmotionsTriggersByEmotionRecord(emotionRecords)
@@ -17,6 +17,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       emotionRecord <- emotionRecords
       id <- emotionRecord.id.toList
     } yield emotionRecord.copy(
+      emotion = emotionDao.findById(emotionRecord.emotion.id).getOrElse(throw new RuntimeException(s"Emotion not found for emotion record id: $id")),
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
       triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id)
     )
@@ -41,7 +42,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       INSERT INTO emotion_records (emotion_id, user_id, intensity)
       VALUES ({emotionId}, {userId}, {intensity})
     """).on("userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
-      "emotionId" -> emotionRecord.emotionId,
+      "emotionId" -> emotionRecord.emotion.id,
       "intensity" -> emotionRecord.intensity)
       .executeInsert()
     idOpt.foreach(id => insertSubLists(emotionRecord, id))
@@ -82,7 +83,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       WHERE id = {id}
     """).on("id" -> emotionRecord.id,
       "userId" -> emotionRecord.userId,
-      "emotionId" -> emotionRecord.emotionId,
+      "emotionId" -> emotionRecord.emotion.id,
       "intensity" -> emotionRecord.intensity)
       .executeUpdate()
 
