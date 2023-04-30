@@ -2,11 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {
-  Emotion,
   EmotionData,
   EmotionRecord,
   EmotionTypesWithEmotions,
-  EmotionWithSubEmotions, SubEmotionWithActions, Trigger
+  EmotionWithSubEmotions,
+  SubEmotionWithActions,
+  Trigger
 } from "../models/emotion.model";
 import {AuthService} from "../services/auth.service";
 import {from} from "rxjs";
@@ -80,14 +81,13 @@ export class CreateEmotionComponent implements OnInit {
 
   convertEmotionFromDataToEmotionRecord(emotionFromData: any): EmotionRecord {
     const decodedToken = this.authService.fetchDecodedToken();
-    const emotionRecord: EmotionRecord = {
+    return {
       userId: decodedToken.userId,
       intensity: this.emotionIntensityValue,
-      emotion: emotionFromData.emotion,
-      subEmotions: [emotionFromData.subEmotion],
-      triggers: [emotionFromData.trigger],
+      emotion: {id: emotionFromData.emotion.emotion.id, emotionType: emotionFromData.emotion.emotion.emotionType},
+      subEmotions: [{subEmotionId: emotionFromData.subEmotion.subEmotionId}],
+      triggers: [{triggerId: emotionFromData.trigger.triggerId}],
     };
-    return emotionRecord;
   }
 
   changeSliderColor(event: any) {

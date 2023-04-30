@@ -116,8 +116,8 @@ describe('CreateEmotionComponent', () => {
 
     component.emotionForm.controls['emotionType'].setValue("positive");
     component.emotionForm.controls['intensity'].setValue(5);
-    component.emotionForm.controls['emotion'].setValue({"id": "Joy", "emotionType": "positive", "emotionName": "Joy"} as Emotion);
-    component.emotionForm.controls['trigger'].setValue({"id": 2, "triggerName": "Family"});
+    component.emotionForm.controls['emotion'].setValue({emotion: {"id": "Joy", "emotionType": "positive", "emotionName": "Joy"} as Emotion});
+    component.emotionForm.controls['trigger'].setValue({"triggerId": 2, "triggerName": "Family"});
     component.emotionForm.controls['subEmotion'].setValue({"subEmotionId": "Gratitude", "subEmotionName": "Gratitude"} as SubEmotion);
     component.changeSliderColor({ target: { valueAsNumber: 5 } })
 
@@ -126,9 +126,9 @@ describe('CreateEmotionComponent', () => {
     const expectedData: any = {
       userId: 1,
       intensity: 5,
-      emotion: {"id": "Joy", "emotionType": "positive", "emotionName": "Joy"},
-      triggers: [{ id: 2, triggerName: 'Family' }],
-      subEmotions: [{ subEmotionId: 'Gratitude', subEmotionName: 'Gratitude' }],
+      emotion: {"id": "Joy", "emotionType": "positive"},
+      triggers: [{ triggerId: 2}],
+      subEmotions: [{ subEmotionId: 'Gratitude'}],
     };
 
     expect(emotionService.insertEmotionRecord).toHaveBeenCalledWith(expectedData);
