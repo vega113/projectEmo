@@ -27,9 +27,9 @@ class EmotionDataServiceImpl @Inject()(emotionDao: EmotionDao,
           SubEmotionWithActions(subEmotion, suggestedActionDao.findAllBySubEmotionId(subEmotion.subEmotionId.getOrElse(
             throw new RuntimeException("subEmotionId is null")))))
         val triggers = triggerDao.findAll()
-        val emotionSubEmotions = emotions.map(emotion => controllers.model.EmotionWithSubEmotions(emotion,
-          subEmotionsWithSuggestedActions.filter(_.subEmotion.parentEmotionId.
-            getOrElse(throw new RuntimeException("EmotionId is null")) == emotion.id)))
+        val emotionSubEmotions: List[EmotionWithSubEmotions] = emotions.map(emotion => controllers.model.EmotionWithSubEmotions(emotion,
+          subEmotionsWithSuggestedActions.filter(subEmotionsWithSuggestedAction =>
+            compareOptions(subEmotionsWithSuggestedAction.subEmotion.parentEmotionId, emotion.id))))
 
         val emotionTypes = emotionSubEmotions.groupBy(_.emotion.emotionType).map {
           case (emotionType, emotionWithSubEmotions) => EmotionTypesWithEmotions(emotionType,
@@ -37,6 +37,13 @@ class EmotionDataServiceImpl @Inject()(emotionDao: EmotionDao,
         }.toList
         EmotionData(emotionTypes, triggers)
       }
+    }
+  }
+
+  def compareOptions[T](actual: Option[T], expected: Option[T]): Boolean = {
+    (actual, expected) match {
+      case (Some(a), Some(e)) => a == e
+      case _ => false
     }
   }
 }

@@ -40,7 +40,7 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
   }
 
   "Emotion" should "serialize and deserialize correctly" in {
-    val emotion = Emotion("1", Option("Happiness"), "Positive")
+    val emotion = Emotion(Some("1"), Option("Happiness"), "Positive")
     val json = Json.toJson(emotion)
     val deserializedEmotion = json.as[Emotion]
     deserializedEmotion shouldBe emotion
@@ -51,7 +51,7 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
   "EmotionRecord" should "serialize and deserialize correctly" in {
     val subEmotions = List(SubEmotion(Option("Amusement"), Option("Amusement"), Option("description"), Option("Joy")))
     val triggers = List(Trigger(Option(1), Some("Person"), Some(1), Some(1), Some("Listening to music")))
-    val emotionRecord = EmotionRecord(Option(1), Option(1L), Emotion("Joy", Option("Joy"), "Positive", Some("description")), 5, subEmotions, triggers)
+    val emotionRecord = EmotionRecord(Option(1), Option(1L), Emotion(Some("Joy"), Option("Joy"), "Positive", Some("description")), 5, subEmotions, triggers)
 
     val json = Json.toJson(emotionRecord)
     println("emotionRecordWithRelations:" + json.toString())

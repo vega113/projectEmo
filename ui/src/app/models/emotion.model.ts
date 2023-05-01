@@ -38,7 +38,7 @@ export interface User {
 }
 
 export interface Emotion {
-  id: string;
+  id?: string;
   emotionName?: string;
   emotionType: string;
   description?: string;

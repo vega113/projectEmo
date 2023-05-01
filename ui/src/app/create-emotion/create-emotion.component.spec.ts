@@ -92,6 +92,7 @@ describe('CreateEmotionComponent', () => {
 
     component.emotionForm.controls["emotionType"].setValue('positive');
     component.emotionForm.controls["intensity"].setValue(5);
+    component.changeSliderColor({ target: { valueAsNumber: 5 } })
 
     component.onSubmit();
 

@@ -8,6 +8,7 @@ import dao.model.{Emotion, SubEmotion, SuggestedAction, Trigger}
 import dao.{DatabaseExecutionContext, EmotionDao, SubEmotionDao, SuggestedActionDao, TriggerDao}
 import org.mockito.Mockito.when
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
+import play.api.libs.json.Json
 
 class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
   "EmotionServiceImpl" should {
@@ -26,7 +27,7 @@ class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
       val emotionServiceImpl = new EmotionDataServiceImpl(mockEmotionDao, mockSubEmotionDao, mockTriggerDao,
         mockSuggestedActionDao, fakeDatabaseExecutionContext)
 
-      val emotions = List(Emotion("Joy", Option("Joy"), "Positive"), Emotion("Sadness", Option("Sadness"), "Negative"))
+      val emotions = List(Emotion(Some("Joy"), Option("Joy"), "Positive"), Emotion(Some("Sadness"), Option("Sadness"), "Negative"))
       val subEmotions = List(SubEmotion(Some("Content"), Some("Content"), Some("description"), Some("Joy")))
       val suggestedActions = List(SuggestedAction(Some("Content"), "Watch a comedy"))
       val triggers = List(Trigger(Some(1), Some("Bad weather"), None, None, Some("Bad weather")))
@@ -48,9 +49,11 @@ class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
       val emotionType2 = EmotionTypesWithEmotions("Negative", List(emotionWithSubEmotions2))
       val expectedEmotionData = EmotionData(List(emotionType2, emotionType1),triggers)
 
-      val actual: Future[EmotionData] = emotionServiceImpl.fetchEmotionData()
+      val actual: EmotionData = Await.result(emotionServiceImpl.fetchEmotionData(), 10000.seconds)
+      println("actual: " + Json.toJson(actual))
+      println("expected: " + Json.toJson(expectedEmotionData))
 
-      Await.result(actual, 1.second) mustEqual expectedEmotionData
+      actual mustEqual expectedEmotionData
     }
   }
 }

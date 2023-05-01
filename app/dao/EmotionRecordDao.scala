@@ -17,7 +17,8 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       emotionRecord <- emotionRecords
       id <- emotionRecord.id.toList
     } yield emotionRecord.copy(
-      emotion = emotionDao.findById(emotionRecord.emotion.id).getOrElse(throw new RuntimeException(s"Emotion not found for emotion record id: $id")),
+      emotion = emotionRecord.emotion.id.flatMap(emotionId => emotionDao.findById(emotionId)).
+        getOrElse(throw new RuntimeException(s"Emotion not found for emotion record id: $id")) ,
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
       triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id)
     )

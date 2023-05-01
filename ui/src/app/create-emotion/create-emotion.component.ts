@@ -2,10 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {
+  Emotion,
   EmotionData,
   EmotionRecord,
   EmotionTypesWithEmotions,
   EmotionWithSubEmotions,
+  SubEmotion,
   SubEmotionWithActions,
   Trigger
 } from "../models/emotion.model";
@@ -81,12 +83,28 @@ export class CreateEmotionComponent implements OnInit {
 
   convertEmotionFromDataToEmotionRecord(emotionFromData: any): EmotionRecord {
     const decodedToken = this.authService.fetchDecodedToken();
+    const emotion: any = {}
+    if (emotionFromData.emotion?.emotion?.id) {
+      emotion.id = emotionFromData.emotion.emotion.id;
+    }
+    if (emotionFromData.emotion?.emotion?.emotionType) {
+      emotion.emotionType = emotionFromData.emotion.emotion.emotionType;
+    }
+    const subEmotions: any[] = [];
+    if (emotionFromData.subEmotion?.subEmotionId) {
+      subEmotions.push({subEmotionId: emotionFromData.subEmotion.subEmotionId});
+    }
+    const triggers: any[] = [];
+    if (emotionFromData.trigger?.triggerId) {
+      triggers.push({triggerId: emotionFromData.trigger.triggerId});
+    }
+
     return {
       userId: decodedToken.userId,
       intensity: this.emotionIntensityValue,
-      emotion: {id: emotionFromData.emotion.emotion.id, emotionType: emotionFromData.emotion.emotion.emotionType},
-      subEmotions: [{subEmotionId: emotionFromData.subEmotion.subEmotionId}],
-      triggers: [{triggerId: emotionFromData.trigger.triggerId}],
+      emotion: emotion as Emotion,
+      subEmotions: subEmotions as SubEmotion[],
+      triggers: triggers as Trigger[]
     };
   }
 
