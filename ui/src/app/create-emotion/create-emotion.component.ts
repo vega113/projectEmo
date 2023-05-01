@@ -67,7 +67,7 @@ export class CreateEmotionComponent implements OnInit {
           {
             next: (response) => {
               console.log('Emotion record inserted successfully', response);
-              this.emotionStateService.updateNewEmotion(emotionRecord);
+              this.emotionStateService.updateNewEmotion(response);
               this.router.navigate(['/display-emotion']);
             },
             error: (error) => {

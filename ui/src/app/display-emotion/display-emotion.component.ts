@@ -25,7 +25,8 @@ export class DisplayEmotionComponent {
     emotion: {
       emotionId: "Interest",
       emotionName: "Interest",
-      description: "Interest"
+      description: "Interest",
+      emotionType: "Positive"
     },
     intensity: 4,
     subEmotions: [
@@ -65,6 +66,7 @@ export class DisplayEmotionComponent {
   ngOnInit(): void {
     this.emotionStateService.newEmotionRecord$.subscribe((newEmotion) => {
       if (newEmotion) {
+        this.emotion = newEmotion;
         // Add the new emotion to the list of displayed emotions, or update the list of displayed emotions
         console.log('New emotion received:', newEmotion);
       }
