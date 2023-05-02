@@ -6,9 +6,9 @@ import {
   EmotionData,
   EmotionRecord,
   EmotionTypesWithEmotions,
-  EmotionWithSubEmotions,
+  EmotionWithSubEmotions, Note,
   SubEmotion,
-  SubEmotionWithActions,
+  SubEmotionWithActions, Tag,
   Trigger
 } from "../models/emotion.model";
 import {AuthService} from "../services/auth.service";
@@ -98,13 +98,20 @@ export class CreateEmotionComponent implements OnInit {
     if (emotionFromData.trigger?.triggerId) {
       triggers.push({triggerId: emotionFromData.trigger.triggerId});
     }
+    const notes: any[] = [];
+    if (emotionFromData.notes) {
+      notes.push({note: emotionFromData.note.text});
+    }
+    const tags: any[] = [];
 
     return {
       userId: decodedToken.userId,
       intensity: this.emotionIntensityValue,
       emotion: emotion as Emotion,
       subEmotions: subEmotions as SubEmotion[],
-      triggers: triggers as Trigger[]
+      triggers: triggers as Trigger[],
+      notes: notes as Note[],
+      tags: tags as Tag[]
     };
   }
 

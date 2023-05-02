@@ -4,6 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import dao.model._
 import play.api.libs.json.Json
+import uitil.TestObjectsFactory.createEmotionRecord
 
 import java.time.LocalDateTime
 
@@ -28,7 +29,7 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
         |  "isPasswordHashed": false
         |}
         |""".stripMargin
-        val json = Json.parse(jsonStr)
+    val json = Json.parse(jsonStr)
     val deserializedUser = json.as[User]
 
     deserializedUser.username shouldBe "example_user2"
@@ -49,10 +50,7 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
   // Similar tests for other case classes
 
   "EmotionRecord" should "serialize and deserialize correctly" in {
-    val subEmotions = List(SubEmotion(Option("Amusement"), Option("Amusement"), Option("description"), Option("Joy")))
-    val triggers = List(Trigger(Option(1), Some("Person"), Some(1), Some(1), Some("Listening to music")))
-    val emotionRecord = EmotionRecord(Option(1), Option(1L), Emotion(Some("Joy"), Option("Joy"), "Positive", Some("description")), 5, subEmotions, triggers)
-
+    val emotionRecord = createEmotionRecord()
     val json = Json.toJson(emotionRecord)
     println("emotionRecordWithRelations:" + json.toString())
     val deserializedEmotionRecord = json.as[EmotionRecord]
@@ -65,7 +63,12 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
         |{
         |  "id": 1,
         |  "userId": 1,
-        |  "emotion": {"id": "Joy", "emotionType": "Positive", "emotionName": "Joy", "description": "description"},
+        |  "emotion": {
+        |    "id": "Joy",
+        |    "emotionType": "Positive",
+        |    "emotionName": "Joy",
+        |    "description": "description"
+        |  },
         |  "intensity": 5,
         |  "subEmotions": [
         |    {
@@ -87,8 +90,22 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
         |      "createdByUser": 1,
         |      "description": "Listening to music"
         |    }
+        |  ],
+        |  "notes": [
+        |    {
+        |      "id": 1,
+        |      "title": "Note 1",
+        |      "text": "Note 1 description"
+        |    }
+        |  ],
+        |  "tags": [
+        |    {
+        |      "tagId": 1,
+        |      "tagName": "Tag 1"
+        |    }
         |  ]
-        |}""".stripMargin)
+        |}
+        |""".stripMargin)
     println("json:" + json.toString())
     val deserializedEmotionRecord = json.as[EmotionRecord]
     println("deserializedEmotionRecord:" + deserializedEmotionRecord.toString)

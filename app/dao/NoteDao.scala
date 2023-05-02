@@ -7,7 +7,11 @@ import service.DateTimeService
 import java.sql.Connection
 import javax.inject.Inject
 
-class NoteDao @Inject() (dateTimeService: DateTimeService) {
+class NoteDao @Inject()(dateTimeService: DateTimeService) {
+  def findAllByEmotionRecordId(id: Long)(implicit connection: Connection): List[Note] = {
+    SQL("SELECT * FROM notes WHERE note_emotion_record_id = {id}").on("id" -> id).as(Note.parser.*)
+  }
+
   def findAll()(implicit connection: Connection): List[Note] = {
     SQL("SELECT * FROM notes").as(Note.parser.*)
   }
@@ -17,25 +21,24 @@ class NoteDao @Inject() (dateTimeService: DateTimeService) {
   }
 
   def insert(note: Note)(implicit connection: Connection): Option[Long] = {
-    SQL("""
-      INSERT INTO notes (title, note_text, note_user_id, created)
-      VALUES ({title}, {noteText}, {noteUserId}, {created})
-    """).on("title" -> note.title,
-      "note_text" -> note.noteText,
-      "note_user_id" -> note.noteUserId,
-      "created" -> dateTimeService.now())
+    SQL(
+      """
+      INSERT INTO notes (title, text, id, created)
+      VALUES ({title}, {text}, {created})""").
+      on("title" -> note.title, "text" -> note.text,
+        "created" -> dateTimeService.now())
       .executeInsert()
   }
 
   def update(note: Note)(implicit connection: Connection): Int = {
-    SQL("""
+    SQL(
+      """
       UPDATE notes
       SET title = {title}, content = {content}, user_id = {userId}, last_updated = {lastUpdated}
       WHERE id = {id}
-    """).on("note_id" -> note.noteId,
+    """).on("note_id" -> note.id,
       "title" -> note.title,
-      "note_text" -> note.noteText,
-      "note_user_id" -> note.noteUserId,
+      "text" -> note.text,
       "created" -> dateTimeService.now())
       .executeUpdate()
   }

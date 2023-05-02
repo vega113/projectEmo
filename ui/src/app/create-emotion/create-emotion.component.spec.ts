@@ -130,6 +130,8 @@ describe('CreateEmotionComponent', () => {
       emotion: {"id": "Joy", "emotionType": "positive"},
       triggers: [{ triggerId: 2}],
       subEmotions: [{ subEmotionId: 'Gratitude'}],
+      notes: [],
+      tags: [],
     };
 
     expect(emotionService.insertEmotionRecord).toHaveBeenCalledWith(expectedData);

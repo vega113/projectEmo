@@ -19,9 +19,22 @@
     <strong>Created:</strong> {{ emotion.created }}
   </div>
 
+  <div *ngIf="emotion.notes.length > 0">
+    <h3>Notes:</h3>
+    <ul>
+      <li *ngFor="let note of emotion.notes">{{ note.title }} - {{ note.text }}</li>
+    </ul>
+  </div>
+
+  <div *ngIf="emotion.tags.length > 0">
+    <h3>Tags:</h3>
+    <ul>
+      <li *ngFor="let tag of emotion.tags">{{ tag.tagName }}</li>
+    </ul>
+  </div>
 
   <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
-  <div class="note-container">
+    <div class="note-container">
       <label for="note">Add a note:</label>
       <textarea id="note" formControlName="note" rows="4"></textarea>
     </div>

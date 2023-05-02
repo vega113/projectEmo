@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import { SuggestedAction } from '../models/emotion.model';
+import {SuggestedAction} from '../models/emotion.model';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
@@ -12,11 +12,12 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 export class DisplayEmotionComponent {
 
 
-  constructor(private fb: FormBuilder,private emotionService: EmotionService, private emotionStateService: EmotionStateService) {
+  constructor(private fb: FormBuilder, private emotionService: EmotionService, private emotionStateService: EmotionStateService) {
     this.noteForm = this.fb.group({
       note: ['', Validators.required]
     });
   }
+
   noteForm: FormGroup;
 
   emotion: any = {
@@ -43,6 +44,21 @@ export class DisplayEmotionComponent {
         description: "People",
         created: "2023-03-31T07:13:18"
       }
+    ],
+    notes: [
+      {
+        id: 1,
+        title: "I was interested",
+        text: "I was interested in the people I was talking to",
+        created: "2023-04-29T22:17:58"
+      },
+    ],
+    tags: [
+      {
+        tagId: 1,
+        tagName: "People",
+        created: "2023-03-31T07:13:18"
+      },
     ],
     created: "2023-04-29T22:17:58"
   };

@@ -6,7 +6,11 @@ import dao.model._
 import java.sql.Connection
 import javax.inject.Inject
 
-class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmotionDao, emotionRecordTriggerDao: EmotionRecordTriggerDao, emotionDao: EmotionDao) {
+class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmotionDao,
+                                 emotionRecordTriggerDao: EmotionRecordTriggerDao,
+                                 emotionDao: EmotionDao,
+                                 noteDao: NoteDao
+                                ) {
   def findAll()(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records").as(EmotionRecord.parser.*)
     populateSubEmotionsTriggersByEmotionRecord(emotionRecords)
@@ -20,7 +24,8 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       emotion = emotionRecord.emotion.id.flatMap(emotionId => emotionDao.findById(emotionId)).
         getOrElse(throw new RuntimeException(s"Emotion not found for emotion record id: $id")) ,
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
-      triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id)
+      triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id),
+      notes = noteDao.findAllByEmotionRecordId(id),
     )
   }
 

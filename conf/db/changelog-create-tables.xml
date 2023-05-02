@@ -183,19 +183,31 @@
 
     <changeSet id="create_notes_table" author="Yuri Zelikov">
         <createTable tableName="notes">
-            <column name="note_id" type="int" autoIncrement="true">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="note_text" type="varchar(255)">
+            <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="note_user_id" type="int"/>
+            <column name="text" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <createIndex indexName="fk_notes_user_id" tableName="notes">
-            <column name="note_user_id"/>
+    </changeSet>
+
+    <changeSet id="create_emotion_record_notes_table" author="Yuri Zelikov">
+        <createTable tableName="emotion_record_notes">
+            <column name="emotion_record_id" type="int"/>
+            <column name="note_id" type="int"/>
+        </createTable>
+        <createIndex indexName="fk_emotion_record_notes_emotion_record_id" tableName="emotion_record_notes">
+            <column name="emotion_record_id"/>
+        </createIndex>
+        <createIndex indexName="fk_emotion_record_tags_note_id" tableName="emotion_record_notes">
+            <column name="note_id"/>
         </createIndex>
     </changeSet>
 

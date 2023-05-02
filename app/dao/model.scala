@@ -42,6 +42,8 @@ object model {
                             intensity: Int,
                             subEmotions: List[SubEmotion],
                             triggers: List[Trigger],
+                            notes: List[Note],
+                            tags: List[Tag],
                             created: Option[LocalDateTime] = None
                           )
 
@@ -55,10 +57,9 @@ object model {
                     )
 
   case class Note(
-                   noteId: Option[Int],
+                   id: Option[Int],
                    title: Option[String],
-                   noteText: String,
-                   noteUserId: Int,
+                   text: String,
                    created: Option[LocalDateTime] = None
                  )
 
@@ -136,7 +137,8 @@ object model {
         int("intensity") ~
         get[Option[LocalDateTime]]("created") map {
         case id ~ userId ~ emotionId ~ intensity ~ created =>
-          EmotionRecord(id, userId, Emotion(emotionId, None, "", None), intensity, List(), List(), created)
+          EmotionRecord(id, userId, Emotion(emotionId, None, "", None), intensity, List(), List(), List(), List(),
+            created)
       }
     }
   }
@@ -177,11 +179,10 @@ object Note {
     implicit val parser: RowParser[Note] = {
       get[Option[Int]]("note_id") ~
         get[Option[String]]("title") ~
-        str("note_text") ~
-        int("note_user_id") ~
+        str("text") ~
         get[Option[LocalDateTime]]("created") map {
-        case noteId ~ title ~ noteText ~ noteUserId ~ created =>
-          Note(noteId, title, noteText, noteUserId, created)
+        case noteId ~ title ~ noteText ~ created =>
+          Note(noteId, title, noteText, created)
       }
     }
   }

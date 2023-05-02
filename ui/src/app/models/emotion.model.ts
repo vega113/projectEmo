@@ -57,6 +57,8 @@ export interface EmotionRecord {
   intensity: number;
   subEmotions: SubEmotion[];
   triggers: Trigger[];
+  notes: Note[];
+  tags: Tag[];
   created?: string;
 }
 
