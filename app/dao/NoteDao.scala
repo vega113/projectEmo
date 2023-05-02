@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class NoteDao @Inject()(dateTimeService: DateTimeService) {
   def findAllByEmotionRecordId(id: Long)(implicit connection: Connection): List[Note] = {
-    SQL("SELECT * FROM notes WHERE note_emotion_record_id = {id}").on("id" -> id).as(Note.parser.*)
+    SQL("SELECT * FROM notes inner join emotion_record_notes on id = note_id  WHERE emotion_record_id = {id}").on("id" -> id).as(Note.parser.*)
   }
 
   def findAll()(implicit connection: Connection): List[Note] = {
