@@ -16,6 +16,7 @@ form {
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem; /* Add spacing between the notes list and the form */
 }
 
 mat-form-field {
@@ -26,23 +27,7 @@ mat-form-field {
 button {
   width: 100%;
 }
-.create-emotion-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
 
-.mat-form-field {
-  width: 100%;
-  max-width: 300px;
-  margin-bottom: 16px;
-}
-
-.mat-slider {
-  width: 100%;
-  max-width: 300px;
-}
 .create-emotion-container {
   display: flex;
   flex-direction: column;
@@ -81,3 +66,12 @@ button {
   border-radius: 3px;
 }
 
+/* Add styles for the textarea */
+.note-container textarea {
+  width: 100%;
+  max-width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 16px; /* Add spacing between the textarea and the submit button */
+}

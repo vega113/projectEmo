@@ -17,6 +17,8 @@ export class DisplayEmotionComponent {
       note: ['', Validators.required]
     });
   }
+  noteSaved: boolean = false;
+
 
   isLoading: boolean = true;
 
@@ -56,9 +58,16 @@ export class DisplayEmotionComponent {
       const note = {
         text: this.noteForm.value.note,
       } as Note;
-      this.emotionService.addNoteToEmotionRecord(this.emotion.id, note).subscribe((updatedEmotion) => {
-        this.emotionStateService.updateNewEmotion(updatedEmotion);
-        this.noteForm.reset();
+      this.emotionService.addNoteToEmotionRecord(this.emotion.id, note).subscribe({
+        next: (response) => {
+          this.emotionStateService.updateNewEmotion(response);
+          this.noteForm.reset();
+          console.log('Note inserted successfully', response);
+          this.noteSaved = true;
+        },
+        error: (error) => {
+          console.error('Error inserting note', error);
+        }
       });
     }
   }

@@ -25,9 +25,11 @@
 
     <div *ngIf="emotion.notes?.length > 0">
       <h3>Notes:</h3>
-      <ul>
-        <li *ngFor="let note of emotion.notes">{{ note.title }} - {{ note.text }}</li>
-      </ul>
+      <div class="notes-list">
+        <div class="note" *ngFor="let note of emotion.notes">
+          {{ note.text }}
+        </div>
+      </div>
     </div>
 
     <div *ngIf="emotion.tags?.length > 0">
@@ -39,10 +41,12 @@
 
     <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
       <div class="note-container">
-        <label for="note">Add a note:</label>
-        <textarea id="note" formControlName="note" rows="4"></textarea>
+        <label for="note">Add a note (max 240 chars):</label>
+        <textarea id="note" formControlName="note" rows="4" maxlength="240"></textarea>
+        <p *ngIf="noteForm.get('note')?.value?.length >= 240">Note limit reached.</p>
       </div>
       <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid">Submit Note</button>
+      <p *ngIf="noteSaved">Note saved successfully.</p>
     </form>
 
     <div class="actions-container">
