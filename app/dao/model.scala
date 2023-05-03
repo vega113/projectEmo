@@ -39,7 +39,7 @@ object model {
                             id: Option[Long],
                             emotionType: String,
                             userId: Option[Long],
-                            emotion: Emotion,
+                            emotion: Option[Emotion],
                             intensity: Int,
                             subEmotions: List[SubEmotion],
                             triggers: List[Trigger],
@@ -138,8 +138,10 @@ object model {
         get[Option[String]]("emotion_id") ~
         int("intensity") ~
         get[Option[LocalDateTime]]("created") map {
-        case id ~ emotionType ~ userId ~ emotionId ~ intensity ~ created =>
-          EmotionRecord(id, emotionType, userId, Emotion(emotionId, None, "", None), intensity, List(), List(), List(), List(),
+        case id ~ emotionType ~ userId ~ emotionIdOpt  ~ intensity ~ created =>
+          EmotionRecord(id, emotionType, userId,
+            emotionIdOpt.map(emotionId => Emotion(Some(emotionId), None, "", None)),
+            intensity, List(), List(), List(), List(),
             created)
       }
     }

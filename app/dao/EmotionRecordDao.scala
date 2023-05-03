@@ -21,7 +21,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       emotionRecord <- emotionRecords
       id <- emotionRecord.id.toList
     } yield emotionRecord.copy(
-      emotion = emotionRecord.emotion.id.flatMap(emotionId => emotionDao.findById(emotionId)).
+      emotion = emotionRecord.emotion.map(emotion => emotion.id.flatMap(emotionId => emotionDao.findById(emotionId))) .
         getOrElse(emotionRecord.emotion) ,
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
       triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id),
@@ -49,7 +49,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       VALUES ({emotionType}, {emotionId}, {userId}, {intensity})
     """).on("userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
       "emotionType" -> emotionRecord.emotionType,
-      "emotionId" -> emotionRecord.emotion.id,
+      "emotionId" -> emotionRecord.emotion.flatMap(_.id),
       "intensity" -> emotionRecord.intensity)
       .executeInsert()
     idOpt.foreach(id => insertSubLists(emotionRecord, id))
@@ -89,7 +89,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       WHERE id = {id}
     """).on("id" -> emotionRecord.id,
       "userId" -> emotionRecord.userId,
-      "emotionId" -> emotionRecord.emotion.id,
+      "emotionId" -> emotionRecord.emotion.flatMap(_.id),
       "intensity" -> emotionRecord.intensity)
       .executeUpdate()
 

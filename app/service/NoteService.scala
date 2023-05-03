@@ -18,14 +18,17 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao,
                       emotionRecordService: EmotionRecordService,
                       databaseExecutionContext: DatabaseExecutionContext) extends NoteService {
   override def insert(userId: Long, emotionRecordId: Long, note: Note): Future[Option[Long]] = {
-    databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordService.findByIdForUser(emotionRecordId, userId).map {
-        case Some(_) =>
-          val noteIdOpt = noteDao.insert(emotionRecordId, note)
-          noteDao.linkNoteToEmotionRecord(noteIdOpt.get, emotionRecordId)
-          noteIdOpt
-        case None => None
-      }
-    })
+    val userFutOpt = emotionRecordService.findByIdForUser(emotionRecordId, userId)
+    userFutOpt.flatMap {
+      case Some(_) => databaseExecutionContext.withConnection({ implicit connection =>
+        val noteId: Long = noteDao.insert(emotionRecordId, note) match {
+          case Some(id) => id
+          case None => throw new Exception("Failed to insert note")
+        }
+        noteDao.linkNoteToEmotionRecord(noteId, emotionRecordId)
+        Future.successful(Some(noteId))
+      })
+      case None => Future.successful(None)
+    }
   }
 }

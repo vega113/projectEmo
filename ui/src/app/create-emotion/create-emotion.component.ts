@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   Emotion,
   EmotionData,
@@ -33,7 +34,7 @@ export class CreateEmotionComponent implements OnInit {
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
-      private emotionStateService: EmotionStateService, private router: Router) {
+      private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar ) {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
@@ -72,6 +73,11 @@ export class CreateEmotionComponent implements OnInit {
             },
             error: (error) => {
               console.error('Error inserting emotion record', error);
+              this.snackBar.open('Failed to submit the emotion record', 'Close', {
+                duration: 5000,
+                panelClass: ['error-snackbar']
+              });
+
             }
           }
         )
@@ -83,8 +89,9 @@ export class CreateEmotionComponent implements OnInit {
 
   convertEmotionFromDataToEmotionRecord(emotionFromData: any): EmotionRecord {
     const decodedToken = this.authService.fetchDecodedToken();
-    const emotion: any = {}
+    let emotion: any = null;
     if (emotionFromData.emotion?.emotion?.id) {
+      emotion = {};
       emotion.id = emotionFromData.emotion.emotion.id;
     }
     const subEmotions: any[] = [];

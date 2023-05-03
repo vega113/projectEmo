@@ -28,6 +28,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import {MatSelectModule} from "@angular/material/select";
 import {MatSliderModule} from "@angular/material/slider";
 
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -56,7 +58,8 @@ import {MatSliderModule} from "@angular/material/slider";
     MatListModule,
     MatSidenavModule,
     MatSelectModule,
-    MatSliderModule
+    MatSliderModule,
+    MatSnackBarModule
 
   ],
   providers: [],

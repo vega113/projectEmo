@@ -16,6 +16,8 @@ import {MatCardModule} from "@angular/material/card";
 import { RouterTestingModule } from '@angular/router/testing';
 import { routes } from '../app-routing.module';
 import {AuthService} from "../services/auth.service";
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+
 
 // Mock EmotionService
 class MockEmotionService {
@@ -57,6 +59,7 @@ describe('CreateEmotionComponent', () => {
         MatSelectModule,
         MatOptionModule,
         RouterTestingModule.withRoutes(routes),
+        MatSnackBarModule
       ],
       declarations: [CreateEmotionComponent],
       providers: [{ provide: EmotionService, useClass: MockEmotionService },

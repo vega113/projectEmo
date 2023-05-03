@@ -67,7 +67,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       },
       note => {
         noteService.insert(token.user.userId, emotionRecordId, note).flatMap {
-          case Some(id) => fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))
+          case Some(id) => fetchRecord(emotionRecordId, token.user.userId).map(record => Ok(Json.toJson(record)))
           case None => Future.successful(InternalServerError)
         }
       }
