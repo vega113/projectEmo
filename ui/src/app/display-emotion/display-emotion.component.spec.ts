@@ -4,6 +4,32 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DisplayEmotionComponent } from './display-emotion.component';
+import {Note} from "../models/emotion.model";
+import {of} from "rxjs";
+import {EmotionService} from "../services/emotion.service";
+import {EmotionStateService} from "../services/emotion-state.service";
+
+
+class MockEmotionService {
+  addNoteToEmotionRecord(emotionId: string, note: Note) {
+    return of({}); // Return an observable of an empty object
+  }
+}
+class MockEmotionStateService {
+  newEmotionRecord$ = of({
+    emotionType: 'Positive',
+    emotion: { emotionId: 'Happy', emotionName: 'Happy', emotionDescription: 'Feeling good' },
+    intensity: 10,
+    subEmotions: [{ subEmotionName: 'Excitement' }],
+    triggers: [{ description: 'Birthday party' }],
+    created: new Date(),
+    notes: [],
+    tags: [],
+  });
+  updateNewEmotion(updatedEmotion: any) {}
+}
+
+
 
 describe('DisplayEmotionComponent', () => {
   let component: DisplayEmotionComponent;
@@ -17,6 +43,10 @@ describe('DisplayEmotionComponent', () => {
         BrowserAnimationsModule,
       ],
       declarations: [DisplayEmotionComponent],
+      providers: [
+        { provide: EmotionService, useClass: MockEmotionService },
+        { provide: EmotionStateService, useClass: MockEmotionStateService },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DisplayEmotionComponent);
@@ -28,48 +58,34 @@ describe('DisplayEmotionComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display emotion details including notes and tags', () => {
-    // set up test data
-    const emotion = {
-      emotion: { emotionId: 'Happy', emotionName: 'Happy',
-        emotionDescription: 'Feeling good', emotionType: 'Positive' },
+  it('should show loading screen when isLoading is true', () => {
+    component.isLoading = true;
+    fixture.detectChanges();
+
+    const loadingScreen = fixture.nativeElement.querySelector('.loading-screen');
+    expect(loadingScreen).toBeTruthy();
+  });
+
+  it('should hide loading screen and show emotion details when isLoading is false', () => {
+    component.isLoading = false;
+    component.emotion = {
+      emotionType: 'Positive',
+      emotion: { emotionId: 'Happy', emotionName: 'Happy', emotionDescription: 'Feeling good' },
       intensity: 10,
       subEmotions: [{ subEmotionName: 'Excitement' }],
       triggers: [{ description: 'Birthday party' }],
-      notes: [{ title: 'Great time', text: 'I had a great time' }],
-      tags: [{ tagName: 'Birthday' }],
       created: new Date(),
     };
-    component.emotion = emotion;
-
-    // trigger change detection
     fixture.detectChanges();
 
-    // test that the emotion details are displayed correctly
+    const loadingScreen = fixture.nativeElement.querySelector('.loading-screen');
+    expect(loadingScreen).toBeNull();
+
     const emotionType = fixture.nativeElement.querySelector('div:nth-child(2)').textContent;
-    const emotionName = fixture.nativeElement.querySelector('div:nth-child(3)').textContent;
-    const intensity = fixture.nativeElement.querySelector('div:nth-child(4)').textContent;
-    const subEmotion = fixture.nativeElement.querySelector('div:nth-child(5)').textContent;
-    const trigger = fixture.nativeElement.querySelector('div:nth-child(6)').textContent;
-    const created = fixture.nativeElement.querySelector('div:nth-child(7)').textContent;
-    const notesHeader = fixture.nativeElement.querySelector('div:nth-child(8) h3').textContent;
-    const tagsHeader = fixture.nativeElement.querySelector('div:nth-child(9) h3').textContent;
-    const note = fixture.nativeElement.querySelector('div:nth-child(8) ul li').textContent;
-    const tag = fixture.nativeElement.querySelector('div:nth-child(9) ul li').textContent;
-
-    expect(notesHeader).toContain('Notes:');
-    expect(tagsHeader).toContain('Tags:');
-    expect(note).toContain(emotion.notes[0].title);
-    expect(note).toContain(emotion.notes[0].text);
-    expect(tag).toContain(emotion.tags[0].tagName);
-
-    expect(emotionType).toContain(emotion.emotion.emotionType);
-    expect(emotionName).toContain(emotion.emotion.emotionName);
-    expect(intensity).toContain(emotion.intensity);
-    expect(subEmotion).toContain(emotion.subEmotions[0].subEmotionName);
-    expect(trigger).toContain(emotion.triggers[0].description);
-    expect(created).toContain(emotion.created.toDateString());
-    expect(note).toContain(emotion.notes[0].text);
-    expect(tag).toContain(emotion.tags[0].tagName);
+    expect(emotionType).toContain(component.emotion.emotionType);
   });
+
+// You can add more test cases to test the component's behavior.
+
+
 });

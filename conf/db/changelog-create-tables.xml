@@ -153,9 +153,16 @@
             <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="emotion_type" type="varchar(255)">
+                    <constraints nullable="false"/>
+            </column>
             <column name="emotion_id" type="varchar(255)"/>
-            <column name="user_id" type="int"/>
-            <column name="intensity" type="int"/>
+            <column name="user_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="intensity" type="int">
+                <constraints nullable="false"/>
+            </column>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>

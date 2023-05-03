@@ -63,6 +63,7 @@ class ModelJsonSpec extends AnyFlatSpec with Matchers {
         |{
         |  "id": 1,
         |  "userId": 1,
+        |  "emotionType": "Positive",
         |  "emotion": {
         |    "id": "Joy",
         |    "emotionType": "Positive",

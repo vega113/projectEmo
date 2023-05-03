@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import {SuggestedAction} from '../models/emotion.model';
+import {Note, SuggestedAction} from '../models/emotion.model';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 @Component({
@@ -18,50 +18,12 @@ export class DisplayEmotionComponent {
     });
   }
 
+  isLoading: boolean = true;
+
+
   noteForm: FormGroup;
 
-  emotion: any = {
-    id: 17,
-    userId: 4,
-    emotion: {
-      emotionId: "Interest",
-      emotionName: "Interest",
-      description: "Interest",
-      emotionType: "Positive"
-    },
-    intensity: 4,
-    subEmotions: [
-      {
-        subEmotionId: "Engagement",
-        subEmotionName: "Engagement",
-        parentEmotionId: "Interest"
-      }
-    ],
-    triggers: [
-      {
-        triggerId: 1,
-        triggerName: "People",
-        description: "People",
-        created: "2023-03-31T07:13:18"
-      }
-    ],
-    notes: [
-      {
-        id: 1,
-        title: "I was interested",
-        text: "I was interested in the people I was talking to",
-        created: "2023-04-29T22:17:58"
-      },
-    ],
-    tags: [
-      {
-        tagId: 1,
-        tagName: "People",
-        created: "2023-03-31T07:13:18"
-      },
-    ],
-    created: "2023-04-29T22:17:58"
-  };
+  emotion: any = {}
 
   note: string = '';
   suggestedActions: SuggestedAction[] | null = null;
@@ -83,7 +45,7 @@ export class DisplayEmotionComponent {
     this.emotionStateService.newEmotionRecord$.subscribe((newEmotion) => {
       if (newEmotion) {
         this.emotion = newEmotion;
-        // Add the new emotion to the list of displayed emotions, or update the list of displayed emotions
+        this.isLoading = false;
         console.log('New emotion received:', newEmotion);
       }
     });
@@ -91,8 +53,13 @@ export class DisplayEmotionComponent {
 
   async onSubmitNote(): Promise<void> {
     if (this.noteForm.valid) {
-      const note = this.noteForm.value.note;
-      // ...submit the note to the backend, and associate it with the emotion record...
+      const note = {
+        text: this.noteForm.value.note,
+      } as Note;
+      this.emotionService.addNoteToEmotionRecord(this.emotion.id, note).subscribe((updatedEmotion) => {
+        this.emotionStateService.updateNewEmotion(updatedEmotion);
+        this.noteForm.reset();
+      });
     }
   }
 }

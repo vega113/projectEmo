@@ -115,7 +115,7 @@ describe('CreateEmotionComponent', () => {
   it('should submit the form with all optional values', () => {
     spyOn(emotionService, 'insertEmotionRecord').and.callThrough();
 
-    component.emotionForm.controls['emotionType'].setValue("positive");
+    component.emotionForm.controls['emotionType'].setValue("Positive");
     component.emotionForm.controls['intensity'].setValue(5);
     component.emotionForm.controls['emotion'].setValue({emotion: {"id": "Joy", "emotionType": "positive", "emotionName": "Joy"} as Emotion});
     component.emotionForm.controls['trigger'].setValue({"triggerId": 2, "triggerName": "Family"});
@@ -126,8 +126,9 @@ describe('CreateEmotionComponent', () => {
 
     const expectedData: any = {
       userId: 1,
+      emotionType: "Positive",
       intensity: 5,
-      emotion: {"id": "Joy", "emotionType": "positive"},
+      emotion: {"id": "Joy"},
       triggers: [{ triggerId: 2}],
       subEmotions: [{ subEmotionId: 'Gratitude'}],
       notes: [],

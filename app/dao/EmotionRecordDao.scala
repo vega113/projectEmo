@@ -13,16 +13,16 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
                                 ) {
   def findAll()(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records").as(EmotionRecord.parser.*)
-    populateSubEmotionsTriggersByEmotionRecord(emotionRecords)
+    populateListsByEmotionRecord(emotionRecords)
   }
 
-  private def populateSubEmotionsTriggersByEmotionRecord(emotionRecords: List[EmotionRecord])(implicit connection: Connection): List[EmotionRecord] = {
+  private def populateListsByEmotionRecord(emotionRecords: List[EmotionRecord])(implicit connection: Connection): List[EmotionRecord] = {
     for {
       emotionRecord <- emotionRecords
       id <- emotionRecord.id.toList
     } yield emotionRecord.copy(
       emotion = emotionRecord.emotion.id.flatMap(emotionId => emotionDao.findById(emotionId)).
-        getOrElse(throw new RuntimeException(s"Emotion not found for emotion record id: $id")) ,
+        getOrElse(emotionRecord.emotion) ,
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
       triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id),
       notes = noteDao.findAllByEmotionRecordId(id),
@@ -33,21 +33,22 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
     val emotionRecordOpt = SQL("SELECT * FROM emotion_records WHERE id = {recordId} and user_id = {userId}" ).
       on("recordId" -> recordId, "userId" -> userId).
       as(EmotionRecord.parser.singleOpt)
-    populateSubEmotionsTriggersByEmotionRecord(emotionRecordOpt.toList).headOption
+    populateListsByEmotionRecord(emotionRecordOpt.toList).headOption
   }
 
   def findAllByUserId(userId: Long)(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records WHERE user_id = {userId}").on("userId" -> userId).
       as(EmotionRecord.parser.*)
-    populateSubEmotionsTriggersByEmotionRecord(emotionRecords)
+    populateListsByEmotionRecord(emotionRecords)
   }
 
   def insert(emotionRecord: EmotionRecord)(implicit connection: Connection): Option[Long] = {
     val idOpt: Option[Long] = SQL(
       """
-      INSERT INTO emotion_records (emotion_id, user_id, intensity)
-      VALUES ({emotionId}, {userId}, {intensity})
+      INSERT INTO emotion_records (emotion_type, emotion_id, user_id, intensity)
+      VALUES ({emotionType}, {emotionId}, {userId}, {intensity})
     """).on("userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
+      "emotionType" -> emotionRecord.emotionType,
       "emotionId" -> emotionRecord.emotion.id,
       "intensity" -> emotionRecord.intensity)
       .executeInsert()
@@ -67,7 +68,6 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
         "id" -> id)
         .executeInsert()
     }
-
     for {
       trigger <- emotionRecord.triggers
     } yield {

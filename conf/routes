@@ -11,10 +11,11 @@ POST          /api/login                                  controllers.LoginContr
 
 # EmotionRecordWithRelations routes
 POST          /api/emotionRecord                          controllers.EmotionRecordController.insert()
-PUT           /api/emotionRecord/:id                      controllers.EmotionRecordController.update(id: Int)
-DELETE        /api/emotionRecord/:id                      controllers.EmotionRecordController.delete(id: Int)
-GET           /api/emotionRecord/user/:userId             controllers.EmotionRecordController.findAllByUserId(userId: Int)
-GET           /api/emotionRecord/id                       controllers.EmotionRecordController.findById(id: Int)
+PUT           /api/emotionRecord/:id                      controllers.EmotionRecordController.update(id: Long)
+POST          /api/emotionRecord/:id/note                 controllers.EmotionRecordController.insertNote(id: Long)
+DELETE        /api/emotionRecord/:id                      controllers.EmotionRecordController.delete(id: Long)
+GET           /api/emotionRecord/user/:userId             controllers.EmotionRecordController.findAllByUserId(userId: Long)
+GET           /api/emotionRecord/id                       controllers.EmotionRecordController.findById(id: Long)
 
 # Cache routes
 GET           /api/emotion                                controllers.EmotionController.findAll()

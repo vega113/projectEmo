@@ -1,53 +1,58 @@
-<div class="display-emotion-container">
-  <h2>Emotion Details</h2>
-  <div>
-    <strong>Emotion Type:</strong> {{ emotion.emotion.emotionType }}
-  </div>
-  <div>
-    <strong>Emotion:</strong> {{ emotion.emotion.emotionName }}
-  </div>
-  <div>
-    <strong>Intensity:</strong> {{ emotion.intensity }}
-  </div>
-  <div>
-    <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0].subEmotionName }}
-  </div>
-  <div>
-    <strong>Trigger:</strong> {{ emotion.triggers[0].description }}
-  </div>
-  <div>
-    <strong>Created:</strong> {{ emotion.created }}
-  </div>
-
-  <div *ngIf="emotion.notes.length > 0">
-    <h3>Notes:</h3>
-    <ul>
-      <li *ngFor="let note of emotion.notes">{{ note.title }} - {{ note.text }}</li>
-    </ul>
-  </div>
-
-  <div *ngIf="emotion.tags.length > 0">
-    <h3>Tags:</h3>
-    <ul>
-      <li *ngFor="let tag of emotion.tags">{{ tag.tagName }}</li>
-    </ul>
-  </div>
-
-  <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
-    <div class="note-container">
-      <label for="note">Add a note:</label>
-      <textarea id="note" formControlName="note" rows="4"></textarea>
+<div *ngIf="isLoading" class="loading-screen">
+  <h2>Loading...</h2>
+</div>
+<ng-container *ngIf="!isLoading">
+  <div class="display-emotion-container">
+    <h2>Emotion Details</h2>
+    <div>
+      <strong>Emotion Type:</strong> {{ emotion.emotionType }}
     </div>
-    <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid">Submit Note</button>
-  </form>
+    <div>
+      <strong>Emotion:</strong> {{ emotion.emotion?.emotionName }}
+    </div>
+    <div>
+      <strong>Intensity:</strong> {{ emotion.intensity }}
+    </div>
+    <div>
+      <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0]?.subEmotionName }}
+    </div>
+    <div>
+      <strong>Trigger:</strong> {{ emotion.triggers[0]?.description }}
+    </div>
+    <div>
+      <strong>Created:</strong> {{ emotion.created }}
+    </div>
 
-  <div class="actions-container">
-    <button (click)="getSuggestedActions()">Get Suggested Actions</button>
-    <div *ngIf="suggestedActions">
-      <h3>Suggested Actions:</h3>
+    <div *ngIf="emotion.notes?.length > 0">
+      <h3>Notes:</h3>
       <ul>
-        <li *ngFor="let action of suggestedActions">{{ action.name }}</li>
+        <li *ngFor="let note of emotion.notes">{{ note.title }} - {{ note.text }}</li>
       </ul>
     </div>
+
+    <div *ngIf="emotion.tags?.length > 0">
+      <h3>Tags:</h3>
+      <ul>
+        <li *ngFor="let tag of emotion.tags">{{ tag.tagName }}</li>
+      </ul>
+    </div>
+
+    <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
+      <div class="note-container">
+        <label for="note">Add a note:</label>
+        <textarea id="note" formControlName="note" rows="4"></textarea>
+      </div>
+      <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid">Submit Note</button>
+    </form>
+
+    <div class="actions-container">
+      <button (click)="getSuggestedActions()">Get Suggested Actions</button>
+      <div *ngIf="suggestedActions">
+        <h3>Suggested Actions:</h3>
+        <ul>
+          <li *ngFor="let action of suggestedActions">{{ action.name }}</li>
+        </ul>
+      </div>
+    </div>
   </div>
-</div>
+</ng-container>

@@ -1,10 +1,10 @@
 package controllers
 
 import auth.AuthenticatedAction
-import dao.model.EmotionRecord
+import dao.model.{EmotionRecord, Note}
 import play.api.libs.json._
 import play.api.mvc._
-import service.EmotionRecordService
+import service.{EmotionRecordService, NoteService}
 
 import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,6 +13,7 @@ import scala.concurrent.Future
 
 class EmotionRecordController @Inject()(cc: ControllerComponents,
                                         emotionRecordService: EmotionRecordService,
+                                        noteService: NoteService,
                                         authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc) {
 
@@ -54,6 +55,20 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
             case Some(id) => fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))
             case None => Future.successful(InternalServerError)
           }
+        }
+      }
+    )
+  }
+
+  def insertNote(emotionRecordId: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+    token.body.validate[Note].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
+      },
+      note => {
+        noteService.insert(token.user.userId, emotionRecordId, note).flatMap {
+          case Some(id) => fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))
+          case None => Future.successful(InternalServerError)
         }
       }
     )

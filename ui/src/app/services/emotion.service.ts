@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import {EmotionData, EmotionRecord} from '../models/emotion.model';
+import {EmotionData, EmotionRecord, Note} from '../models/emotion.model';
 import { catchError, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import {ErrorService} from "./error.service";
@@ -26,6 +26,14 @@ export class EmotionService {
     headers.set('Content-Type', 'application/json');
     return this.http
       .post<EmotionRecord>(`${this.apiUrl}/emotionRecord`, emotionRecord, { headers })
+      .pipe(catchError(resp => this.errorService.handleError(resp)));
+  }
+
+  addNoteToEmotionRecord(emotionRecordId: number, note: Note) {
+    const headers: HttpHeaders = this.authService.getAuthorizationHeader();
+    headers.set('Content-Type', 'application/json');
+    return this.http
+      .post<EmotionRecord>(`${this.apiUrl}/emotionRecord/${emotionRecordId}/note`, note, { headers })
       .pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 

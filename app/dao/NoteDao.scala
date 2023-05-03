@@ -20,14 +20,26 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
     SQL("SELECT * FROM notes WHERE noteId = {id}").on("id" -> id).as(Note.parser.singleOpt)
   }
 
-  def insert(note: Note)(implicit connection: Connection): Option[Long] = {
+  def insert(emotionRecordId: Long, note: Note)(implicit connection: Connection): Option[Long] = {
+    val noteIdOpt: Option[Long] = SQL(
+      """
+      INSERT INTO notes (title, text)
+      VALUES ({title}, {text})""").
+      on("title" -> createTitle(note), "text" -> note.text). // TODO create title using AI
+      executeInsert()
+    noteIdOpt
+  }
+
+  def linkNoteToEmotionRecord(noteId: Long, emotionRecordId: Long)(implicit connection: Connection): Int = {
     SQL(
       """
-      INSERT INTO notes (title, text, id, created)
-      VALUES ({title}, {text}, {created})""").
-      on("title" -> note.title, "text" -> note.text,
-        "created" -> dateTimeService.now())
-      .executeInsert()
+      INSERT INTO emotion_record_notes (note_id, emotion_record_id)
+      VALUES ({noteId}, {emotionRecordId})""").
+      on("noteId" -> noteId, "emotionRecordId" -> emotionRecordId).executeUpdate()
+  }
+
+  private def createTitle(note: Note) = {
+    note.title.getOrElse("")
   }
 
   def update(note: Note)(implicit connection: Connection): Int = {
@@ -37,7 +49,7 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
       SET title = {title}, content = {content}, user_id = {userId}, last_updated = {lastUpdated}
       WHERE id = {id}
     """).on("note_id" -> note.id,
-      "title" -> note.title,
+      "title" -> createTitle(note),
       "text" -> note.text,
       "created" -> dateTimeService.now())
       .executeUpdate()

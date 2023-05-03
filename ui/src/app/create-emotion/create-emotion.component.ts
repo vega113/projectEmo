@@ -87,9 +87,6 @@ export class CreateEmotionComponent implements OnInit {
     if (emotionFromData.emotion?.emotion?.id) {
       emotion.id = emotionFromData.emotion.emotion.id;
     }
-    if (emotionFromData.emotion?.emotion?.emotionType) {
-      emotion.emotionType = emotionFromData.emotion.emotion.emotionType;
-    }
     const subEmotions: any[] = [];
     if (emotionFromData.subEmotion?.subEmotionId) {
       subEmotions.push({subEmotionId: emotionFromData.subEmotion.subEmotionId});
@@ -106,6 +103,7 @@ export class CreateEmotionComponent implements OnInit {
 
     return {
       userId: decodedToken.userId,
+      emotionType: emotionFromData.emotionType,
       intensity: this.emotionIntensityValue,
       emotion: emotion as Emotion,
       subEmotions: subEmotions as SubEmotion[],

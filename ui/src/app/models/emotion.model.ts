@@ -40,7 +40,7 @@ export interface User {
 export interface Emotion {
   id?: string;
   emotionName?: string;
-  emotionType: string;
+  emotionType?: string;
   description?: string;
 }
 
@@ -52,6 +52,7 @@ export interface SubEmotion {
 
 export interface EmotionRecord {
   id?: number;
+  emotionType: string;
   userId?: number;
   emotion: Emotion,
   intensity: number;
@@ -72,10 +73,9 @@ export interface Trigger {
 }
 
 export interface Note {
-  noteId?: number;
+  id?: number;
   title?: string;
-  noteText: string;
-  noteUserId: number;
+  text: string;
   created?: string;
 }
 
