@@ -17,6 +17,10 @@ export class DisplayEmotionComponent {
       note: ['', Validators.required]
     });
   }
+
+  isLoadingNotes: boolean = false;
+  isLoadingActions: boolean = false;
+
   noteSaved: boolean = false;
 
 
@@ -54,6 +58,8 @@ export class DisplayEmotionComponent {
   }
 
   async onSubmitNote(): Promise<void> {
+    this.isLoadingNotes = true;
+
     if (this.noteForm.valid) {
       const note = {
         text: this.noteForm.value.note,
@@ -70,5 +76,6 @@ export class DisplayEmotionComponent {
         }
       });
     }
+    this.isLoadingNotes = false;
   }
 }

@@ -30,6 +30,7 @@ import {MatSliderModule} from "@angular/material/slider";
 
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatChipsModule} from "@angular/material/chips";
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -61,7 +62,8 @@ import {MatChipsModule} from "@angular/material/chips";
     MatSelectModule,
     MatSliderModule,
     MatSnackBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatProgressSpinnerModule
 
   ],
   providers: [],

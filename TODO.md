@@ -10,3 +10,4 @@
 - [ ] Add a new emotion type: "Other" and allow user to add a custom emotion type
 - [ ] Emotion type should by a table in the DB and it should be connected directly to the emotion record table
 - [ ] Cache the emotion cache data in state service
+- [ ] Test insert notes in different languages

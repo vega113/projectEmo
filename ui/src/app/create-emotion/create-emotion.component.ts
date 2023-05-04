@@ -24,6 +24,8 @@ import {Router} from "@angular/router";
   styleUrls: ['./create-emotion.component.css']
 })
 export class CreateEmotionComponent implements OnInit {
+  isLoadingEmotionCache: boolean = true;
+
   emotionForm: FormGroup;
   emotionIntensityValue: number = 1;
   sliderColor = 'rgba(75, 192, 192, 0.2)';
@@ -51,9 +53,12 @@ export class CreateEmotionComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching emotion cache:', error);
-      },
+        this.isLoadingEmotionCache = false;
+        this.snackBar.open('Failed to fetch emotion cache', 'Close', {
+      })},
       complete: () => {
         console.log('Emotion cache fetch completed');
+        this.isLoadingEmotionCache = false;
       }
     });
   }

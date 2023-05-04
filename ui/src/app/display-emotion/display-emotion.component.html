@@ -1,4 +1,5 @@
 <div *ngIf="isLoading" class="loading-screen">
+  <mat-spinner diameter="48"></mat-spinner>
   <h2>Loading...</h2>
 </div>
 <ng-container *ngIf="!isLoading">
@@ -60,7 +61,10 @@
                 <textarea id="note" matInput formControlName="note" rows="4" maxlength="240"></textarea>
               </mat-form-field>
               <p *ngIf="noteForm.get('note')?.value?.length >= 240">Note limit reached.</p>
-              <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid">Submit Note</button>
+              <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid || isLoadingNotes">
+                <mat-spinner *ngIf="isLoadingNotes" diameter="24" [style.marginRight.px]="4"></mat-spinner>
+                Submit Note
+              </button>
             </form>
           </div>
         </mat-card-content>
@@ -68,14 +72,17 @@
 
 
       <div class="actions-container">
-        <button (click)="getSuggestedActions()">Get Suggested Actions</button>
+        <button mat-raised-button color="primary" (click)="getSuggestedActions()" [disabled]="isLoadingActions">
+          <mat-spinner *ngIf="isLoadingActions" diameter="24" [style.marginRight.px]="4"></mat-spinner>
+          Get Suggested Actions
+        </button>
         <div *ngIf="suggestedActions">
-          <h3>Suggested Actions:</h3>
-          <ul>
-            <li *ngFor="let action of suggestedActions">{{ action.name }}</li>
-          </ul>
+          <mat-list>
+            <mat-list-item *ngFor="let action of suggestedActions">{{ action.name }}</mat-list-item>
+          </mat-list>
         </div>
       </div>
+
     </div>
   </div>
 </ng-container>
