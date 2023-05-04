@@ -9,7 +9,8 @@ import javax.inject.Inject
 class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmotionDao,
                                  emotionRecordTriggerDao: EmotionRecordTriggerDao,
                                  emotionDao: EmotionDao,
-                                 noteDao: NoteDao
+                                 noteDao: NoteDao,
+                                 tagDao: TagDao
                                 ) {
   def findAll()(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records").as(EmotionRecord.parser.*)
@@ -26,6 +27,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
       triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id),
       notes = noteDao.findAllByEmotionRecordId(id),
+      tags = tagDao.findAllByEmotionRecordId(id)
     )
   }
 

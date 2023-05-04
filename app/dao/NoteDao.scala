@@ -25,7 +25,7 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
       """
       INSERT INTO notes (title, text)
       VALUES ({title}, {text})""").
-      on("title" -> createTitle(note), "text" -> note.text). // TODO create title using AI
+      on("title" -> note.title, "text" -> note.text).
       executeInsert()
     noteIdOpt
   }
@@ -38,10 +38,6 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
       on("noteId" -> noteId, "emotionRecordId" -> emotionRecordId).executeUpdate()
   }
 
-  private def createTitle(note: Note) = {
-    note.title.getOrElse("")
-  }
-
   def update(note: Note)(implicit connection: Connection): Int = {
     SQL(
       """
@@ -49,7 +45,7 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
       SET title = {title}, content = {content}, user_id = {userId}, last_updated = {lastUpdated}
       WHERE id = {id}
     """).on("note_id" -> note.id,
-      "title" -> createTitle(note),
+      "title" -> note.title,
       "text" -> note.text,
       "created" -> dateTimeService.now())
       .executeUpdate()

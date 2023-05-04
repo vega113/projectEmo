@@ -26,7 +26,7 @@ object model {
       username, email, firstName.getOrElse(""), lastName.getOrElse(""))
   }
 
-  case class Emotion(id: Option[String], emotionName: Option[String], emotionType: String, description: Option[String] = None)
+  case class Emotion(id: Option[String], emotionName: Option[String], emotionType: Option[String], description: Option[String] = None)
 
   case class SubEmotion(
                          subEmotionId: Option[String],
@@ -106,7 +106,7 @@ object model {
     implicit val parser: RowParser[Emotion] = {
       get[Option[String]]("emotion_id") ~
         get[Option[String]]("emotion_name") ~
-        str("emotion_type") ~
+        get[Option[String]]("emotion_type") ~
         get[Option[String]]("emotion_description") map {
         case id ~ emotionName ~  emotionType ~ emotionDescription  =>
           Emotion(id, emotionName, emotionType, emotionDescription)
@@ -140,7 +140,7 @@ object model {
         get[Option[LocalDateTime]]("created") map {
         case id ~ emotionType ~ userId ~ emotionIdOpt  ~ intensity ~ created =>
           EmotionRecord(id, emotionType, userId,
-            emotionIdOpt.map(emotionId => Emotion(Some(emotionId), None, "", None)),
+            emotionIdOpt.map(emotionId => Emotion(Some(emotionId), None, None, None)),
             intensity, List(), List(), List(), List(),
             created)
       }
@@ -168,8 +168,8 @@ object model {
     implicit val tagFormat: Format[Tag] = Json.format[Tag]
 
     implicit val parser: RowParser[Tag] = {
-      get[Option[Int]]("tag_id") ~
-        str("tag_name") ~
+      get[Option[Int]]("id") ~
+        str("name") ~
         get[Option[LocalDateTime]]("created") map {
         case tagId ~ tagName ~ created =>
           Tag(tagId, tagName, created)

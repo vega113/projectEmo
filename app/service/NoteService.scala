@@ -1,9 +1,10 @@
 package service
 
 import com.google.inject.ImplementedBy
-import dao.{DatabaseExecutionContext, NoteDao}
-import dao.model.Note
+import dao.{DatabaseExecutionContext, NoteDao, TagDao}
+import dao.model.{Note, Tag}
 
+import java.sql.Connection
 import javax.inject.Inject
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,15 +15,34 @@ trait NoteService {
 
 }
 
-class NoteServiceImpl @Inject() (noteDao: NoteDao,
+class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
                       emotionRecordService: EmotionRecordService,
                       databaseExecutionContext: DatabaseExecutionContext) extends NoteService {
+
+  private def makeTitle(text: String): String = {
+    val maxLength = 30
+    val firstLine = text.split("\n")(0)
+    if (firstLine.length > maxLength) {
+      firstLine.substring(0, maxLength)
+    } else {
+      firstLine
+    }
+  }
+
+  private def extractTags(text: String): List[Tag] = {
+    val tagRegex = "#[a-zA-Z0-9]+".r
+    tagRegex.findAllIn(text).toList.map(tag => Tag(None, tag)).groupBy(_.tagName).map(_._2.head).toList
+  }
+
   override def insert(userId: Long, emotionRecordId: Long, note: Note): Future[Option[Long]] = {
     val userFutOpt = emotionRecordService.findByIdForUser(emotionRecordId, userId)
     userFutOpt.flatMap {
       case Some(_) => databaseExecutionContext.withConnection({ implicit connection =>
-        val noteId: Long = noteDao.insert(emotionRecordId, note) match {
-          case Some(id) => id
+        val title = note.title.getOrElse(makeTitle(note.text))
+        val noteId: Long = noteDao.insert(emotionRecordId, note.copy(title = Some(title))) match {
+          case Some(id) =>
+            addNewTagsFromNoteToRecord(emotionRecordId, note)
+            id
           case None => throw new Exception("Failed to insert note")
         }
         noteDao.linkNoteToEmotionRecord(noteId, emotionRecordId)
@@ -30,5 +50,12 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao,
       })
       case None => Future.successful(None)
     }
+  }
+
+  private def addNewTagsFromNoteToRecord(emotionRecordId: Long, note: Note)(implicit connection: Connection): List[Long] = {
+    val tags = extractTags(note.text)
+    val existingTags = tagDao.findAllByEmotionRecordId(emotionRecordId)
+    val newTags = tags.filter(tag => !existingTags.map(_.tagName).contains(tag.tagName))
+    tagDao.insert(emotionRecordId, newTags)
   }
 }

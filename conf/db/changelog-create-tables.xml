@@ -98,18 +98,18 @@
 
     <changeSet id="create_tags_table" author="Yuri Zelikov">
         <createTable tableName="tags">
-            <column name="tag_id" type="int" autoIncrement="true">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="tag_name" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" />
             </column>
             <column name="created" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <createIndex indexName="tags_tag_name_idx" tableName="tags">
-            <column name="tag_name"/>
+            <column name="name"/>
         </createIndex>
     </changeSet>
 
@@ -177,14 +177,14 @@
 
     <changeSet id="create_emotion_record_tags_table" author="Yuri Zelikov">
         <createTable tableName="emotion_record_tags">
-            <column name="parent_emotion_record_id" type="int"/>
-            <column name="parent_tag_id" type="int"/>
+            <column name="emotion_record_id" type="int"/>
+            <column name="tag_id" type="int"/>
         </createTable>
         <createIndex indexName="fk_emotion_record_tags_emotion_record_id" tableName="emotion_record_tags">
-            <column name="parent_emotion_record_id"/>
+            <column name="emotion_record_id"/>
         </createIndex>
         <createIndex indexName="fk_emotion_record_tags_tag_id" tableName="emotion_record_tags">
-            <column name="parent_tag_id"/>
+            <column name="tag_id"/>
         </createIndex>
     </changeSet>
 
@@ -213,7 +213,7 @@
         <createIndex indexName="fk_emotion_record_notes_emotion_record_id" tableName="emotion_record_notes">
             <column name="emotion_record_id"/>
         </createIndex>
-        <createIndex indexName="fk_emotion_record_tags_note_id" tableName="emotion_record_notes">
+        <createIndex indexName="fk_emotion_record_notes_note_id" tableName="emotion_record_notes">
             <column name="note_id"/>
         </createIndex>
     </changeSet>

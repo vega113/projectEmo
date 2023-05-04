@@ -29,6 +29,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatSliderModule} from "@angular/material/slider";
 
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import {MatChipsModule} from "@angular/material/chips";
 
 @NgModule({
   declarations: [
@@ -59,7 +60,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatSidenavModule,
     MatSelectModule,
     MatSliderModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatChipsModule
 
   ],
   providers: [],

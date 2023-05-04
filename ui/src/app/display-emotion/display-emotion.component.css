@@ -6,68 +6,101 @@
   padding: 1rem;
 }
 
-.display-emotion-container {
-  display: flex;
+form {
   flex-direction: column;
   align-items: center;
-  max-width: 500px;
-  width: 100%;
+  max-width: 100%; /* Change the max-width to 100% */
   background-color: #fff;
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.note-container,
-.actions-container {
+mat-form-field {
   width: 100%;
   margin-bottom: 1.5rem;
 }
 
-textarea {
-  width: 100%;
-  resize: none;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 0.5rem;
-}
-
 button {
   width: 100%;
-  margin-top: 1rem;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 0.5rem;
-}
-.notes-list {
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 0 1rem;
-  max-width: 500px; /* Add max-width to match the note submission form */
-  width: 100%; /* Add width to match the note submission form */
-}
-
-.note {
-  background-color: #f8f8f8;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.mat-card {
+  width: 500px;
   margin-bottom: 1rem;
 }
 
-/* Add styles for the textarea */
-.note-container textarea {
+mat-card-content {
+  text-align: left;
+}
+
+.note {
   width: 100%;
-  max-width: 300px;
+  height: 100px;
+  overflow: auto;
+  padding: 8px;
+  box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 8px;
   margin-bottom: 8px;
 }
+
+
+/* Update the media query */
+@media (min-width: 768px) {
+  .note {
+    width: 500px;
+  }
+  form {
+    max-width: 500px; /* Set max-width to match the .note width */
+  }
+}
+.full-width {
+  width: 100%;
+}
+
+.note-form-card {
+  width: calc(100% - 32px); /* Adjust based on your card's padding */
+}
+
+/* ... */
+.card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+mat-card {
+  width: 100%;
+  max-width: 500px;
+}
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.mat-chip-option {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 8px;
+}
+
+.tags-container {
+  text-align: left;
+  flex-direction: column;
+}
+
+
+
+
+
+
+
 

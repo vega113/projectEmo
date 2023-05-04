@@ -4,58 +4,77 @@
 <ng-container *ngIf="!isLoading">
   <div class="display-emotion-container">
     <h2>Emotion Details</h2>
-    <div>
-      <strong>Emotion Type:</strong> {{ emotion.emotionType }}
-    </div>
-    <div>
-      <strong>Emotion:</strong> {{ emotion.emotion?.emotionName }}
-    </div>
-    <div>
-      <strong>Intensity:</strong> {{ emotion.intensity }}
-    </div>
-    <div>
-      <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0]?.subEmotionName }}
-    </div>
-    <div>
-      <strong>Trigger:</strong> {{ emotion.triggers[0]?.description }}
-    </div>
-    <div>
-      <strong>Created:</strong> {{ emotion.created }}
-    </div>
+    <div class="card-container">
+      <mat-card>
+        <mat-card-content>
+          <div>
+            <strong>Emotion Type:</strong> {{ emotion.emotionType }}
+          </div>
+          <div>
+            <strong>Emotion:</strong> {{ emotion.emotion?.emotionName }}
+          </div>
+          <div>
+            <strong>Intensity:</strong> {{ emotion.intensity }}
+          </div>
+          <div>
+            <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0]?.subEmotionName }}
+          </div>
+          <div>
+            <strong>Trigger:</strong> {{ emotion.triggers[0]?.description }}
+          </div>
+          <div>
+            <strong>Created:</strong> {{ emotion.created }}
+          </div>
+        </mat-card-content>
+      </mat-card>
 
-    <div *ngIf="emotion.notes?.length > 0">
-      <h3>Notes:</h3>
-      <div class="notes-list">
-        <div class="note" *ngFor="let note of emotion.notes">
-          {{ note.text }}
+      <div *ngIf="emotion.notes?.length > 0">
+        <h3>Notes:</h3>
+        <div class="notes-list">
+          <mat-card class="note" *ngFor="let note of emotion.notes">
+            <mat-card-content>{{ note.text }}</mat-card-content>
+          </mat-card>
         </div>
       </div>
-    </div>
 
-    <div *ngIf="emotion.tags?.length > 0">
-      <h3>Tags:</h3>
-      <ul>
-        <li *ngFor="let tag of emotion.tags">{{ tag.tagName }}</li>
-      </ul>
-    </div>
+      <div *ngIf="emotion.tags?.length > 0" class="tags-container">
+        <h3>Tags:</h3>
+        <mat-card class="note">
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip-option disabled *ngFor="let tag of emotion.tags">{{ tag.tagName }}</mat-chip-option>
+            </mat-chip-set>
+          </mat-card-content>
+        </mat-card>
 
-    <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
-      <div class="note-container">
-        <label for="note">Add a note (max 240 chars):</label>
-        <textarea id="note" formControlName="note" rows="4" maxlength="240"></textarea>
-        <p *ngIf="noteForm.get('note')?.value?.length >= 240">Note limit reached.</p>
       </div>
-      <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid">Submit Note</button>
-      <p *ngIf="noteSaved">Note saved successfully.</p>
-    </form>
 
-    <div class="actions-container">
-      <button (click)="getSuggestedActions()">Get Suggested Actions</button>
-      <div *ngIf="suggestedActions">
-        <h3>Suggested Actions:</h3>
-        <ul>
-          <li *ngFor="let action of suggestedActions">{{ action.name }}</li>
-        </ul>
+
+      <mat-card>
+        <mat-card-content>
+          <div class="form-wrapper">
+            <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
+              <label for="note">Add a note (max 240 chars):</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Note</mat-label>
+                <textarea id="note" matInput formControlName="note" rows="4" maxlength="240"></textarea>
+              </mat-form-field>
+              <p *ngIf="noteForm.get('note')?.value?.length >= 240">Note limit reached.</p>
+              <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid">Submit Note</button>
+            </form>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+
+      <div class="actions-container">
+        <button (click)="getSuggestedActions()">Get Suggested Actions</button>
+        <div *ngIf="suggestedActions">
+          <h3>Suggested Actions:</h3>
+          <ul>
+            <li *ngFor="let action of suggestedActions">{{ action.name }}</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

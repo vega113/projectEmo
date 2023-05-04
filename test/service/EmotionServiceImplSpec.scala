@@ -27,7 +27,7 @@ class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
       val emotionServiceImpl = new EmotionDataServiceImpl(mockEmotionDao, mockSubEmotionDao, mockTriggerDao,
         mockSuggestedActionDao, fakeDatabaseExecutionContext)
 
-      val emotions = List(Emotion(Some("Joy"), Option("Joy"), "Positive"), Emotion(Some("Sadness"), Option("Sadness"), "Negative"))
+      val emotions = List(Emotion(Some("Joy"), Option("Joy"), Some("Positive")), Emotion(Some("Sadness"), Option("Sadness"), Some("Negative")))
       val subEmotions = List(SubEmotion(Some("Content"), Some("Content"), Some("description"), Some("Joy")))
       val suggestedActions = List(SuggestedAction(Some("Content"), "Watch a comedy"))
       val triggers = List(Trigger(Some(1), Some("Bad weather"), None, None, Some("Bad weather")))
