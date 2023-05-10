@@ -17,10 +17,6 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
                                         authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc) {
 
-  def findAll(): Action[AnyContent] = Action andThen authenticatedAction async { // TODO allow only for admins
-    emotionRecordService.findAll().map(emotionRecords => Ok(Json.toJson(emotionRecords)))
-  }
-
   def findById(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
     emotionRecordService.findByIdForUser(id, token.user.userId).map {
       case Some(emotionRecord) => Ok(Json.toJson(emotionRecord))
@@ -36,9 +32,11 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   private def fetchRecord(id: Long, userId: Long): Future[EmotionRecord] = {
-    emotionRecordService.findByIdForUser(id, userId).map {
-      case Some(emotionRecord) => emotionRecord
-      case None => throw new RuntimeException(s"Record not found recordId: $id userId: $userId")
+    emotionRecordService.findByIdForUser(id, userId).flatMap {
+      case Some(emotionRecord) => Future.successful(emotionRecord)
+      case None =>
+        Future.failed[EmotionRecord](new RuntimeException(
+          s"Record not found recordId: $id userId: $userId"))
     }
   }
 
@@ -74,6 +72,14 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     )
   }
 
+  def fetchSuggestions(emotionRecordId: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
+    fetchRecord(emotionRecordId, token.user.userId).flatMap { record =>
+      emotionRecordService.findSuggestionsByEmotionRecord(record).
+        map(suggestions => Ok(Json.toJson(suggestions)))
+    }
+  }
+
+
   def update(id: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     token.body.validate[EmotionRecord].fold(
       errors => {
@@ -95,7 +101,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     }
   }
 
-  def findAllByUserId(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
+  def findAllByUserId(): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
     emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
 }

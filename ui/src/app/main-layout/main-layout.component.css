@@ -26,7 +26,6 @@ mat-sidenav {
   }
 }
 
-
 .main-container {
   display: flex;
   flex-direction: column;
@@ -45,6 +44,15 @@ mat-sidenav {
   text-decoration: none;
   color: inherit;
 }
+.menu-button {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .menu-button {
+    display: block;
+  }
+}
 
 .spacer {
   flex: 1;
@@ -61,4 +69,27 @@ mat-sidenav {
   width: 250px;
 }
 
+.menu-button {
+  display: none;
+}
+
+/* Mobile view adjustments */
+@media (max-width: 600px) {
+  .menu-button {
+    display: block;
+  }
+
+  mat-sidenav {
+    width: 100%;
+  }
+
+  .button-container {
+    display: none;
+  }
+}
+
+.sidenav {
+  color: rgba(0, 0, 0, 0.87);
+  width: 250px;
+}
 

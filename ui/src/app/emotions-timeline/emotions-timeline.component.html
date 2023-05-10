@@ -1,1 +1,41 @@
-<p>emotions-timeline works!</p>
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+  <ng-container matColumnDef="date">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header > Date </th>
+    <td mat-cell *matCellDef="let record"> {{record.created | date: 'medium'}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="emotionType">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Emotion Type </th>
+    <td mat-cell *matCellDef="let record"> {{record.emotionType}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="intensity">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Intensity </th>
+    <td mat-cell *matCellDef="let record"> {{record.intensity}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="emotion">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Emotion </th>
+    <td mat-cell *matCellDef="let record"> {{record.emotion?.emotionName}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="subEmotion">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Sub-Emotion </th>
+    <td mat-cell *matCellDef="let record"> {{record.subEmotions[0]?.subEmotionName}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="trigger">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Trigger </th>
+    <td mat-cell *matCellDef="let record"> {{record.triggers[0]?.description}} </td>
+  </ng-container>
+
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+      (click)="onRowClicked(row)"
+      (mouseover)="row.hover = true"
+      (mouseleave)="row.hover = false"
+      [ngClass]="{'hovered-row': row.hover}">
+  </tr>
+</table>
+<mat-paginator [pageSizeOptions]="[10, 20, 50, 200]" showFirstLastButtons></mat-paginator>

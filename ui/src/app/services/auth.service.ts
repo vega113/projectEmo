@@ -5,6 +5,9 @@ import { tap, catchError } from 'rxjs/operators';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { ErrorService } from './error.service';
 import {JwtHelperService} from "@auth0/angular-jwt";
+import {MatSnackBar} from "@angular/material/snack-bar";
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +18,7 @@ export class AuthService {
   public isAuthenticated: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
 
 
-  constructor(private http: HttpClient, private errorService: ErrorService) {
+  constructor(private http: HttpClient, private snackBar: MatSnackBar) {
     const token = localStorage.getItem('auth_token');
     this.isAuthenticatedSubject.next(!!token);
   }
@@ -39,7 +42,15 @@ export class AuthService {
           console.log('User logged in successfully', response);
           localStorage.setItem('auth_token', response.token);
         }),
-        catchError((error: HttpErrorResponse) => this.errorService.handleError(error, 'Login failed'))
+        catchError((error: HttpErrorResponse) =>
+          {
+            this.snackBar.open('Invalid username or password', 'Close', {
+              duration: 5000,
+            });
+            this.isAuthenticatedSubject.next(false);
+            return throwError(() => new Error('Invalid username or password'));
+          }
+        )
       );
   }
 

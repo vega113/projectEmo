@@ -31,6 +31,11 @@ import {MatSliderModule} from "@angular/material/slider";
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import {MatChipsModule} from "@angular/material/chips";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatTableModule} from "@angular/material/table";
+import {MatPaginatorModule} from "@angular/material/paginator";
+import {MatSortModule} from "@angular/material/sort";
+import {ScreenSizeDirective} from "./directives/screenSize.directive";
+import {LayoutModule} from "@angular/cdk/layout";
 
 @NgModule({
   declarations: [
@@ -43,7 +48,8 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     CreateEmotionComponent,
     DisplayEmotionComponent,
     EmotionsTimelineComponent,
-    DashboardComponent
+    DashboardComponent,
+    ScreenSizeDirective
   ],
   imports: [
     BrowserModule,
@@ -63,7 +69,11 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     MatSliderModule,
     MatSnackBarModule,
     MatChipsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    LayoutModule
 
   ],
   providers: [],

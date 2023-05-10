@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {EmotionCacheService} from '../services/emotion-cache.service';
 import {
   Emotion,
   EmotionData,
@@ -36,7 +37,8 @@ export class CreateEmotionComponent implements OnInit {
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
-      private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar ) {
+              private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar,
+              private emotionCacheService: EmotionCacheService) {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
@@ -47,18 +49,26 @@ export class CreateEmotionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.emotionService.getEmotionCache().subscribe({
-      next: (emotionCache) => {
-        this.emotionCache = emotionCache;
-      },
-      error: (error) => {
-        console.error('Error fetching emotion cache:', error);
+    this.emotionCacheService.emotionCache$.subscribe((cachedEmotionData) => {
+      if (cachedEmotionData) {
+        this.emotionCache = cachedEmotionData;
         this.isLoadingEmotionCache = false;
-        this.snackBar.open('Failed to fetch emotion cache', 'Close', {
-      })},
-      complete: () => {
-        console.log('Emotion cache fetch completed');
-        this.isLoadingEmotionCache = false;
+      } else {
+        this.emotionService.getEmotionCache().subscribe({
+          next: (emotionCache) => {
+            this.emotionCache = emotionCache;
+            this.emotionCacheService.updateEmotionCache(emotionCache);
+          },
+          error: (error) => {
+            console.error('Error fetching emotion cache:', error);
+            this.isLoadingEmotionCache = false;
+            this.snackBar.open('Failed to fetch emotion cache', 'Close', {});
+          },
+          complete: () => {
+            console.log('Emotion cache fetch completed');
+            this.isLoadingEmotionCache = false;
+          }
+        });
       }
     });
   }
@@ -82,7 +92,6 @@ export class CreateEmotionComponent implements OnInit {
                 duration: 5000,
                 panelClass: ['error-snackbar']
               });
-
             }
           }
         )

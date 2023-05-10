@@ -11,8 +11,4 @@ class SuggestedActionController @Inject()(cc: ControllerComponents,
                                           suggestedActionService: SuggestedActionService)
   extends AbstractController(cc) {
 
-    def findAllBySubEmotionId(subEmotionId: String): Action[AnyContent] = Action async {
-      suggestedActionService.findAllBySubEmotionId(subEmotionId).map(suggestedActions => Ok(Json.toJson(suggestedActions)))
-    }
-
   }

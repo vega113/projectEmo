@@ -3,6 +3,7 @@ import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {Note, SuggestedAction} from '../models/emotion.model';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-display-emotion',
@@ -12,7 +13,9 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 export class DisplayEmotionComponent {
 
 
-  constructor(private fb: FormBuilder, private emotionService: EmotionService, private emotionStateService: EmotionStateService) {
+  constructor(private fb: FormBuilder, private emotionService: EmotionService,
+              private emotionStateService: EmotionStateService,
+              private snackBar: MatSnackBar) {
     this.noteForm = this.fb.group({
       note: ['', Validators.required]
     });
@@ -32,20 +35,28 @@ export class DisplayEmotionComponent {
   emotion: any = {}
 
   note: string = '';
+
   suggestedActions: SuggestedAction[] | null = null;
 
 // Add this method to get suggested actions
-  getSuggestedActions(): void {
+  async getSuggestedActions(): Promise<void> {
+    this.isLoadingActions = true;
     // Replace the following with the actual API call to get suggested actions
-    this.suggestedActions = [
-      {
-        id: "engage_in_physical_activity",
-        name: "Engage in physical activity",
-        created: "2023-04-15T15:16:52"
-      }
-    ];
+   this.emotionService.fetchSuggestedActionsForEmotionRecord(this.emotion.id).subscribe({
+     next: (response) => {
+       this.suggestedActions = response;
+       this.isLoadingActions = false;
+       console.log('Suggested actions received:', response);
+     },
+      error: (error) => {
+        this.isLoadingActions = false;
+        console.error('Error getting suggested actions', error);
+        this.snackBar.open('Error getting suggested actions', 'Close', {
+          duration: 5000,
+        });
+    }}
+   )
   }
-
 
   ngOnInit(): void {
     this.emotionStateService.newEmotionRecord$.subscribe((newEmotion) => {
@@ -70,12 +81,17 @@ export class DisplayEmotionComponent {
           this.noteForm.reset();
           console.log('Note inserted successfully', response);
           this.noteSaved = true;
+          this.isLoadingNotes = false;
         },
         error: (error) => {
           console.error('Error inserting note', error);
+          this.isLoadingNotes = false;
+          this.snackBar.open('Error inserting note', 'Close', {
+            duration: 5000,
+          });
         }
       });
     }
-    this.isLoadingNotes = false;
+
   }
 }

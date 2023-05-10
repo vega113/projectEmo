@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import {EmotionData, EmotionRecord, Note} from '../models/emotion.model';
+import {EmotionData, EmotionRecord, Note, SuggestedAction} from '../models/emotion.model';
 import { catchError, tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import {ErrorService} from "./error.service";
@@ -36,6 +36,13 @@ export class EmotionService {
       .post<EmotionRecord>(`${this.apiUrl}/emotionRecord/${emotionRecordId}/note`, note, { headers })
       .pipe(catchError(resp => this.errorService.handleError(resp)));
   }
+  fetchSuggestedActionsForEmotionRecord(emotionRecordId: number) {
+    const headers: HttpHeaders = this.authService.getAuthorizationHeader();
+    return this.http
+      .get<SuggestedAction[]>(`${this.apiUrl}/emotionRecord/${emotionRecordId}/suggestedActions`, { headers })
+      .pipe(catchError(resp => this.errorService.handleError(resp)));
+  }
+
 
   getEmotionCache(): Observable<EmotionData> {
     const headers = this.authService.getAuthorizationHeader();
@@ -47,5 +54,14 @@ export class EmotionService {
         }),
         catchError(resp => this.errorService.handleError(resp))
       );
+  }
+
+  fetchEmotionRecordsForCurrentUser() {
+    const headers = this.authService.getAuthorizationHeader();
+    return this.http.get<EmotionRecord[]>(`${this.apiUrl}/emotionRecord/user`, { headers }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        return this.errorService.handleError(error);
+      })
+    );
   }
 }

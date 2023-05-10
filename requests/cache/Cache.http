@@ -11,5 +11,6 @@ GET http://localhost:9000/api/trigger
 ### Fetch SubEmotions for an Emotion
 GET http://localhost:9000/api/emotion/Joy/subEmotions
 
-### Fetch Suggested Actions for a SubEmotion
-GET http://localhost:9000/api/subEmotion/Excitement/suggestedActions
+### Fetch Suggested Actions for Emotion Record
+GET http://localhost:9000/api/emotionRecord/4/suggestedActions
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTI3NzY5MzksImlhdCI6MTY4MTI0MDkzOSwidXNlcklkIjozLCJ1c2VybmFtZSI6IkZpZnR5b25lQWRtaW5Vc2VyMSIsImVtYWlsIjoiRmlmdHlvbmVBZG1pblVzZXIxQGVtYWlsLmNvbSIsImZpcnN0bmFtZSI6Ill1cmkiLCJsYXN0bmFtZSI6IlVzZXIiLCJyb2xlIjoidXNlciJ9.brtjzMVjEv_h_MiZkCjuexDovZFBkm-eYlQdSAXR1n4
