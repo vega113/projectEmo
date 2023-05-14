@@ -14,8 +14,10 @@ POST          /api/emotionRecord                             controllers.Emotion
 PUT           /api/emotionRecord/:id                         controllers.EmotionRecordController.update(id: Long)
 POST          /api/emotionRecord/:id/note                    controllers.EmotionRecordController.insertNote(id: Long)
 DELETE        /api/emotionRecord/:id                         controllers.EmotionRecordController.delete(id: Long)
-GET           /api/emotionRecord/user             controllers.EmotionRecordController.findAllByUserId()
+GET           /api/emotionRecord/user                        controllers.EmotionRecordController.findAllByUserId()
 GET           /api/emotionRecord/id                          controllers.EmotionRecordController.findById(id: Long)
+GET           /api/emotionRecord/user/days                   controllers.EmotionRecordController.findAllDaysByUserId()
+GET           /api/emotionRecord/user/month/:date         controllers.EmotionRecordController.findRecordsByUserIdForCurrentMonth(date: String)
 
 
 GET           /api/emotion                                   controllers.EmotionController.findAll()

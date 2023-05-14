@@ -12,6 +12,13 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
                                  noteDao: NoteDao,
                                  tagDao: TagDao
                                 ) {
+  def findAllByUserIdAndDateRange(userId: Long, startDate: String, endDate: String)(implicit connection: Connection): List[EmotionRecord] = {
+    val emotionRecords = SQL("SELECT * FROM emotion_records WHERE user_id = {userId} AND created BETWEEN {startDate} AND {endDate}").
+      on("userId" -> userId, "startDate" -> startDate, "endDate" -> endDate).
+      as(EmotionRecord.parser.*)
+    populateListsByEmotionRecord(emotionRecords)
+  }
+
   def findAll()(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records").as(EmotionRecord.parser.*)
     populateListsByEmotionRecord(emotionRecords)

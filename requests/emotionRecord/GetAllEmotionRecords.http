@@ -2,3 +2,11 @@
 GET http://localhost:9000/emotionRecord
 Authorization: Bearer {{auth_token}}
 
+### List EmotionRecordDays
+GET http://localhost:9000/api/emotionRecord/user/months/current
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MTU0MDY5OTEsImlhdCI6MTY4Mzg3MDk5MSwidXNlcklkIjoxLCJ1c2VybmFtZSI6InZlZ2EiLCJlbWFpbCI6ImFzIiwiZmlyc3RuYW1lIjoic2QiLCJsYXN0bmFtZSI6InNkIiwicm9sZSI6InVzZXIifQ.L3QbibHDcitBrEFwMv0Fl7rZkxYe_8tp7LhVCC7lsjM
+
+
+
+
+

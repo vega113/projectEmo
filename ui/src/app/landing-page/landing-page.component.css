@@ -10,80 +10,72 @@ main {
   align-items: center;
   justify-content: center;
   flex-grow: 1;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
+  padding: 60px 0;
 }
 
 .value-proposition {
   text-align: center;
-  padding: 20px;
-  background-color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  border-radius: 5px;
-  color: #000; /* Add this line to set the text color to black */
+  margin-bottom: 60px;
 }
 
-.value-proposition mat-card-title {
-  background-color: rgba(255, 255, 255, 0.7);
-  padding: 5px;
-  border-radius: 5px;
-  color: #333;
+.value-proposition-title {
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
+.section-title {
+  font-size: 2em;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  margin-bottom: 30px;
+}
 
-.cta {
+.benefits {
   display: flex;
-  gap: 16px;
-  margin-bottom: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
 }
 
-.visuals {
-  /* Add styles for visuals section */
+.call-to-action {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
 }
 
-.testimonials {
-  /* Add styles for testimonials section */
-}
-
-.features {
-  /* Add styles for features section */
-}
-.spacer {
-  flex: 1;
-}
-
-/*.login-button {*/
-/*  color: #ffffff; !* Change this to your desired color *!*/
-/*}*/
-.logo {
-  width: 30px; /* Adjust the width as needed */
-  height: auto; /* Maintain aspect ratio */
-  /* Add additional CSS rules for positioning, margins, etc. */
-}
-
-@keyframes gradientChange {
-  0% {
-    background-position: 0 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0 50%;
-  }
-}
-
-main {
-  background: linear-gradient(-45deg, #00f, #00f7ff);
-  background-size: 300% 300%;
-  animation: gradientChange 20s ease infinite;
-}
 .benefit-card {
-  background-color: rgba(255, 255, 255, 0.7);
+  max-width: 300px;
+  background-color: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
   border-radius: 5px;
+  transition: transform 0.3s ease;
 }
 
+.benefit-card:hover {
+  transform: translateY(-10px);
+}
+
+.benefit-card mat-card-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.benefit-card button {
+  margin-top: 15px;
+}
+/* app.component.css */
+.gradient-background {
+  background-image: linear-gradient(
+    135deg,
+    rgba(173, 216, 230, 1) 0%,
+    rgba(221, 160, 221, 1) 50%,
+    rgba(144, 238, 144, 1) 100%
+  );
+  width: 100%;
+  height: 100vh;
+}

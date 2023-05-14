@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+mat-form-field {
+  margin-bottom: 20px;
+}
+
+.calendar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+mat-grid-list {
+  width: 100%;
+}
+
+.week {
+  display: flex;
+  justify-content: space-between;
+}
+
+app-day {
+  flex-grow: 1;
+  margin: 5px;
+}
+/* CSS for weekday names */
+.weekdays {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 1em 20px;
+}
+
+.weekday {
+  text-align: center;
+  flex-grow: 1;
+  font-weight: bold;
+}

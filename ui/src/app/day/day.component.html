@@ -1,0 +1,6 @@
+<div class="day" [style.background-color]="getColor()">
+  <div class="date" *ngIf="day?.date !== 0; else placeholder">{{ day?.date }}</div>
+  <ng-template #placeholder><div class="placeholder"></div></ng-template>
+  <div class="average-intensity" *ngIf="day?.date !== 0; else placeholder2">{{ getAverageIntensity() }}</div>
+  <ng-template #placeholder2><div class="placeholder"></div></ng-template>
+</div>

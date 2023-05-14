@@ -36,6 +36,24 @@ import {MatPaginatorModule} from "@angular/material/paginator";
 import {MatSortModule} from "@angular/material/sort";
 import {ScreenSizeDirective} from "./directives/screenSize.directive";
 import {LayoutModule} from "@angular/cdk/layout";
+import { EmotionCalendarComponent } from './emotion-calendar/emotion-calendar.component';
+import {MatDatepickerModule} from "@angular/material/datepicker";
+import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/core";
+import {DateFnsAdapter} from "./adapters/date-fns.adapter";
+import { DayComponent } from './day/day.component';
+import {MatGridListModule} from "@angular/material/grid-list";
+
+export const MAT_DATE_FNS_FORMATS = {
+  parse: {
+    dateInput: 'MM/dd/yyyy',
+  },
+  display: {
+    dateInput: 'MM/dd/yyyy',
+    monthYearLabel: 'MMM yyyy',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM yyyy',
+  },
+};
 
 @NgModule({
   declarations: [
@@ -49,34 +67,46 @@ import {LayoutModule} from "@angular/cdk/layout";
     DisplayEmotionComponent,
     EmotionsTimelineComponent,
     DashboardComponent,
-    ScreenSizeDirective
+    ScreenSizeDirective,
+    EmotionCalendarComponent,
+    DayComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    MatToolbarModule,
-    MatCardModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatListModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatSliderModule,
-    MatSnackBarModule,
-    MatChipsModule,
-    MatProgressSpinnerModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
-    LayoutModule
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        MatToolbarModule,
+        MatCardModule,
+        MatButtonModule,
+        MatInputModule,
+        MatIconModule,
+        MatListModule,
+        MatSidenavModule,
+        MatSelectModule,
+        MatSliderModule,
+        MatSnackBarModule,
+        MatChipsModule,
+        MatProgressSpinnerModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatSortModule,
+        LayoutModule,
+        MatDatepickerModule,
+        MatGridListModule,
 
-  ],
-  providers: [],
+    ],
+  providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {
+    provide: DateAdapter,
+    useClass: DateFnsAdapter,
+    deps: [MAT_DATE_LOCALE],
+  },
+    {
+      provide: MAT_DATE_FORMATS,
+      useValue: MAT_DATE_FNS_FORMATS
+    }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

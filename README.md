@@ -29,6 +29,7 @@ Emotion Tracker is a web application that allows users to track and analyze thei
 
 ### Installation
 ```agsl
+npm install date-fns --save
 npm install karma-jasmine --save-dev                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 npm install --save-dev karma                                                                                                                                                         
 npm install -g karma-cli                                                                                                                                                             

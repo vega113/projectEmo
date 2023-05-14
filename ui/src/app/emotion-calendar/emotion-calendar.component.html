@@ -1,0 +1,22 @@
+<mat-form-field appearance="fill">
+  <mat-label>Choose a month</mat-label>
+  <input matInput [matDatepicker]="picker" (dateChange)="monthSelected($event)" [value]="date">
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker startView="multi-year" (yearSelected)="chosenYearHandler($event)" (monthSelected)="chosenMonthHandler($event, picker)" panelClass="example-month-picker">
+  </mat-datepicker>
+</mat-form-field>
+<h2>{{ date | date: 'MMMM yyyy' }}</h2>
+<div class="calendar">
+  <mat-grid-list cols="7" rowHeight="100px">
+    <!-- Weekday names -->
+    <div class="weekdays">
+      <div class="weekday" *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']">{{ day }}</div>
+    </div>
+    <!-- Calendar -->
+    <ng-container *ngFor="let week of calendarWeeks">
+      <mat-grid-tile *ngFor="let day of week.days">
+        <app-day [day]="day"></app-day>
+      </mat-grid-tile>
+    </ng-container>
+  </mat-grid-list>
+</div>

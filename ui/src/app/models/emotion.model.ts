@@ -90,3 +90,29 @@ export interface SuggestedAction {
   name: string;
   created?: string;
 }
+
+export interface EmotionRecordDay {
+  date: Date;
+  records: EmotionRecord[];
+}
+
+export interface EmotionRecordWeek {
+  week: number;
+  days: EmotionRecordDay[];
+}
+
+export interface EmotionRecordMonth {
+  month: Date;
+  weeks: EmotionRecordWeek[];
+}
+
+export interface DayOfWeek {
+  date: number;
+  records: EmotionRecord[];
+  averageIntensity: number;
+  dayColor: string;
+}
+
+export interface Week {
+  days: DayOfWeek[];
+}

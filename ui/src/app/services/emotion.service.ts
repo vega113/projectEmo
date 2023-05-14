@@ -1,8 +1,16 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import {EmotionData, EmotionRecord, Note, SuggestedAction} from '../models/emotion.model';
-import { catchError, tap } from 'rxjs/operators';
-import { AuthService } from './auth.service';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import {
+  EmotionData,
+  EmotionRecord,
+  EmotionRecordDay,
+  EmotionRecordMonth,
+  EmotionRecordWeek,
+  Note,
+  SuggestedAction
+} from '../models/emotion.model';
+import {catchError, map, tap} from 'rxjs/operators';
+import {AuthService} from './auth.service';
 import {ErrorService} from "./error.service";
 import {Observable} from "rxjs";
 
@@ -64,4 +72,55 @@ export class EmotionService {
       })
     );
   }
+
+  fetchEmotionRecordDaysForCurrentUser() {
+    const headers = this.authService.getAuthorizationHeader();
+    return this.http.get<any[]>(`${this.apiUrl}/emotionRecord/user/days`, { headers }).pipe(
+      map(data => {
+        return data.map((recordDay: any) => {
+          return {
+            date: new Date(recordDay.date), // Convert date string to Date object
+            records: recordDay.records, // Assume records are already in the correct format
+          } as EmotionRecordDay;
+        });
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return this.errorService.handleError(error);
+      })
+    );
+  }
+
+  fetchMonthEmotionRecordsForCurrentUser(date: Date) {
+    const headers = this.authService.getAuthorizationHeader();
+    const isoDateString = this.formatDateToIsoString(date)
+    return this.http.get<EmotionRecordMonth>(`${this.apiUrl}/emotionRecord/user/month/${isoDateString}`, { headers }).pipe(
+      map(data => {
+        return {
+          month: new Date(data.month), // Convert date string to Date object
+          weeks: data.weeks.map((recordWeek: any) => {
+            return {
+              week: recordWeek.week,
+              days: recordWeek.days.map((recordDay: any) => {
+                return {
+                  date: new Date(recordDay.date), // Convert date string to Date object
+                  records: recordDay.records, // Assume records are already in the correct format
+                } as EmotionRecordDay;
+              }),
+            } as EmotionRecordWeek;
+          }),
+        } as EmotionRecordMonth;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return this.errorService.handleError(error);
+      })
+    );
+  }
+
+  private formatDateToIsoString(date: Date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+  }
+
 }

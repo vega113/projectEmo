@@ -3,6 +3,7 @@ import {Observable, Subscription} from "rxjs";
 import {AuthService} from "../services/auth.service";
 import {MatSidenav} from "@angular/material/sidenav";
 import {BreakpointObserver, Breakpoints} from "@angular/cdk/layout";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-main-layout',
@@ -15,7 +16,8 @@ export class MainLayoutComponent {
   screenWidth!: number;
   resizeSubscription!: Subscription;
 
-  constructor(private authService: AuthService, private breakpointObserver: BreakpointObserver) {
+  constructor(private authService: AuthService, private breakpointObserver: BreakpointObserver,
+              private router: Router) {
     this.isAuthenticated = this.authService.isAuthenticated;
   }
 
@@ -43,5 +45,6 @@ export class MainLayoutComponent {
 
   logout() {
     this.authService.logout();
+    this.router.navigate(['landing']);
   }
 }

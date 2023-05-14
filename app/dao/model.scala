@@ -1,6 +1,6 @@
 package dao
 
-import java.time.LocalDateTime
+import java.time.{LocalDate, LocalDateTime}
 import anorm._
 import anorm.SqlParser._
 import auth.model.TokenData
@@ -47,6 +47,15 @@ object model {
                             tags: List[Tag],
                             created: Option[LocalDateTime] = None
                           )
+
+  case class EmotionRecordDay(
+                               date: LocalDate,
+                               records: List[EmotionRecord]
+                             )
+
+  case class EmotionRecordWeek(week: Int, days: List[EmotionRecordDay])
+
+  case class EmotionRecordMonth(month: LocalDate, weeks: List[EmotionRecordWeek])
 
   case class Trigger(
                       triggerId: Option[Int],
@@ -202,5 +211,17 @@ object Note {
           SuggestedAction(id, name, created)
       }
     }
+  }
+
+  object EmotionRecordDay {
+    implicit val emotionRecordDayFormat: Format[EmotionRecordDay] = Json.format[EmotionRecordDay]
+  }
+
+  object EmotionRecordWeek {
+    implicit val emotionRecordWeekFormat: Format[EmotionRecordWeek] = Json.format[EmotionRecordWeek]
+  }
+
+  object EmotionRecordMonth {
+    implicit val emotionRecordMonthFormat: Format[EmotionRecordMonth] = Json.format[EmotionRecordMonth]
   }
 }
