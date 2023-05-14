@@ -90,6 +90,13 @@ object model {
                               created: Option[LocalDateTime] = None
                             )
 
+  case class NoteTemplate(
+                           id: Option[String],
+                           label: String,
+                           value: String,
+                           created: Option[LocalDateTime] = None
+                         )
+
 
   object User {
     implicit val userFormat: Format[User] = Json.format[User]
@@ -223,5 +230,18 @@ object Note {
 
   object EmotionRecordMonth {
     implicit val emotionRecordMonthFormat: Format[EmotionRecordMonth] = Json.format[EmotionRecordMonth]
+  }
+
+  object NoteTemplate {
+    implicit val noteTemplateFormat: Format[NoteTemplate] = Json.format[NoteTemplate]
+    implicit val parser: RowParser[NoteTemplate] = {
+      get[Option[String]]("id") ~
+        str("label") ~
+        str("value") ~
+        get[Option[LocalDateTime]]("created") map {
+        case id ~ label ~ value ~ created =>
+          NoteTemplate(id, label, value, created)
+      }
+    }
   }
 }

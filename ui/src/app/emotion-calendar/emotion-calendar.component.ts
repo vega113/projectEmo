@@ -108,7 +108,7 @@ export class EmotionCalendarComponent implements OnInit {
           date: day,
           records: dayRecord.records,
           averageIntensity: averageIntensity,
-          dayColor: this.getColorForDay(averageIntensity)
+          dayColor: this.getColorForDay(averageIntensity, dayRecord.records.length > 0)
         };
       }
     }
@@ -123,14 +123,14 @@ export class EmotionCalendarComponent implements OnInit {
 
 
 
-  getColorForDay(averageIntensity: number) {
+  getColorForDay(averageIntensity: number, hasRecords: boolean) {
 
     let color = 'blue';
     if(averageIntensity < 0) {
       color = 'red';
     } else if (averageIntensity > 0) {
       color = 'green';
-    } else {
+    } else if (!hasRecords) {
       color = 'grey';
     }
     return color;

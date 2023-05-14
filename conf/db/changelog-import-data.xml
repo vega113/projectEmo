@@ -19,5 +19,8 @@
     <changeSet id="load-suggested_actions-data" author="Yuri Zelikov">
         <loadData file="conf/db/data/suggested_actions.csv" tableName="suggested_actions" separator=","/>
     </changeSet>
+    <changeSet id="load-note_template-data" author="Yuri Zelikov">
+        <loadData file="conf/db/data/note_template.csv" tableName="note_template" separator=","/>
+    </changeSet>
 
 </databaseChangeLog>

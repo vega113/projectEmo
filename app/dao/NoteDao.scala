@@ -54,4 +54,8 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
   def delete(id: Int)(implicit connection: Connection): Int = {
     SQL("DELETE FROM notes WHERE note_id = {note_id}").on("note_id" -> id).executeUpdate()
   }
+
+  def findAllNoteTemplates()(implicit connection: Connection): List[NoteTemplate] = {
+    SQL("SELECT * FROM note_template").as(NoteTemplate.parser.*)
+  }
 }

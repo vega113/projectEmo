@@ -2,7 +2,7 @@ package service
 
 import com.google.inject.ImplementedBy
 import dao.{DatabaseExecutionContext, NoteDao, TagDao}
-import dao.model.{Note, Tag}
+import dao.model.{Note, NoteTemplate, Tag}
 
 import java.sql.Connection
 import javax.inject.Inject
@@ -12,6 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @ImplementedBy(classOf[NoteServiceImpl])
 trait NoteService {
   def insert(userId: Long, emotionRecordId: Long, note: Note): Future[Option[Long]]
+  def findAllNoteTemplates(): Future[List[NoteTemplate]]
 
 }
 
@@ -57,5 +58,11 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
     val existingTags = tagDao.findAllByEmotionRecordId(emotionRecordId)
     val newTags = tags.filter(tag => !existingTags.map(_.tagName).contains(tag.tagName))
     tagDao.insert(emotionRecordId, newTags)
+  }
+
+  override def findAllNoteTemplates(): Future[List[NoteTemplate]] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(noteDao.findAllNoteTemplates())
+    })
   }
 }

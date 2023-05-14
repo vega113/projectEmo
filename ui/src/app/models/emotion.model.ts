@@ -116,3 +116,9 @@ export interface DayOfWeek {
 export interface Week {
   days: DayOfWeek[];
 }
+
+export interface NoteTemplate {
+  id?: string;
+  label: string;
+  value: string;
+}

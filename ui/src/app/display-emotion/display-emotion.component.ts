@@ -1,9 +1,12 @@
 import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import {Note, SuggestedAction} from '../models/emotion.model';
+import {Note, NoteTemplate, SuggestedAction} from '../models/emotion.model';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatSelectChange} from "@angular/material/select";
+import {Observable} from "rxjs";
+import { NoteService } from '../services/note.service';
 
 @Component({
   selector: 'app-display-emotion',
@@ -15,11 +18,15 @@ export class DisplayEmotionComponent {
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
               private emotionStateService: EmotionStateService,
-              private snackBar: MatSnackBar) {
+              private snackBar: MatSnackBar,
+              private noteService: NoteService) {
     this.noteForm = this.fb.group({
       note: ['', Validators.required]
     });
   }
+
+  noteTemplates: NoteTemplate[] | null = null;
+
 
   isLoadingNotes: boolean = false;
   isLoadingActions: boolean = false;
@@ -66,6 +73,11 @@ export class DisplayEmotionComponent {
         console.log('New emotion received:', newEmotion);
       }
     });
+
+    this.noteService.getNoteTemplates().subscribe((noteTemplates) => {
+      this.noteTemplates = noteTemplates;
+      console.log('note templates received');
+    });
   }
 
   async onSubmitNote(): Promise<void> {
@@ -92,6 +104,9 @@ export class DisplayEmotionComponent {
         }
       });
     }
+  }
 
+  onTemplateSelected(event: MatSelectChange) {
+    this.noteForm.get('note')?.setValue(event.value);
   }
 }

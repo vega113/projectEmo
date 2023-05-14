@@ -17,13 +17,13 @@ DELETE        /api/emotionRecord/:id                         controllers.Emotion
 GET           /api/emotionRecord/user                        controllers.EmotionRecordController.findAllByUserId()
 GET           /api/emotionRecord/id                          controllers.EmotionRecordController.findById(id: Long)
 GET           /api/emotionRecord/user/days                   controllers.EmotionRecordController.findAllDaysByUserId()
-GET           /api/emotionRecord/user/month/:date         controllers.EmotionRecordController.findRecordsByUserIdForCurrentMonth(date: String)
-
+GET           /api/emotionRecord/user/month/:date            controllers.EmotionRecordController.findRecordsByUserIdForCurrentMonth(date: String)
 
 GET           /api/emotion                                   controllers.EmotionController.findAll()
 GET           /api/trigger                                   controllers.TriggerController.findAll()
 GET           /api/emotion/:id/subEmotions                   controllers.SubEmotionController.findAllByEmotionId(id: String)
 GET           /api/emotionRecord/:id/suggestedActions        controllers.EmotionRecordController.fetchSuggestions(id: Long)
+GET           /api/noteTemplate                              controllers.NoteController.fetchNoteTemplate()
 
 
 # User routes
