@@ -1,14 +1,14 @@
 ### TODOs
-- [ ] Use Stepper component for emotion creation
+- [ ] ~~Use Stepper component for emotion creation~~
 - [ ] Add emotion date for the emotions table, and add a date picker to the emotion creation 
 - [ ] Add tooltips on every controller with explanations. 
 - [ ] Add explanation for every emotion and sub-emotion
-- [ ] Update trigger to use tree/sub tree
-- [ ] Update display emotion to show emotion type and also save the notes to DB
-- [ ] Add error handling, especially for login and all UI operations
-- [ ] Add loading spinner for all UI operations
-- [ ] Add a new emotion type: "Other" and allow user to add a custom emotion type
-- [ ] Emotion type should by a table in the DB and it should be connected directly to the emotion record table
+- [ ] ~~Update trigger to use tree/sub tree~~
+- [X] Update display emotion to show emotion type and also save the notes to DB
+- [X] Add error handling, especially for login and all UI operations
+- [X] Add loading spinner for all UI operations
+- [X] Add a new emotion type: "Other" and allow user to add a custom emotion type
+- [ ] ~~Emotion type should by a table in the DB and it should be connected directly to the emotion record table~~
 - [ ] Cache the emotion cache data in state service
 - [ ] Test insert notes in different languages
--  [] Logout the current user in case the token is invalid on some request
+- [X] Logout the current user in case the token is invalid on some request
