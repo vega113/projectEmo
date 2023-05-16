@@ -42,6 +42,7 @@ import {DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE} from "@angular/material/
 import {DateFnsAdapter} from "./adapters/date-fns.adapter";
 import { DayComponent } from './day/day.component';
 import {MatGridListModule} from "@angular/material/grid-list";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -96,6 +97,7 @@ export const MAT_DATE_FNS_FORMATS = {
         LayoutModule,
         MatDatepickerModule,
         MatGridListModule,
+        MatTooltipModule,
 
     ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {
