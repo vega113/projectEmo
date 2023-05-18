@@ -24,7 +24,7 @@
             <strong>Trigger:</strong> {{ emotion.triggers[0]?.description }}
           </div>
           <div>
-            <strong>Created:</strong> {{ emotion.created }}
+            <strong>Created:</strong> {{  this.dateService.formatDateFromDb( emotion.created) }}
           </div>
         </mat-card-content>
       </mat-card>

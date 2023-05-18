@@ -54,12 +54,13 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
   def insert(emotionRecord: EmotionRecord)(implicit connection: Connection): Option[Long] = {
     val idOpt: Option[Long] = SQL(
       """
-      INSERT INTO emotion_records (emotion_type, emotion_id, user_id, intensity)
-      VALUES ({emotionType}, {emotionId}, {userId}, {intensity})
+      INSERT INTO emotion_records (emotion_type, emotion_id, user_id, intensity, created)
+      VALUES ({emotionType}, {emotionId}, {userId}, {intensity}, {created})
     """).on("userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
       "emotionType" -> emotionRecord.emotionType,
       "emotionId" -> emotionRecord.emotion.flatMap(_.id),
-      "intensity" -> emotionRecord.intensity)
+      "intensity" -> emotionRecord.intensity,
+      "created" -> emotionRecord.created)
       .executeInsert()
     idOpt.foreach(id => insertSubLists(emotionRecord, id))
     idOpt

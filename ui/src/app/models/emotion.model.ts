@@ -101,11 +101,6 @@ export interface EmotionRecordWeek {
   days: EmotionRecordDay[];
 }
 
-export interface EmotionRecordMonth {
-  month: Date;
-  weeks: EmotionRecordWeek[];
-}
-
 export interface DayOfWeek {
   date: number;
   records: EmotionRecord[];

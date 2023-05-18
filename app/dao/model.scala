@@ -52,11 +52,6 @@ object model {
                                date: LocalDate,
                                records: List[EmotionRecord]
                              )
-
-  case class EmotionRecordWeek(week: Int, days: List[EmotionRecordDay])
-
-  case class EmotionRecordMonth(month: LocalDate, weeks: List[EmotionRecordWeek])
-
   case class Trigger(
                       triggerId: Option[Int],
                       triggerName: Option[String],
@@ -222,14 +217,6 @@ object Note {
 
   object EmotionRecordDay {
     implicit val emotionRecordDayFormat: Format[EmotionRecordDay] = Json.format[EmotionRecordDay]
-  }
-
-  object EmotionRecordWeek {
-    implicit val emotionRecordWeekFormat: Format[EmotionRecordWeek] = Json.format[EmotionRecordWeek]
-  }
-
-  object EmotionRecordMonth {
-    implicit val emotionRecordMonthFormat: Format[EmotionRecordMonth] = Json.format[EmotionRecordMonth]
   }
 
   object NoteTemplate {

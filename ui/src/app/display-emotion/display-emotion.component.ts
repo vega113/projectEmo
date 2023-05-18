@@ -5,8 +5,8 @@ import {Note, NoteTemplate, SuggestedAction} from '../models/emotion.model';
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatSelectChange} from "@angular/material/select";
-import {Observable} from "rxjs";
 import { NoteService } from '../services/note.service';
+import {DateService} from "../services/date.service";
 
 @Component({
   selector: 'app-display-emotion',
@@ -19,7 +19,8 @@ export class DisplayEmotionComponent {
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
               private emotionStateService: EmotionStateService,
               private snackBar: MatSnackBar,
-              private noteService: NoteService) {
+              private noteService: NoteService,
+              public dateService: DateService) {
     this.noteForm = this.fb.group({
       note: ['', Validators.required]
     });

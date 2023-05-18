@@ -17,7 +17,7 @@ DELETE        /api/emotionRecord/:id                         controllers.Emotion
 GET           /api/emotionRecord/user                        controllers.EmotionRecordController.findAllByUserId()
 GET           /api/emotionRecord/id                          controllers.EmotionRecordController.findById(id: Long)
 GET           /api/emotionRecord/user/days                   controllers.EmotionRecordController.findAllDaysByUserId()
-GET           /api/emotionRecord/user/month/:date            controllers.EmotionRecordController.findRecordsByUserIdForCurrentMonth(date: String)
+GET           /api/emotionRecord/user/month/:monthStart/:monthEnd            controllers.EmotionRecordController.findRecordsByUserIdForMonth(monthStart: String, monthEnd)
 
 GET           /api/emotion                                   controllers.EmotionController.findAll()
 GET           /api/trigger                                   controllers.TriggerController.findAll()

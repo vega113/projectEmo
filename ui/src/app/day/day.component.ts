@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {DayOfWeek, EmotionRecord} from "../models/emotion.model";
+import {DayOfWeek} from "../models/emotion.model";
 
 @Component({
   selector: 'app-day',
@@ -25,8 +25,10 @@ export class DayComponent {
       for (let i = 0; i < day.records.length && i < 5; i++) {
         let record = day.records[i];
 
-        info += `${i + 1}:`;
-        info += `Emotion: ${record.emotion.emotionName}\n`;
+        info += `#${i + 1}:`;
+        if(record.emotion){
+          info += `Emotion: ${record.emotion.emotionName}\n`;
+        }
         info += `Intensity: ${record.intensity}\n`;
 
         // Assuming there is at most one SubEmotion and Trigger per EmotionRecord

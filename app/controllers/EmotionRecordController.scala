@@ -6,7 +6,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import service.{EmotionRecordService, NoteService}
 
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime, ZonedDateTime}
 import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -96,7 +96,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     )
   }
 
-  def delete(id: Long): Action[AnyContent] = Action andThen authenticatedAction async  { implicit token =>
+  def delete(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
     emotionRecordService.delete(token.user.userId).map {
       case 1 => Ok
       case _ => NotFound
@@ -107,17 +107,22 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
 
-  def findAllByUserIdAndDateRange(startDate: String, endDate: String): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
-    emotionRecordService.findAllByUserIdAndDateRange(token.user.userId, startDate, endDate).map(emotionRecords => Ok(Json.toJson(emotionRecords)))
-  }
-
-  def findRecordsByUserIdForCurrentMonth(dateStr: String): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
-    Try(LocalDate.parse(dateStr)) match {
-      case Success(date) =>  emotionRecordService.fetchRecordsForMonthByDate(token.user.userId, date).map(
-        emotionRecords => Ok(Json.toJson(emotionRecords)))
-      case Failure(_) => Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
+  def findAllByUserIdAndDateRange(startDate: String, endDate: String): Action[AnyContent] =
+    Action andThen authenticatedAction async { implicit token =>
+      emotionRecordService.findAllByUserIdAndDateRange(token.user.userId, startDate, endDate).
+        map(emotionRecords => Ok(Json.toJson(emotionRecords)))
     }
-  }
+
+  def findRecordsByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
+    Action andThen authenticatedAction async { implicit token =>
+      Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
+        case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.user.userId,
+          from.toInstant, to.toInstant).map(
+          emotionRecords => Ok(Json.toJson(emotionRecords)))
+        case Failure(_) => Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
+      }
+    }
+
 
   def findAllDaysByUserId(): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
     emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecordService.groupRecordsByDate).

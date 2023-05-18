@@ -2,9 +2,11 @@ import {Component, OnInit} from '@angular/core';
 import {MatDatepicker, MatDatepickerInputEvent} from '@angular/material/datepicker';
 import {getDate, getDay, getMonth, getYear, isSameDay, setMonth, setYear} from 'date-fns';
 
-import {DayOfWeek, EmotionRecord, EmotionRecordMonth, Week} from "../models/emotion.model";
+import {DayOfWeek, EmotionRecord, Week} from "../models/emotion.model";
 import {EmotionService} from "../services/emotion.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {DateService} from "../services/date.service";
+
 
 
 @Component({
@@ -14,11 +16,12 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 })
 export class EmotionCalendarComponent implements OnInit {
   date = new Date();
-  monthRecords: EmotionRecordMonth | undefined;
+  monthRecords: EmotionRecord[] | undefined;
   isLoadingRecords = false;
   calendarWeeks: Week[] = [];
 
-  constructor(private emotionRecordService: EmotionService, private snackBar: MatSnackBar) { }
+  constructor(private emotionRecordService: EmotionService, private snackBar: MatSnackBar,
+              private dateService: DateService ) { }
 
   ngOnInit() {
     this.fetchRecords(this.date);
@@ -91,24 +94,24 @@ export class EmotionCalendarComponent implements OnInit {
     this.calendarWeeks = weeks;
   }
 
-  findDayRecord(date: Date, monthRecords: EmotionRecordMonth | undefined): DayOfWeek {
+  findDayRecord(date: Date, monthRecords: EmotionRecord[] | undefined): DayOfWeek {
     const day = getDate(date);
     const month = getMonth(date);
     const year = getYear(date);
 
     if (monthRecords) {
-      const dayRecord = monthRecords.weeks.map(week => week.days).flat().find(dayRecord => {
+      const dayRecords = monthRecords.filter(dayRecord => {
         const currentDay = new Date(year, month, day);
-        return isSameDay(dayRecord.date, currentDay);
+        return isSameDay(new Date(this.dateService.formatDateFromDb(dayRecord.created!)), currentDay);
       });
 
-      if (dayRecord) {
-        const averageIntensity = this.calculateAverageIntensity(dayRecord.records);
+      if (dayRecords) {
+        const averageIntensity = this.calculateAverageIntensity(dayRecords);
         return {
           date: day,
-          records: dayRecord.records,
+          records: dayRecords,
           averageIntensity: averageIntensity,
-          dayColor: this.getColorForDay(averageIntensity, dayRecord.records.length > 0)
+          dayColor: this.getColorForDay(averageIntensity, dayRecords.length > 0)
         };
       }
     }

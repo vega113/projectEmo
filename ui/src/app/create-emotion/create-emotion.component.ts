@@ -3,6 +3,29 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {EmotionCacheService} from '../services/emotion-cache.service';
+
+import { NativeDateAdapter } from '@angular/material/core';
+
+export class CustomDateAdapter extends NativeDateAdapter {
+  override getDayOfWeekNames(style: 'long' | 'short' | 'narrow'): string[] {
+    return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  }
+}
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'LL',
+  },
+  display: {
+    dateInput: 'LL',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+    weekday: 'short'
+  },
+};
+
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+
 import {
   Emotion,
   EmotionData,
@@ -17,12 +40,18 @@ import {AuthService} from "../services/auth.service";
 import {from} from "rxjs";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {Router} from "@angular/router";
+import {DateService} from "../services/date.service";
 
 
 @Component({
   selector: 'app-create-emotion',
   templateUrl: './create-emotion.component.html',
-  styleUrls: ['./create-emotion.component.css']
+  styleUrls: ['./create-emotion.component.css'],
+  providers: [
+    { provide: DateAdapter, useClass: CustomDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+    { provide: MAT_DATE_LOCALE, useValue: 'en-US' }
+  ]
 })
 export class CreateEmotionComponent implements OnInit {
   isLoadingEmotionCache: boolean = true;
@@ -38,13 +67,15 @@ export class CreateEmotionComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
               private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar,
-              private emotionCacheService: EmotionCacheService) {
+              private emotionCacheService: EmotionCacheService,
+              private dateService: DateService) {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
-      emotion: [''],
+      emotion: ['', Validators.required],
       trigger: [''],
-      subEmotion: ['']
+      subEmotion: [''],
+      emotionDate: [new Date()]
     });
   }
 
@@ -130,7 +161,8 @@ export class CreateEmotionComponent implements OnInit {
       subEmotions: subEmotions as SubEmotion[],
       triggers: triggers as Trigger[],
       notes: notes as Note[],
-      tags: tags as Tag[]
+      tags: tags as Tag[],
+      created: this.dateService.formatDateToIsoString(emotionFromData.emotionDate)
     };
   }
 

@@ -2,14 +2,13 @@ package service
 
 import com.google.inject.{ImplementedBy, Inject}
 import controllers.model
-import dao.model.{EmotionRecord, EmotionRecordDay, EmotionRecordMonth, EmotionRecordWeek, SuggestedAction}
+import dao.model.{EmotionRecord, EmotionRecordDay, SuggestedAction}
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
 
-import java.time.LocalDate
-import java.time.temporal.ChronoField
+import java.time.{Instant, LocalDate}
 import scala.collection.immutable.ListMap
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.math.Ordered.orderingToOrdered
 
 @ImplementedBy(classOf[EmotionRecordServiceImpl])
@@ -23,8 +22,7 @@ trait EmotionRecordService {
   def delete(id: Long): Future[Int]
   def findSuggestionsByEmotionRecord(record: EmotionRecord): Future[List[SuggestedAction]]
   def groupRecordsByDate(records: List[EmotionRecord]): List[EmotionRecordDay]
-
-  def fetchRecordsForMonthByDate(userId: Long, date: LocalDate): Future[EmotionRecordMonth]
+  def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
 }
 
 class EmotionRecordServiceImpl @Inject()(
@@ -111,42 +109,11 @@ class EmotionRecordServiceImpl @Inject()(
     }))
   }
 
-  private def groupRecordsByWeek(records: List[EmotionRecordDay]): List[EmotionRecordWeek] = {
-    val recordsByWeek: Map[Int, List[EmotionRecordDay]] = records.groupBy(record => {
-      record.date.get(ChronoField.ALIGNED_WEEK_OF_YEAR)
-    })
-    val out: List[EmotionRecordWeek] = recordsByWeek.map(entry => {
-      EmotionRecordWeek(entry._1, entry._2)
-    }).toList.sortWith((w1, w2) => {
-      w1.week > w2.week
-    })
-    out
-  }
-
-  private def fillInEmotionRecordDaysIfMissing(date: LocalDate, days: List[EmotionRecordDay]): List[EmotionRecordDay] = {
-    val minDayOfMonth = 1
-    val maxDayOfMonth = date.lengthOfMonth()
-
-    (minDayOfMonth to maxDayOfMonth).toList.flatMap(dayOfMonth => {
-      days match {
-        case Nil => Some(EmotionRecordDay(LocalDate.of(date.getYear, date.getMonth, dayOfMonth), List()))
-        case _ => days.find(_.date.getDayOfMonth == dayOfMonth)
-          .orElse(Some(EmotionRecordDay(LocalDate.of(days.head.date.getYear, days.head.date.getMonth, dayOfMonth), List())))
-      }
-    })
-  }
-
-  def fetchRecordsForMonthByDate(userId: Long, date: LocalDate): Future[EmotionRecordMonth] = {
+  def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      val startDate = date.withDayOfMonth(1)
-      val endDate = date.withDayOfMonth(date.lengthOfMonth())
-
       val records: List[EmotionRecord] = emotionRecordDao.findAllByUserIdAndDateRange(
-        userId, startDate.toString, endDate.toString)
-      val recordsByDay: List[EmotionRecordDay] = fillInEmotionRecordDaysIfMissing(date, groupRecordsByDate(records))
-      val recordsByWeek: List[EmotionRecordWeek] = groupRecordsByWeek(recordsByDay)
-      val recordsByMonth = EmotionRecordMonth(date.withDayOfMonth(1), recordsByWeek)
-      recordsByMonth
+        userId, startDateTime.toString, endDateTime.toString)
+      records
     }))
   }
 }
