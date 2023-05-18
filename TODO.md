@@ -12,4 +12,5 @@
 - [ ] Cache the emotion cache data in state service
 - [ ] Test insert notes in different languages
 - [X] Logout the current user in case the token is invalid on some request
+- [ ] Add internalization
 - [ ] Allow emotion records to be public
