@@ -70,4 +70,80 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
       actual mustEqual expectedResult
     }
   }
+
+
+  "EmotionRecordServiceImpl" should {
+    "convert emotion records to chart data" in new TestData {
+      // Prepare test data
+      val records = List(
+        EmotionRecord(
+          id = Some(1),
+          emotionType = "Positive",
+          userId = Some(1),
+          emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
+          intensity = 5,
+          subEmotions = List(SubEmotion(Some("Amusement"), Some("Amusement"), Some("description"), Some("Joy"))),
+          triggers = List(),
+          notes = List(),
+          tags = List(),
+          created = None
+        ),
+        EmotionRecord(
+          id = Some(2),
+          emotionType = "Positive",
+          userId = Some(1),
+          emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
+          intensity = 8,
+          subEmotions = List(SubEmotion(Some("Amusement"), Some("Amusement"), Some("description"), Some("Joy"))),
+          triggers = List(),
+          notes = List(),
+          tags = List(),
+          created = None
+        ),
+        EmotionRecord(
+          id = Some(3),
+          emotionType = "Positive",
+          userId = Some(1),
+          emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
+          intensity = 7,
+          subEmotions = List(SubEmotion(Some("Excitement"), Some("Excitement"), Some("description"), Some("Joy"))),
+          triggers = List(),
+          notes = List(),
+          tags = List(),
+          created = None
+        ),
+        EmotionRecord(
+          id = Some(4),
+          emotionType = "Neutral",
+          userId = Some(1),
+          emotion = Some(Emotion(Some("Other"), Some("Other"), Some("Neutral"), Some("description"))),
+          intensity = 3,
+          subEmotions = List(SubEmotion(Some("Indifference"), Some("Indifference"), Some("description"), Some("Other"))),
+          triggers = List(),
+          notes = List(),
+          tags = List(),
+          created = None
+        )
+      )
+
+      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockEmotionDataService, fakeDatabaseExecutionContext)
+      // Execute the method
+      private val result = emotionRecordServiceImpl.emotionRecordsToChartData(records)
+
+      // Verify the result
+      result mustEqual Map(
+        "Positive" -> Map(
+          "Joy" -> Map(
+            "Amusement" -> 2,
+            "Excitement" -> 1
+          )
+        ),
+        "Neutral" -> Map(
+          "Other" -> Map(
+            "Indifference" -> 1
+          )
+        )
+      )
+    }
+  }
 }

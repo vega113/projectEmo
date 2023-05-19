@@ -128,4 +128,13 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecordService.groupRecordsByDate).
       map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
+
+
+  def findAllByUserIdAndDateRangeForSunburnForCharts(startDate: String, endDate: String): Action[AnyContent] =
+    Action andThen authenticatedAction async { implicit token =>
+      emotionRecordService.findAllByUserIdAndDateRange(token.user.userId, startDate, endDate).
+        map(emotionRecordService.emotionRecordsToChartData).
+        map(emotionRecordsChartData => Ok(Json.toJson(emotionRecordsChartData)))
+    }
+
 }

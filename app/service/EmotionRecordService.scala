@@ -23,6 +23,7 @@ trait EmotionRecordService {
   def findSuggestionsByEmotionRecord(record: EmotionRecord): Future[List[SuggestedAction]]
   def groupRecordsByDate(records: List[EmotionRecord]): List[EmotionRecordDay]
   def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
+  def emotionRecordsToChartData(records: List[EmotionRecord]): Map[String, Map[String, Map[String, Int]]]
 }
 
 class EmotionRecordServiceImpl @Inject()(
@@ -115,6 +116,39 @@ class EmotionRecordServiceImpl @Inject()(
         userId, startDateTime.toString, endDateTime.toString)
       records
     }))
+  }
+
+  import model._
+
+  import model._
+
+  import model._
+
+  import model._
+
+  import model._
+
+  def emotionRecordsToChartData(records: List[EmotionRecord]): Map[String, Map[String, Map[String, Int]]] = {
+    // First grouping by emotionType
+    val recordsByType: Map[String, List[EmotionRecord]] = records.groupBy(_.emotionType)
+
+    val chartData = recordsByType.map { case (emotionType, recordsForType) =>
+      // Second grouping by emotionName within each emotionType
+      val recordsByEmotion: Map[String, List[EmotionRecord]] = recordsForType.groupBy(record => record.emotion.flatMap(_.emotionName).getOrElse("undefined"))
+
+      val secondLevel = recordsByEmotion.map { case (emotionName, recordsForEmotion) =>
+        // Third grouping by subEmotionName within each emotion
+        val recordsBySubEmotion = recordsForEmotion
+          .flatMap(_.subEmotions.flatMap(_.subEmotionName))
+          .groupBy(identity)
+          .view
+          .mapValues(_.length)
+          .toMap
+        emotionName -> recordsBySubEmotion
+      }
+      emotionType -> secondLevel
+    }
+    chartData
   }
 }
 

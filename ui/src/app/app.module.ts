@@ -43,6 +43,8 @@ import {DateFnsAdapter} from "./adapters/date-fns.adapter";
 import { DayComponent } from './day/day.component';
 import {MatGridListModule} from "@angular/material/grid-list";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatTabsModule} from "@angular/material/tabs";
+import {NgxChartsModule} from "@swimlane/ngx-charts";
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -72,34 +74,35 @@ export const MAT_DATE_FNS_FORMATS = {
     EmotionCalendarComponent,
     DayComponent
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        FormsModule,
-        HttpClientModule,
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-        MatToolbarModule,
-        MatCardModule,
-        MatButtonModule,
-        MatInputModule,
-        MatIconModule,
-        MatListModule,
-        MatSidenavModule,
-        MatSelectModule,
-        MatSliderModule,
-        MatSnackBarModule,
-        MatChipsModule,
-        MatProgressSpinnerModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatSortModule,
-        LayoutModule,
-        MatDatepickerModule,
-        MatGridListModule,
-        MatTooltipModule,
-
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatButtonModule,
+    MatInputModule,
+    MatIconModule,
+    MatListModule,
+    MatSidenavModule,
+    MatSelectModule,
+    MatSliderModule,
+    MatSnackBarModule,
+    MatChipsModule,
+    MatProgressSpinnerModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    LayoutModule,
+    MatDatepickerModule,
+    MatGridListModule,
+    MatTooltipModule,
+    MatTabsModule,
+    NgxChartsModule,
+  ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {
     provide: DateAdapter,
     useClass: DateFnsAdapter,

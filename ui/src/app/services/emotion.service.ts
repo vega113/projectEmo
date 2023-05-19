@@ -99,7 +99,17 @@ export class EmotionService {
     const startOfMonthDateString = this.dateService.formatDateToIsoMonthStartEndString(date, startOfMonth);
     const endOfMonthDateString = this.dateService.formatDateToIsoMonthStartEndString(date, endOfMonth);
 
-    return this.http.get<EmotionRecord[]>(`${this.apiUrl}/emotionRecord/user/month/${startOfMonthDateString}/${endOfMonthDateString}`, {headers}).
+    return this.http.get<EmotionRecord[]>(
+      `${this.apiUrl}/emotionRecord/user/month/${startOfMonthDateString}/${endOfMonthDateString}`,
+      {headers}).
+    pipe(catchError(resp => this.errorService.handleError(resp)));
+  }
+
+  fetchEmotionSunburnChartDataForDateRange(dateRange: {start: string, end: string}) {
+    const headers = this.authService.getAuthorizationHeader();
+    return this.http.get<Map<string, Map<string, Map<string, number>>>>(
+      `${this.apiUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
+      {headers}).
     pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 }

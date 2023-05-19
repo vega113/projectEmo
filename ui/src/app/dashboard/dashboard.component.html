@@ -1,1 +1,34 @@
-<p>dashboard works!</p>
+<mat-tab-group [(selectedIndex)]="activeTab">
+  <mat-tab label="Emotions by type">
+    <div *ngIf="isLoading" class="loading-screen">
+      <mat-spinner diameter="48"></mat-spinner>
+      <h2>Loading Emotions Chart...</h2>
+    </div>
+
+    <ng-container *ngIf="!isLoading">
+      <div class="chart-container">
+        <!-- Render the emotions sunburst chart here -->
+        <ngx-charts-sunburst
+          [view]="[500, 300]"
+          [results]="chartData"
+          [scheme]="colorScheme"
+          [labelFormatting]="labelFormattingFunction"
+        >
+        </ngx-charts-sunburst>
+
+      </div>
+    </ng-container>
+  </mat-tab>
+
+  <mat-tab label="Tab 2">
+    <!-- Tab 2 content here -->
+  </mat-tab>
+
+  <mat-tab label="Tab 3">
+    <!-- Tab 3 content here -->
+  </mat-tab>
+
+  <mat-tab label="Tab 4">
+    <!-- Tab 4 content here -->
+  </mat-tab>
+</mat-tab-group>

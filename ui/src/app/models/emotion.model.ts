@@ -117,3 +117,8 @@ export interface NoteTemplate {
   label: string;
   value: string;
 }
+
+export interface DateRange {
+  startDate: Date;
+  endDate: Date;
+}
