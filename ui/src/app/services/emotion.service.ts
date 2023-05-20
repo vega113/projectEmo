@@ -5,7 +5,7 @@ import {
   EmotionRecord,
   EmotionRecordDay,
   Note,
-  SuggestedAction
+  SuggestedAction, SunburstData
 } from '../models/emotion.model';
 import {catchError, map, tap} from 'rxjs/operators';
 import {AuthService} from './auth.service';
@@ -107,7 +107,7 @@ export class EmotionService {
 
   fetchEmotionSunburnChartDataForDateRange(dateRange: {start: string, end: string}) {
     const headers = this.authService.getAuthorizationHeader();
-    return this.http.get<Map<string, Map<string, Map<string, number>>>>(
+    return this.http.get<SunburstData[]>(
       `${this.apiUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
       {headers}).
     pipe(catchError(resp => this.errorService.handleError(resp)));

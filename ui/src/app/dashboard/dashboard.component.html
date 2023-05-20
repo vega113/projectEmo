@@ -1,3 +1,9 @@
+<div class="date-picker-container">
+  <app-custom-date-picker placeholder="Start Date" [formControl]="startDateControl"></app-custom-date-picker>
+  <app-custom-date-picker placeholder="End Date" [formControl]="endDateControl"></app-custom-date-picker>
+  <button mat-raised-button color="primary" (click)="fetchChartData()">Update Chart</button>
+</div>
+
 <mat-tab-group [(selectedIndex)]="activeTab">
   <mat-tab label="Emotions by type">
     <div *ngIf="isLoading" class="loading-screen">
@@ -8,13 +14,8 @@
     <ng-container *ngIf="!isLoading">
       <div class="chart-container">
         <!-- Render the emotions sunburst chart here -->
-        <ngx-charts-sunburst
-          [view]="[500, 300]"
-          [results]="chartData"
-          [scheme]="colorScheme"
-          [labelFormatting]="labelFormattingFunction"
-        >
-        </ngx-charts-sunburst>
+        <ngx-sunburst-chart [width]="700"
+                            [data]="chartData" colorScheme="colorful"></ngx-sunburst-chart>
 
       </div>
     </ng-container>

@@ -1,0 +1,43 @@
+:host {
+  width: 100%;
+}
+
+mat-form-field {
+  width: 100%;
+}
+mat-mdc-form-field-subscript-wrapper {
+  display: none;
+  padding: 0;
+}
+mat-mdc-form-field-bottom-align ng-tns-c37-1 {
+  display: none;
+}
+
+
+/* Customizations for the mat-datepicker */
+.mat-datepicker-content {
+  background-color: #ffffff;
+  color: #333;
+}
+
+.mat-calendar {
+  width: 300px;
+  height: 320px;
+}
+
+.mat-calendar-table-header {
+  color: #3f51b5;
+}
+
+.mat-calendar-body-cell {
+  height: 36px;
+  width: 36px;
+}
+
+.mat-calendar-body-selected {
+  background-color: #3f51b5;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: #3f51b5;
+}

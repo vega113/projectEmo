@@ -45,6 +45,8 @@ import {MatGridListModule} from "@angular/material/grid-list";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatTabsModule} from "@angular/material/tabs";
 import {NgxChartsModule} from "@swimlane/ngx-charts";
+import { BeautifulChartsModule } from 'ngx-beautiful-charts';
+import { CustomDatePickerComponent } from './custom-date-picker/custom-date-picker.component';
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -72,7 +74,8 @@ export const MAT_DATE_FNS_FORMATS = {
     DashboardComponent,
     ScreenSizeDirective,
     EmotionCalendarComponent,
-    DayComponent
+    DayComponent,
+    CustomDatePickerComponent
   ],
   imports: [
     BrowserModule,
@@ -102,6 +105,8 @@ export const MAT_DATE_FNS_FORMATS = {
     MatTooltipModule,
     MatTabsModule,
     NgxChartsModule,
+    BeautifulChartsModule
+
   ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {
     provide: DateAdapter,
