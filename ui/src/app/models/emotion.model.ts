@@ -122,3 +122,11 @@ export interface DateRange {
   startDate: Date;
   endDate: Date;
 }
+
+export interface SunburstData {
+  name: string;
+  value?: number;
+  children: SunburstData[];
+  color?: string;
+}
+

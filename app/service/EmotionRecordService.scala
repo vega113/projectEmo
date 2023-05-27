@@ -2,7 +2,7 @@ package service
 
 import com.google.inject.{ImplementedBy, Inject}
 import controllers.model
-import dao.model.{EmotionRecord, EmotionRecordDay, SuggestedAction}
+import dao.model.{EmotionRecord, EmotionRecordDay, SuggestedAction, SunburstData}
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
 
 import java.time.{Instant, LocalDate}
@@ -23,7 +23,7 @@ trait EmotionRecordService {
   def findSuggestionsByEmotionRecord(record: EmotionRecord): Future[List[SuggestedAction]]
   def groupRecordsByDate(records: List[EmotionRecord]): List[EmotionRecordDay]
   def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
-  def emotionRecordsToChartData(records: List[EmotionRecord]): Map[String, Map[String, Map[String, Int]]]
+  def emotionRecordsToChartData(records: List[EmotionRecord]): List[SunburstData]
 }
 
 class EmotionRecordServiceImpl @Inject()(
@@ -128,15 +128,24 @@ class EmotionRecordServiceImpl @Inject()(
 
   import model._
 
-  def emotionRecordsToChartData(records: List[EmotionRecord]): Map[String, Map[String, Map[String, Int]]] = {
+  private def computeColor(name: String): Option[String] = {
+    name match {
+      case "Positive" => Some("green")
+      case "Negative" => Some("red")
+      case "Neutral" => Some("blue")
+      case _ => Some("gray")
+    }
+  }
+
+  def emotionRecordsToChartData(records: List[EmotionRecord]): List[SunburstData] = {
     // First grouping by emotionType
     val recordsByType: Map[String, List[EmotionRecord]] = records.groupBy(_.emotionType)
 
-    val chartData = recordsByType.map { case (emotionType, recordsForType) =>
+    val chartData = recordsByType.flatMap { case (emotionType, recordsForType) =>
       // Second grouping by emotionName within each emotionType
       val recordsByEmotion: Map[String, List[EmotionRecord]] = recordsForType.groupBy(record => record.emotion.flatMap(_.emotionName).getOrElse("undefined"))
 
-      val secondLevel = recordsByEmotion.map { case (emotionName, recordsForEmotion) =>
+      val secondLevel = recordsByEmotion.flatMap { case (emotionName, recordsForEmotion) =>
         // Third grouping by subEmotionName within each emotion
         val recordsBySubEmotion = recordsForEmotion
           .flatMap(_.subEmotions.flatMap(_.subEmotionName))
@@ -144,11 +153,17 @@ class EmotionRecordServiceImpl @Inject()(
           .view
           .mapValues(_.length)
           .toMap
-        emotionName -> recordsBySubEmotion
+        List(SunburstData(emotionName, None, recordsBySubEmotion.map { case (subEmotionName, count) =>
+          SunburstData(subEmotionName, Some(count), List())
+        }.toList))
       }
-      emotionType -> secondLevel
-    }
-    chartData
+      List(SunburstData(emotionType, None, secondLevel.toList))
+    }.toList
+
+    chartData.map(data => data.copy(color = computeColor(data.name)))
   }
+
+
+
 }
 

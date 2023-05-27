@@ -71,7 +71,7 @@ export class DateService {
     return format(adjustedDate, "yyyy-MM-dd'T'HH:mm:ssXXX", {timeZone: timeZone});
   }
 
-  createThreeMonthDateRange(): { start: string, end: string } {
+  createThreeMonthDateRangeFormattedStr(): { start: string, end: string } {
     const today = new Date();
     const threeMonthsAgo = new Date();
     threeMonthsAgo.setMonth(today.getMonth() - 3);
@@ -81,4 +81,17 @@ export class DateService {
       end: this.formatDateToIsoMonthStartEndString(today, endOfMonth)
     };
   }
+
+  createThreeMonthDateRange(): { start: Date, end: Date } {
+    const today = new Date();
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+
+    return {
+      start: threeMonthsAgo,
+      end: today
+    };
+  }
+
+
 }

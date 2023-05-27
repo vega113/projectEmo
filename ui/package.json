@@ -11,7 +11,7 @@
     "test:coverage": "ng test --watch=true --code-coverage=true",
     "test:coverage:ci": "ng test --watch=false --code-coverage=true --browsers ChromeHeadless",
     "build:dev": "ng build --progress --output-path ../public",
-    "build:prod": "ng build --progress --prod --output-path ../public"
+    "build:prod": "ng build --progress --configuration production --output-path ../public"
   },
   "private": true,
   "dependencies": {
@@ -30,6 +30,7 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
     "moment": "^2.29.4",
+    "ngx-beautiful-charts": "^2.0.9",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"

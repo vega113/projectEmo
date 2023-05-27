@@ -3,17 +3,15 @@ import {HttpClient, HttpHeaders, HttpErrorResponse} from '@angular/common/http';
 import { User } from '../models/emotion.model';
 import { tap, catchError } from 'rxjs/operators';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { ErrorService } from './error.service';
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {MatSnackBar} from "@angular/material/snack-bar";
-
+import {environment} from "../../environments/environment";
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:4200/api';
   public isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
 
@@ -24,7 +22,7 @@ export class AuthService {
   }
 
   signUp(user: User) {
-    return this.http.post(`${this.apiUrl}/user`, user)
+    return this.http.post(`${environment.baseUrl}/user`, user)
       .pipe(
         tap((response) => {
           console.log('User registered successfully', response);
@@ -35,7 +33,7 @@ export class AuthService {
 
   login(username: string, password: string) {
     return this.http
-      .post<{ token: string }>(`${this.apiUrl}/login`, { username, password })
+      .post<{ token: string }>(`${environment.baseUrl}/login`, { username, password })
       .pipe(
         tap((response) => {
           this.isAuthenticatedSubject.next(true);

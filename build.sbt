@@ -1,9 +1,9 @@
 ThisBuild / scalaVersion := "2.13.10"
 
-ThisBuild / version := "1.0-SNAPSHOT"
+ThisBuild / version := "1.0.2-SNAPSHOT"
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, UniversalPlugin, DockerSpotifyClientPlugin, DockerPlugin)
   .settings(
     name := """projectEmo""",
     libraryDependencies ++= Seq(
@@ -21,7 +21,6 @@ resolvers += Resolver.jcenterRepo
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
 dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
-
 
 
 libraryDependencies ++= Seq(

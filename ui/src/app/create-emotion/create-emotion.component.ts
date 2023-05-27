@@ -4,28 +4,6 @@ import {EmotionService} from '../services/emotion.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {EmotionCacheService} from '../services/emotion-cache.service';
 
-import { NativeDateAdapter } from '@angular/material/core';
-
-export class CustomDateAdapter extends NativeDateAdapter {
-  override getDayOfWeekNames(style: 'long' | 'short' | 'narrow'): string[] {
-    return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  }
-}
-export const MY_DATE_FORMATS = {
-  parse: {
-    dateInput: 'LL',
-  },
-  display: {
-    dateInput: 'LL',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-    weekday: 'short'
-  },
-};
-
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-
 import {
   Emotion,
   EmotionData,
@@ -47,11 +25,7 @@ import {DateService} from "../services/date.service";
   selector: 'app-create-emotion',
   templateUrl: './create-emotion.component.html',
   styleUrls: ['./create-emotion.component.css'],
-  providers: [
-    { provide: DateAdapter, useClass: CustomDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
-    { provide: MAT_DATE_LOCALE, useValue: 'en-US' }
-  ]
+  providers: []
 })
 export class CreateEmotionComponent implements OnInit {
   isLoadingEmotionCache: boolean = true;

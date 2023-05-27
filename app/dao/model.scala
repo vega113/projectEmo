@@ -92,6 +92,8 @@ object model {
                            created: Option[LocalDateTime] = None
                          )
 
+  case class SunburstData(name: String, value: Option[Int], children: List[SunburstData], color: Option[String] = None)
+
 
   object User {
     implicit val userFormat: Format[User] = Json.format[User]
@@ -230,5 +232,9 @@ object Note {
           NoteTemplate(id, label, value, created)
       }
     }
+  }
+
+  object SunburstData {
+    implicit val sunburstDataFormat: Format[SunburstData] = Json.format[SunburstData]
   }
 }

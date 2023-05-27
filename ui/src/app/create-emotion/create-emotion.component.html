@@ -8,12 +8,7 @@
 
   <div class="create-emotion-container">
     <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
-      <mat-form-field>
-        <mat-label>Emotion Date</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="emotionDate">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
+      <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
       <mat-form-field>
         <mat-label>Emotion Type</mat-label>
         <mat-select formControlName="emotionType">
