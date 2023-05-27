@@ -13,6 +13,7 @@ import {ErrorService} from "./error.service";
 import {Observable} from "rxjs";
 import {DateService} from "./date.service";
 import { startOfMonth, endOfMonth } from 'date-fns';
+import {environment} from "../../environments/environment";
 
 
 @Injectable({
@@ -28,7 +29,7 @@ export class EmotionService {
   getEmotionRecordsByUserId(userId: number) {
     const headers = this.authService.getAuthorizationHeader();
     return this.http
-      .get<EmotionRecord[]>(`${this.apiUrl}/emotionRecord/user/${userId}`, {headers})
+      .get<EmotionRecord[]>(`${environment.baseUrl}/emotionRecord/user/${userId}`, {headers})
       .pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 
@@ -36,7 +37,7 @@ export class EmotionService {
     const headers: HttpHeaders = this.authService.getAuthorizationHeader();
     headers.set('Content-Type', 'application/json');
     return this.http
-      .post<EmotionRecord>(`${this.apiUrl}/emotionRecord`, emotionRecord, {headers})
+      .post<EmotionRecord>(`${environment.baseUrl}/emotionRecord`, emotionRecord, {headers})
       .pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 
@@ -44,14 +45,14 @@ export class EmotionService {
     const headers: HttpHeaders = this.authService.getAuthorizationHeader();
     headers.set('Content-Type', 'application/json');
     return this.http
-      .post<EmotionRecord>(`${this.apiUrl}/emotionRecord/${emotionRecordId}/note`, note, {headers})
+      .post<EmotionRecord>(`${environment.baseUrl}/emotionRecord/${emotionRecordId}/note`, note, {headers})
       .pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 
   fetchSuggestedActionsForEmotionRecord(emotionRecordId: number) {
     const headers: HttpHeaders = this.authService.getAuthorizationHeader();
     return this.http
-      .get<SuggestedAction[]>(`${this.apiUrl}/emotionRecord/${emotionRecordId}/suggestedActions`, {headers})
+      .get<SuggestedAction[]>(`${environment.baseUrl}/emotionRecord/${emotionRecordId}/suggestedActions`, {headers})
       .pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 
@@ -59,7 +60,7 @@ export class EmotionService {
   getEmotionCache(): Observable<EmotionData> {
     const headers = this.authService.getAuthorizationHeader();
     return this.http
-      .get<EmotionData>(`${this.apiUrl}/emotionCache`, {headers})
+      .get<EmotionData>(`${environment.baseUrl}/emotionCache`, {headers})
       .pipe(
         tap((response) => {
           console.log('getEmotionCache', response);
@@ -70,7 +71,7 @@ export class EmotionService {
 
   fetchEmotionRecordsForCurrentUser() {
     const headers = this.authService.getAuthorizationHeader();
-    return this.http.get<EmotionRecord[]>(`${this.apiUrl}/emotionRecord/user`, {headers}).pipe(
+    return this.http.get<EmotionRecord[]>(`${environment.baseUrl}/emotionRecord/user`, {headers}).pipe(
       catchError((error: HttpErrorResponse) => {
         return this.errorService.handleError(error);
       })
@@ -79,7 +80,7 @@ export class EmotionService {
 
   fetchEmotionRecordDaysForCurrentUser() {
     const headers = this.authService.getAuthorizationHeader();
-    return this.http.get<any[]>(`${this.apiUrl}/emotionRecord/user/days`, {headers}).pipe(
+    return this.http.get<any[]>(`${environment.baseUrl}/emotionRecord/user/days`, {headers}).pipe(
       map(data => {
         return data.map((recordDay: any) => {
           return {
@@ -100,7 +101,7 @@ export class EmotionService {
     const endOfMonthDateString = this.dateService.formatDateToIsoMonthStartEndString(date, endOfMonth);
 
     return this.http.get<EmotionRecord[]>(
-      `${this.apiUrl}/emotionRecord/user/month/${startOfMonthDateString}/${endOfMonthDateString}`,
+      `${environment.baseUrl}/emotionRecord/user/month/${startOfMonthDateString}/${endOfMonthDateString}`,
       {headers}).
     pipe(catchError(resp => this.errorService.handleError(resp)));
   }
@@ -108,7 +109,7 @@ export class EmotionService {
   fetchEmotionSunburnChartDataForDateRange(dateRange: {start: string, end: string}) {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.get<SunburstData[]>(
-      `${this.apiUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
+      `${environment.baseUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
       {headers}).
     pipe(catchError(resp => this.errorService.handleError(resp)));
   }

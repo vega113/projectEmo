@@ -11,7 +11,7 @@
     "test:coverage": "ng test --watch=true --code-coverage=true",
     "test:coverage:ci": "ng test --watch=false --code-coverage=true --browsers ChromeHeadless",
     "build:dev": "ng build --progress --output-path ../public",
-    "build:prod": "ng build --progress --prod --output-path ../public"
+    "build:prod": "ng build --progress --configuration production --output-path ../public"
   },
   "private": true,
   "dependencies": {
