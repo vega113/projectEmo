@@ -18,7 +18,7 @@ GET           /api/emotionRecord/user                                    control
 GET           /api/emotionRecord/id                                      controllers.EmotionRecordController.findById(id: Long)
 GET           /api/emotionRecord/user/days                               controllers.EmotionRecordController.findAllDaysByUserId()
 GET           /api/emotionRecord/user/month/:monthStart/:monthEnd        controllers.EmotionRecordController.findRecordsByUserIdForMonth(monthStart: String, monthEnd)
-GET           /api/charts/user/month/:monthStart/:monthEnd               controllers.EmotionRecordController.findAllByUserIdAndDateRangeForSunburnForCharts(monthStart: String, monthEnd)
+GET           /api/charts/user/month/:monthStart/:monthEnd               controllers.EmotionRecordController.findAllByUserIdAndDateRangeForCharts(monthStart: String, monthEnd)
 
 GET           /api/emotion                                               controllers.EmotionController.findAll()
 GET           /api/trigger                                               controllers.TriggerController.findAll()

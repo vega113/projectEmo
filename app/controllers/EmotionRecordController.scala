@@ -1,3 +1,4 @@
+
 package controllers
 
 import auth.AuthenticatedAction
@@ -6,7 +7,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import service.{EmotionRecordService, NoteService}
 
-import java.time.{LocalDate, LocalDateTime, ZonedDateTime}
+import java.time.ZonedDateTime
 import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -26,7 +27,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     }
   }
 
-  private def validateUserId(bodyUserId: Option[Long], tokenUserId: Long): Boolean = {
+  private def validateRequestUserId(bodyUserId: Option[Long], tokenUserId: Long): Boolean = {
     bodyUserId match {
       case Some(id) => id == tokenUserId
       case None => true
@@ -48,7 +49,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
-        if (!validateUserId(emotionRecord.userId, token.user.userId)) {
+        if (!validateRequestUserId(emotionRecord.userId, token.user.userId)) {
           Future.successful(BadRequest(Json.obj("message" -> s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
         } else {
           emotionRecordService.insert(emotionRecord).flatMap {
@@ -130,7 +131,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
 
-  def findAllByUserIdAndDateRangeForSunburnForCharts(startDate: String, endDate: String): Action[AnyContent] =
+  def findAllByUserIdAndDateRangeForCharts(startDate: String, endDate: String): Action[AnyContent] =
     Action andThen authenticatedAction async { implicit token =>
       emotionRecordService.findAllByUserIdAndDateRange(token.user.userId, startDate, endDate).
         map(emotionRecordService.emotionRecordsToChartData).

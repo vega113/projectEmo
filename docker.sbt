@@ -1,5 +1,5 @@
 // Docker settings
-dockerBaseImage := "openjdk:8-jdk"
+dockerBaseImage := "amazoncorretto:8-alpine-jdk"
 dockerExposedPorts := Seq(9000)
 dockerUpdateLatest := true
 
@@ -8,15 +8,24 @@ Universal / javaOptions ++= Seq(
   "-Dpidfile.path=/dev/null"
 )
 
-Universal / mappings  += {
-  // Create a new directory in the Docker image
-  val directory = new java.io.File("./logs")
-  directory -> "logs"
-}
+import com.typesafe.sbt.packager.docker.Cmd
+dockerCommands ++= Seq(
+  Cmd("USER", "root"),
+  Cmd("RUN", "apk add --no-cache mysql-client"),
+  Cmd("USER", "1001")
+)
+
+//Docker / dockerCommands := Seq(
+//  Cmd("FROM", dockerBaseImage.value),
+//  Cmd("RUN", "apk add --no-cache mysql-client"),
+//  Cmd("WORKDIR", "/opt/docker"),
+//  Cmd("COPY", "target/universal/stage/ ."),
+//  Cmd("RUN", "chmod +x bin/projectemo"),
+//  Cmd("RUN", "mkdir logs"),
+//  Cmd("ENTRYPOINT", "bin/projectemo")
+//)
 
 
-import com.typesafe.sbt.packager.docker.DockerChmodType
 
-dockerAdditionalPermissions += (DockerChmodType.UserGroupPlusExecute, "/opt/docker/logs")
 
 
