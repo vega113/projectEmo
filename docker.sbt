@@ -25,15 +25,6 @@ dockerCommands ++= Seq(
 
 )
 
-//dockerCommands := {
-//  val commands = dockerCommands.value
-//  val index = commands.indexWhere {
-//    case Cmd("RUN", args @ _*) => args.contains("demiourgos728")
-//    case _ => false
-//  }
-//  commands.patch(index, Seq(ExecCmd("RUN", "yum", "-y", "install", "shadow-utils")), 0)
-//}
-
 
 
 
