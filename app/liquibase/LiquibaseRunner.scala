@@ -21,6 +21,7 @@ class LiquibaseRunner @Inject()(env: Environment, config: Configuration) {
     val url = dbConf.get[String]("url")
     val username = dbConf.get[String]("username")
     val password = dbConf.get[String]("password")
+    logger.info(s"Running Liquibase migrations on $url")
 
     val changeLogFile = liquibaseConf.get[String]("changeLogFile")
 
