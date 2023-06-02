@@ -1,5 +1,9 @@
+
+enablePlugins(DockerPlugin)
 // Docker settings
-dockerBaseImage := "amazoncorretto:8-alpine-jdk"
+dockerBaseImage := "openjdk:8-alpine"
+import com.typesafe.sbt.packager.docker.*
+
 dockerExposedPorts := Seq(9000)
 dockerUpdateLatest := true
 
@@ -8,22 +12,27 @@ Universal / javaOptions ++= Seq(
   "-Dpidfile.path=/dev/null"
 )
 
-import com.typesafe.sbt.packager.docker.Cmd
+Docker / defaultLinuxLogsLocation := "/opt/docker/logs"
+dockerExposedVolumes := Seq((Docker / defaultLinuxLogsLocation).value)
+dockerEnvVars := Map(
+  "LOG_DIR" -> (Docker / defaultLinuxLogsLocation).value,
+)
+//
 dockerCommands ++= Seq(
   Cmd("USER", "root"),
-  Cmd("RUN", "apk add --no-cache mysql-client"),
-  Cmd("USER", "1001")
+  Cmd("RUN", "apk add --no-cache bash"),
+  Cmd("USER", "1001"),
+
 )
 
-//Docker / dockerCommands := Seq(
-//  Cmd("FROM", dockerBaseImage.value),
-//  Cmd("RUN", "apk add --no-cache mysql-client"),
-//  Cmd("WORKDIR", "/opt/docker"),
-//  Cmd("COPY", "target/universal/stage/ ."),
-//  Cmd("RUN", "chmod +x bin/projectemo"),
-//  Cmd("RUN", "mkdir logs"),
-//  Cmd("ENTRYPOINT", "bin/projectemo")
-//)
+//dockerCommands := {
+//  val commands = dockerCommands.value
+//  val index = commands.indexWhere {
+//    case Cmd("RUN", args @ _*) => args.contains("demiourgos728")
+//    case _ => false
+//  }
+//  commands.patch(index, Seq(ExecCmd("RUN", "yum", "-y", "install", "shadow-utils")), 0)
+//}
 
 
 

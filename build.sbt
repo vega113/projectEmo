@@ -3,7 +3,7 @@ ThisBuild / scalaVersion := "2.13.10"
 ThisBuild / version := "1.0.2-SNAPSHOT"
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala, UniversalPlugin, DockerSpotifyClientPlugin, DockerPlugin, AshScriptPlugin)
+  .enablePlugins(PlayScala)
   .settings(
     name := """projectEmo""",
     libraryDependencies ++= Seq(
