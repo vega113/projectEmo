@@ -1,6 +1,6 @@
 ThisBuild / scalaVersion := "2.13.10"
 
-ThisBuild / version := "1.0.2-SNAPSHOT"
+ThisBuild / version := "1.0.3-SNAPSHOT"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)

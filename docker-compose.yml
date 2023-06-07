@@ -12,7 +12,7 @@ services:
     ports:
       - "3306:3306"
   app:
-    image: projectemo:1.0.2-SNAPSHOT
+    image: projectemo:1.0.3-SNAPSHOT
     ports:
       - "9000:9000"
     depends_on:
