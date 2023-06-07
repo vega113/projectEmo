@@ -4,7 +4,7 @@
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>${application.home:-.}/logs/application.log</file>
+    <file>${LOG_DIR:-.}/logs/application.log</file>
     <encoder>
       <charset>UTF-8</charset>
       <pattern>
@@ -34,7 +34,7 @@
   <logger name="play" level="INFO" />
   <logger name="application" level="DEBUG" />
 
-  <root level="INFO">
+  <root level="debug">
     <appender-ref ref="ASYNCFILE" />
     <appender-ref ref="ASYNCSTDOUT" />
   </root>

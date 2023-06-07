@@ -21,6 +21,7 @@ dockerEnvVars := Map(
 dockerCommands ++= Seq(
   Cmd("USER", "root"),
   Cmd("RUN", "apk add --no-cache bash"),
+  Cmd("RUN", "mkdir -p /opt/docker/logs && chown -R 1001:root /opt/docker/logs"),
   Cmd("USER", "1001"),
 
 )
