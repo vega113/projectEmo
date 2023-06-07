@@ -15,6 +15,7 @@ class LiquibaseRunner @Inject()(env: Environment, config: Configuration) {
   runMigrations()
 
   private def runMigrations(): Unit = {
+    println("Running migrations")
     val dbConf = config.get[Configuration]("db.default")
     val liquibaseConf = config.get[Configuration]("liquibase")
 
