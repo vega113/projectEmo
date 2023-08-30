@@ -4,5 +4,8 @@ target
 /logs
 /RUNNING_PID
 db_dump
-/public/
+/public/assets
+/public/main.*.js
+/public/styles.*.js
+/public/polyfills.*.js
 /.env

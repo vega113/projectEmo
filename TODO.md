@@ -1,6 +1,6 @@
 ### TODOs
 - [ ] ~~Use Stepper component for emotion creation~~
-- [ ] Add emotion date for the emotions table, and add a date picker to the emotion creation 
+- [X] Add emotion date for the emotions table, and add a date picker to the emotion creation 
 - [ ] Add tooltips on every controller with explanations. 
 - [ ] Add explanation for every emotion and sub-emotion
 - [ ] ~~Update trigger to use tree/sub tree~~
@@ -14,3 +14,8 @@
 - [X] Logout the current user in case the token is invalid on some request
 - [ ] Add internalization
 - [ ] Allow emotion records to be public
+- [ ] Allow to edit the note 
+- [ ] Allow all the parameters
+- [ ] Allow to let AI choose the parameters by reading the note
+- [ ] Add an option to create emotion out of text (from a note) and determine all the parameters using AI. Also output explanation for every choice.
+- [ ] Change emotion intensity to have 5 steps, like: calm, normal, agitated etc... and replace the color cue with words and a tooltip that will explain in details the intensity definitions.

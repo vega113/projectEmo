@@ -9,12 +9,12 @@ import {environment} from "../../environments/environment"; // adjust the path a
   providedIn: 'root',
 })
 export class NoteService {
-  private apiUrl = '/api/noteTemplate';
+  private apiUrl = '/noteTemplate';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   getNoteTemplates(): Observable<NoteTemplate[]> {
     const headers = this.authService.getAuthorizationHeader();
-    return this.http.get<NoteTemplate[]>(environment.baseUrl, { headers });
+    return this.http.get<NoteTemplate[]>(environment.baseUrl + this.apiUrl, { headers });
   }
 }

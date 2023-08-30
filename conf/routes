@@ -39,3 +39,6 @@ GET           /api/emotionCache                                          control
 # Serve static assets under public directory
 GET           /*file                                                     controllers.FrontendController.assetOrDefault(file)
 
+GET           /api/healthcheck                                                 controllers.HealthcheckController.healthcheck()
+
+

@@ -1,6 +1,8 @@
 ThisBuild / scalaVersion := "2.13.10"
 
-ThisBuild / version := "1.0.3-SNAPSHOT"
+ThisBuild / version := "1.0.3.1-SNAPSHOT"
+
+maintainer := "vega113@gmail.com"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
@@ -26,18 +28,24 @@ dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2
 libraryDependencies ++= Seq(
   jdbc,
   "org.playframework.anorm" %% "anorm" % "2.7.0",
-  "mysql" % "mysql-connector-java" % "8.0.27",
-  "com.zaxxer" % "HikariCP" % "4.0.3",
+  "mysql" % "mysql-connector-java" % "8.0.33",
+  "com.zaxxer" % "HikariCP" % "5.0.1",
 
 )
-libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1"
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.4"
 
-libraryDependencies += "org.liquibase" % "liquibase-core" % "4.4.2"
+libraryDependencies += "org.liquibase" % "liquibase-core" % "4.20.0"
 
 libraryDependencies += "com.pauldijou" %% "jwt-core" % "5.0.0"
 libraryDependencies += "com.pauldijou" %% "jwt-play-json" % "5.0.0"
 
-libraryDependencies += "org.mockito" % "mockito-core" % "2.10.0" % "test"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8"
+libraryDependencies += "org.fusesource.jansi" % "jansi" % "2.4.0"
+libraryDependencies += "com.google.inject" % "guice" % "5.0.0"
+
+
+
+libraryDependencies += "org.mockito" % "mockito-core" % "5.2.0" % "test"
 libraryDependencies += "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test"
 
 

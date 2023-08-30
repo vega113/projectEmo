@@ -42,7 +42,7 @@ npm install @angular/material
 
 1. Clone the repository: `git clone https://github.com/<username>/emotion-tracker.git`
 2. Change into the project directory: `cd emotion-tracker`
-3. Create the database using docker : `docker compose up -d`
+3. Create the database using docker : `docker compose up -d db`
 4. Set the database connection properties in `conf/application.conf`.
 5. Start the application: `sbt run`
 
@@ -52,6 +52,13 @@ npm install @angular/material
 2. Log in with your user credentials or sign up for a new account.
 3. Record your emotions using the web interface.
 4. View your emotion history and analyze trends over time.
+
+## Dev notes:
+1. Run docker container with `limactl start`
+2. Build docker image with `sbt clean docker:publishLocal`
+3. Run docker with `docker run -it --entrypoint /bin/sh --env-file .env projectemo:1.0.3-SNAPSHOT`
+4. Attach to the container with command `docker exec -it projectemo-app-1 bash`
+
 
 ## Contributing
 
