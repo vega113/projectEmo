@@ -9,3 +9,7 @@ db_dump
 /public/styles.*.js
 /public/polyfills.*.js
 /.env
+/ui/node_modules
+/node_modules
+package-lock.json
+package.json

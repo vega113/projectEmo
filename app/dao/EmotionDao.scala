@@ -40,7 +40,7 @@ class EmotionDao {
   }
 
   def delete(id: String)(implicit connection: Connection): Int = {
-    SQL("DELETE FROM emotions WHERE emotion_id = {id}").on(Symbol("id") -> id).executeUpdate()
+    SQL("DELETE FROM emotions WHERE emotion_id = {id}").on("id"-> id).executeUpdate()
   }
 
   def findById(id: String)(implicit connection: Connection): Option[Emotion] = {

@@ -45,7 +45,6 @@ import {MatGridListModule} from "@angular/material/grid-list";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatTabsModule} from "@angular/material/tabs";
 import {NgxChartsModule} from "@swimlane/ngx-charts";
-import { BeautifulChartsModule } from 'ngx-beautiful-charts';
 import { CustomDatePickerComponent } from './custom-date-picker/custom-date-picker.component';
 
 export const MAT_DATE_FNS_FORMATS = {
@@ -104,8 +103,7 @@ export const MAT_DATE_FNS_FORMATS = {
     MatGridListModule,
     MatTooltipModule,
     MatTabsModule,
-    NgxChartsModule,
-    BeautifulChartsModule
+    NgxChartsModule
 
   ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {
