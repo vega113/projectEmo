@@ -23,7 +23,7 @@ jobs:
 
       - name: Extract version
         id: get_version
-        run: echo "::set-output name=version::$(grep -oP '(?<=ThisBuild / version := ").*(?=")' build.sbt)"
+        run: echo "$(grep -oP '(?<=ThisBuild / version := ").*(?=")' build.sbt)" > ${{ github.workspace }}/version.txt
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
@@ -36,7 +36,11 @@ jobs:
         run: sbt clean docker:publishLocal
 
       - name: Tag Docker image
-        run: docker tag projectemo:${{ steps.get_version.outputs.version }} ghcr.io/vega113/projectemo:${{ steps.get_version.outputs.version }}
+        run: |
+          VERSION=$(cat ${{ github.workspace }}/version.txt)
+          docker tag projectemo:$VERSION ghcr.io/vega113/projectemo:$VERSION
 
       - name: Push Docker image
-        run: docker push ghcr.io/vega113/projectemo:${{ steps.get_version.outputs.version }}
+        run: |
+          VERSION=$(cat ${{ github.workspace }}/version.txt)
+          docker push ghcr.io/vega113/projectemo:$VERSION
