@@ -13,3 +13,5 @@ db_dump
 /node_modules
 package-lock.json
 package.json
+/public/styles.*.css
+/public/runtime.*.js
