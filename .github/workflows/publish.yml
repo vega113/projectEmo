@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # Trigger the workflow on push or pull request to the main branch
+  workflow_dispatch:  # Trigger the workflow manually from the Actions tab
 
 jobs:
   build-and-upload:
