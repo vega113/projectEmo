@@ -36,7 +36,7 @@ jobs:
         run: sbt clean docker:publishLocal
 
       - name: Tag Docker image
-        run: docker tag <image_id> ghcr.io/${{ github.repository }}/projectEmo:${{ steps.get_version.outputs.version }}
+        run: docker tag projectemo:${{ steps.get_version.outputs.version }} ghcr.io/${{ github.repository }}/projectemo:${{ steps.get_version.outputs.version }}
 
       - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/projectEmo:${{ steps.get_version.outputs.version }}
+        run: docker push ghcr.io/${{ github.repository }}/projectemo:${{ steps.get_version.outputs.version }}
