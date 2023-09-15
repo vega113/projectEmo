@@ -35,10 +35,10 @@ POST          /api/user                                                  control
 
 GET           /api/emotionCache                                          controllers.EmotionDataController.fetchEmotionData()
 
+GET           /api/healthcheck                                           controllers.HealthcheckController.healthcheck()
 
 # Serve static assets under public directory
 GET           /*file                                                     controllers.FrontendController.assetOrDefault(file)
 
-GET           /api/healthcheck                                                 controllers.HealthcheckController.healthcheck()
 
 

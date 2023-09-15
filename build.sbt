@@ -1,6 +1,6 @@
 ThisBuild / scalaVersion := "2.13.10"
 
-ThisBuild / version := "1.0.3.3"
+ThisBuild / version := "1.0.3.4"
 
 maintainer := "vega113@gmail.com"
 
@@ -14,6 +14,9 @@ lazy val root = (project in file("."))
     ),
     watchSources ++= (baseDirectory.value / "ui/emo-app/src" ** "*").get,
   )
+
+PlayKeys.devSettings += "play.server.http.idleTimeout" -> "infinite"
+
 
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
