@@ -13,3 +13,4 @@ db_dump
 package-lock.json
 package.json
 /public/styles.*.css
+/application.log
