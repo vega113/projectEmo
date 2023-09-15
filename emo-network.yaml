@@ -1,0 +1,8 @@
+ interfaces:
+  - name: play
+    port: 9000
+    public:
+      enabled: true
+      method:
+        load_balancer:
+          port: 9000

@@ -1,0 +1,8 @@
+ interfaces:
+  - name: mysql
+    port: 3306
+    public:
+      enabled: true
+      method:
+        load_balancer:
+          port: 3306

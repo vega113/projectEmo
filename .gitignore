@@ -6,7 +6,6 @@ target
 db_dump
 /public/assets
 /public/main.*.js
-/public/styles.*.js
 /public/polyfills.*.js
 /.env
 /ui/node_modules
@@ -14,4 +13,3 @@ db_dump
 package-lock.json
 package.json
 /public/styles.*.css
-/public/runtime.*.js

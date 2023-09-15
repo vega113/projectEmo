@@ -1,6 +1,6 @@
 ThisBuild / scalaVersion := "2.13.10"
 
-ThisBuild / version := "1.0.3.2"
+ThisBuild / version := "1.0.3.3"
 
 maintainer := "vega113@gmail.com"
 

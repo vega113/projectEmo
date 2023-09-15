@@ -29,9 +29,7 @@ Emotion Tracker is a web application that allows users to track and analyze thei
 
 ### Installation
 ```agsl
-npm install date-fns --save
-npm install karma-jasmine --save-dev                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-npm install --save-dev karma                                                                                                                                                         
+npm install --save                                                                
 npm install -g karma-cli                                                                                                                                                             
 npm install jasmine-core --save-dev                                                                                                                                                  
 npm install karma-coverage-istanbul-reporter --save-dev   
@@ -54,10 +52,13 @@ npm install @angular/material
 4. View your emotion history and analyze trends over time.
 
 ## Dev notes:
-1. Run docker container with `limactl start`
+1. Run docker container with `colima start`
 2. Build docker image with `sbt clean docker:publishLocal`
 3. Run docker with `docker run -it --entrypoint /bin/sh --env-file .env projectemo:1.0.3-SNAPSHOT`
 4. Attach to the container with command `docker exec -it projectemo-app-1 bash`
+### Running in Docker with Rig.dev
+`docker compose up -d`  
+go to `http://localhost:4747/projects`
 
 
 ## Contributing
