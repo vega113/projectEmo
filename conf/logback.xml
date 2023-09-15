@@ -4,7 +4,7 @@
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>${LOG_DIR:-.}/logs/application.log</file>
+    <file>${LOG_DIR:-./logs}/application.log</file>
     <encoder>
       <charset>UTF-8</charset>
       <pattern>
@@ -32,8 +32,9 @@
   </appender>
 
   <logger name="play" level="INFO" />
-  <logger name="play" level="INFO" />
   <logger name="application" level="INFO" />
+  <logger name="com.zaxxer.hikari" level="INFO" />
+  <logger name="akka.serialization.jackson.JacksonObjectMapperProvider" level="INFO" />
 
   <root level="debug">
     <appender-ref ref="ASYNCFILE" />
