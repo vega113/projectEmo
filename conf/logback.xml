@@ -35,6 +35,7 @@
   <logger name="application" level="INFO" />
   <logger name="com.zaxxer.hikari" level="INFO" />
   <logger name="akka.serialization.jackson.JacksonObjectMapperProvider" level="INFO" />
+  <logger name="akka.http.impl.util.StreamUtils" level="INFO" />
 
   <root level="debug">
     <appender-ref ref="ASYNCFILE" />

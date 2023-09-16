@@ -13,6 +13,11 @@ Universal / javaOptions ++= Seq(
   "-Dpidfile.path=/dev/null"
 )
 
+Docker / defaultLinuxLogsLocation := "/opt/docker/logs"
+dockerExposedVolumes := Seq((Docker / defaultLinuxLogsLocation).value)
+dockerEnvVars := Map(
+  "LOG_DIR" -> (Docker / defaultLinuxLogsLocation).value,
+)
 //
 dockerCommands ++= Seq(
   Cmd("USER", "root"),
