@@ -2,7 +2,7 @@ package liquibase
 
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
-import liquibase.resource.{DirectoryResourceAccessor, FileSystemResourceAccessor}
+import liquibase.resource.DirectoryResourceAccessor
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.{Configuration, Environment}
 
