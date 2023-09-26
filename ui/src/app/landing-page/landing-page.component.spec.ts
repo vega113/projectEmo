@@ -25,5 +25,13 @@ describe('LandingPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // Add more tests as needed
+  it('should have a title', () => {
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('h1').textContent).toContain('Welcome to our redesigned landing page!');
+  });
+
+  it('should have a description', () => {
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('p').textContent).toContain('Experience our visually appealing and user-friendly landing page.');
+  });
 });

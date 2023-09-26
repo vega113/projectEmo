@@ -6,5 +6,9 @@ import {Component} from '@angular/core';
   styleUrls: ['./landing-page.component.css']
 })
 export class LandingPageComponent {
+  title = 'Welcome to the Landing Page!';
 
+  changeTitle() {
+    this.title = 'Welcome to the Updated Landing Page!';
+  }
 }

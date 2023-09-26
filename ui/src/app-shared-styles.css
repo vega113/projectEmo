@@ -12,9 +12,9 @@
 }
 
 body {
-  background: linear-gradient(-45deg,  #00f, #0f0);
-  background-size: 300% 300%;
-  animation: gradientChange 20s ease infinite;
+  background: linear-gradient(-45deg, #ff6347, #40e0d0, #20b2aa, #800080);
+  background-size: 400% 400%;
+  animation: gradientChange 30s ease infinite;
   min-height: 100vh;
   margin: 0;
 }
@@ -23,8 +23,10 @@ body {
 mat-toolbar {
   display: flex;
   justify-content: space-between;
+  background-color: #20b2aa;
+  color: white;
 }
 
 mat-toolbar button {
-  color: white;
+  color: #800080;
 }
