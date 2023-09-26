@@ -1,0 +1,13 @@
+{
+  "name": "projectemo",
+  "description": "An example app.json for a Scala app",
+  "image": "heroku/scala",
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/scala"
+    }
+  ]
+}
