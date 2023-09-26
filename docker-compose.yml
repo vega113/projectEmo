@@ -1,22 +1,22 @@
+version: "3"
 services:
-  rig:
-    image: ghcr.io/rigdev/rig:1.1.2
+  db:
+    platform: linux/amd64
+    image: mysql:5.7
+    env_file:
+      - .env
     environment:
-      RIG_AUTH_JWT_SECRET: mysecret
-      RIG_CLIENT_MONGO_HOST: mongo:27017
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "4747:4747"
-
-  mongo:
-    image: "mongo:latest"
+      - "3306:3306"
+  app:
+    image: projectemo:latest
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
     volumes:
-      - mongo-data:/data'
-
-volumes:
-  mongo-data:
-
-networks:
-  default:
-    name: rig
+      - ./logs:/opt/projectemo/logs

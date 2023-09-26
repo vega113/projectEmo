@@ -54,7 +54,7 @@ npm install @angular/material
 ## Dev notes:
 1. Run docker container with `colima start`
 2. Build docker image with `sbt clean docker:publishLocal`
-3. Run docker with `docker run -it --entrypoint /bin/sh --env-file .env projectemo:1.0.3-SNAPSHOT`
+3. Run docker with `docker run --platform linux/amd64 -it --entrypoint /bin/sh --env-file .env -p 9000:9000 ghcr.io/vega113/projectemo:1.0.3.5`
 4. Attach to the container with command `docker exec -it projectemo-app-1 bash`
 ### Running in Docker with Rig.dev
 `docker compose up -d`  

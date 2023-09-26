@@ -1,6 +1,6 @@
 ThisBuild / scalaVersion := "2.13.10"
 
-ThisBuild / version := "1.0.3.5"
+ThisBuild / version := "1.0.3.8"
 
 maintainer := "vega113@gmail.com"
 
@@ -15,9 +15,6 @@ lazy val root = (project in file("."))
     watchSources ++= (baseDirectory.value / "ui/emo-app/src" ** "*").get,
   )
 
-PlayKeys.devSettings += "play.server.http.idleTimeout" -> "infinite"
-
-
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
 resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/"
@@ -26,6 +23,7 @@ resolvers += Resolver.jcenterRepo
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
 dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
+
 
 
 libraryDependencies ++= Seq(

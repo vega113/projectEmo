@@ -2,7 +2,7 @@ package liquibase
 
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
-import liquibase.resource.FileSystemResourceAccessor
+import liquibase.resource.{DirectoryResourceAccessor, FileSystemResourceAccessor}
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.{Configuration, Environment}
 
@@ -31,7 +31,7 @@ class LiquibaseRunner @Inject()(env: Environment, config: Configuration) {
 
     try {
       val database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection)
-      val resourceAccessor = new  FileSystemResourceAccessor(new java.io.File(env.rootPath.getAbsolutePath))
+      val resourceAccessor = new  DirectoryResourceAccessor(new java.io.File(env.rootPath.getAbsolutePath))
       val liquibase = new Liquibase(changeLogFile, resourceAccessor, database)
       liquibase.update(new Contexts())
       logger.info("Liquibase migrations successfully applied.")
