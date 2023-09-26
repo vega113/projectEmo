@@ -12,6 +12,5 @@ db_dump
 /ui/node_modules
 /node_modules
 package-lock.json
-package.json
 /public/styles.*.css
 /application.log
