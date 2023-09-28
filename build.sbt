@@ -4,6 +4,8 @@ ThisBuild / version := "1.0.3.8"
 
 maintainer := "vega113@gmail.com"
 
+javaOptions += "-Dgraal.CompilationFailureAction=Silent"
+
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
   .settings(
