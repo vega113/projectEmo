@@ -6,3 +6,16 @@ Content-Type: application/json
   "username": "FiftyoneAdminUser1",
   "password": "FiftyoneAdminUser1"
 }
+
+### Create User
+POST http://localhost:9000/api/user
+Content-Type: application/json
+
+{
+"username": "testusername",
+"email": "test@email.com",
+"password": "testpassword",
+"firstName": "Test",
+"lastName": "User",
+"isPasswordHashed": false
+}
