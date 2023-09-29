@@ -16,12 +16,8 @@ class DatabaseExecutionContextImpl @Inject()(db: Database, actorSystem: ActorSys
   extends CustomExecutionContext(actorSystem, "database.dispatcher") with DatabaseExecutionContext {
 
   def withConnection[A](block: Connection => A): A = {
-    val connection = db.getConnection()
-    try {
-      val out = block(connection)
-      out
-    } finally {
-      connection.close()
+    db.withConnection { connection =>
+      block(connection)
     }
   }
 }
