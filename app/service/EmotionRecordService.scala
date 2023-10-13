@@ -2,7 +2,7 @@ package service
 
 import com.google.inject.{ImplementedBy, Inject}
 import controllers.model
-import dao.model.{EmotionRecord, EmotionRecordDay, SuggestedAction, SunburstData, IsArchived}
+import dao.model.{EmotionRecord, EmotionRecordDay, SuggestedAction, SunburstData}
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
 
 import java.time.{Instant, LocalDate}
@@ -43,9 +43,9 @@ class EmotionRecordServiceImpl @Inject()(
     }))
   }
 
-  def findAllByUserId(userId: Long): Future[List[EmotionRecord]] = {
+  override def findAllByUserId(userId: Long): Future[List[EmotionRecord]] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.findAllByUserId(userId).filter(_.is_archived == false).sortWith((d1, d2) => {
+      emotionRecordDao.findAllByUserId(userId).sortWith((d1, d2) => {
         val earliestTime = LocalDate.of(2022, 1, 1).atStartOfDay()
         val d1Time = d1.created.getOrElse(earliestTime)
         val d2Time = d2.created.getOrElse(earliestTime)
@@ -100,9 +100,7 @@ class EmotionRecordServiceImpl @Inject()(
 
   override def delete(id: Long): Future[Int] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      val record = emotionRecordDao.findById(id)
-      record.is_archived = true
-      emotionRecordDao.update(record)
+      emotionRecordDao.delete(id)
     }))
   }
 
@@ -164,8 +162,5 @@ class EmotionRecordServiceImpl @Inject()(
 
     chartData.map(data => data.copy(color = computeColor(data.name)))
   }
-
-
-
 }
 
