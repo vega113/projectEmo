@@ -40,5 +40,7 @@ GET           /api/healthcheck                                           control
 # Serve static assets under public directory
 GET           /*file                                                     controllers.FrontendController.assetOrDefault(file)
 
+OPTIONS /*all  controllers.DefaultController.defaultOptions
+
 
 
