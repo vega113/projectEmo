@@ -7,5 +7,6 @@
 
     <include file="conf/db/changelog-create-tables.xml" />
     <include file="conf/db/changelog-import-data.xml" />
+    <include file="conf/db/milestones/milestone_1.xml" />
 
 </databaseChangeLog>

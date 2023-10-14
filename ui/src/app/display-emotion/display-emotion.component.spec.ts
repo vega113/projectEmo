@@ -11,8 +11,8 @@ import {EmotionStateService} from "../services/emotion-state.service";
 
 
 class MockEmotionService {
-  addNoteToEmotionRecord(emotionId: string, note: Note) {
-    return of({}); // Return an observable of an empty object
+  addNoteToEmotionsRecord(emotionId: string, note: Note) {
+    return of({}); // Redurn an observable of an empty object
   }
 }
 class MockEmotionStateService {
@@ -70,11 +70,13 @@ describe('DisplayEmotionComponent', () => {
     component.isLoading = false;
     component.emotion = {
       emotionType: 'Positive',
-      emotion: { emotionId: 'Happy', emotionName: 'Happy', emotionDescription: 'Feeling good' },
+      emotion: { id: 'Happy', emotionName: 'Happy' },
       intensity: 10,
       subEmotions: [{ subEmotionName: 'Excitement' }],
       triggers: [{ description: 'Birthday party' }],
-      created: new Date(),
+      notes: [],
+      tags: [],
+      created: new Date().toDateString(),
     };
     fixture.detectChanges();
 

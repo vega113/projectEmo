@@ -2,7 +2,7 @@
   <mat-spinner diameter="48"></mat-spinner>
   <h2>Loading...</h2>
 </div>
-<ng-container *ngIf="!isLoading">
+<ng-container *ngIf="!isLoading && emotion">
   <div class="display-emotion-container">
     <h2>Emotion Details</h2>
     <div class="card-container">
@@ -12,33 +12,38 @@
             <strong>Emotion Type:</strong> {{ emotion.emotionType }}
           </div>
           <div>
-            <strong>Emotion:</strong> {{ emotion.emotion?.emotionName }}
+            <strong>Emotion:</strong> {{ emotion.emotion.emotionName }}
           </div>
           <div>
             <strong>Intensity:</strong> {{ emotion.intensity }}
           </div>
           <div>
-            <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0]?.subEmotionName }}
+            <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0].subEmotionName }}
           </div>
           <div>
-            <strong>Trigger:</strong> {{ emotion.triggers[0]?.description }}
+            <strong>Trigger:</strong> {{ emotion.triggers[0].description }}
           </div>
           <div>
-            <strong>Created:</strong> {{  this.dateService.formatDateFromDb( emotion.created) }}
+            <strong>Created:</strong> {{  this.dateService.formatDateFromDb( emotion.created!) }}
           </div>
         </mat-card-content>
       </mat-card>
 
-      <div *ngIf="emotion.notes?.length > 0">
+      <div *ngIf="emotion && emotion.notes.length > 0">
         <h3>Notes:</h3>
         <div class="notes-list">
-          <mat-card class="note" *ngFor="let note of emotion.notes">
-            <mat-card-content>{{ note.text }}</mat-card-content>
-          </mat-card>
+          <div *ngFor="let noteElem of emotion.notes">
+            <mat-card class="note">
+              <mat-card-content>{{ noteElem.text }}</mat-card-content>
+              <button mat-icon-button (click)="deleteNote(noteElem)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-card>
+          </div>
         </div>
       </div>
 
-      <div *ngIf="emotion.tags?.length > 0" class="tags-container">
+      <div *ngIf="emotion && emotion.tags.length > 0" class="tags-container">
         <h3>Tags:</h3>
         <mat-card class="tags">
           <mat-card-content>

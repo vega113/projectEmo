@@ -37,7 +37,11 @@ class LiquibaseRunner @Inject()(env: Environment, config: Configuration) {
       logger.info("Liquibase migrations successfully applied.")
     } catch {
       case e: Exception =>
+        if (connection != null) {
+          connection.close()
+        }
         logger.error("Error applying Liquibase migrations", e)
+        throw e
     } finally {
       if (connection != null) {
         connection.close()

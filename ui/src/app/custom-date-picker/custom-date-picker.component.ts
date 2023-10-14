@@ -1,7 +1,8 @@
-import {Component, forwardRef, Input} from '@angular/core';
+import {Component, forwardRef, Injectable, Input} from '@angular/core';
 import {ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {DateAdapter, NativeDateAdapter, MAT_DATE_FORMATS} from '@angular/material/core';
 
+@Injectable()
 export class CustomDateAdapter extends NativeDateAdapter {
   override getDayOfWeekNames(style: 'long' | 'short' | 'narrow'): string[] {
     return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

@@ -84,7 +84,7 @@ export class CreateEmotionComponent implements OnInit {
       const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
       console.log(`Emotion record to be inserted: ${JSON.stringify(emotionRecord)}`);
       try {
-        await from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
+        from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
           {
             next: (response) => {
               console.log('Emotion record inserted successfully', response);
