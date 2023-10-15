@@ -12,13 +12,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 @ImplementedBy(classOf[NoteServiceImpl])
 trait NoteService {
   def insert(userId: Long, emotionRecordId: Long, note: Note): Future[Option[Long]]
+
   def findAllNoteTemplates(): Future[List[NoteTemplate]]
 
+  def delete(userId: Long, id: Long): Future[Boolean]
+
+  def undelete(userId: Long, id: Long): Future[Boolean]
 }
 
 class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
-                      emotionRecordService: EmotionRecordService,
-                      databaseExecutionContext: DatabaseExecutionContext) extends NoteService {
+                                 emotionRecordService: EmotionRecordService,
+                                 databaseExecutionContext: DatabaseExecutionContext) extends NoteService {
 
   private def makeTitle(text: String): String = {
     val maxLength = 30
@@ -36,8 +40,8 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
   }
 
   override def insert(userId: Long, emotionRecordId: Long, note: Note): Future[Option[Long]] = {
-    val userFutOpt = emotionRecordService.findByIdForUser(emotionRecordId, userId)
-    userFutOpt.flatMap {
+    val userEmotionRecordFutOpt = emotionRecordService.findByIdForUser(emotionRecordId, userId)
+    userEmotionRecordFutOpt.flatMap {
       case Some(_) => databaseExecutionContext.withConnection({ implicit connection =>
         val title = note.title.getOrElse(makeTitle(note.text))
         val noteId: Long = noteDao.insert(emotionRecordId, note.copy(title = Some(title))) match {
@@ -63,6 +67,37 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
   override def findAllNoteTemplates(): Future[List[NoteTemplate]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful(noteDao.findAllNoteTemplates())
+    })
+  }
+
+  override def delete(userId: Long, id: Long): Future[Boolean] = {
+    val emotionRecordIdOpt = emotionRecordService.findEmotionRecordIdByNoteId(id)
+    emotionRecordIdOpt.flatMap {
+      case Some(emotionRecordId) =>
+        val userEmotionRecordFutOpt = emotionRecordService.findByIdForUser(emotionRecordId, userId)
+        userEmotionRecordFutOpt.flatMap {
+          case Some(_) =>
+            databaseExecutionContext.withConnection({ implicit connection =>
+              Future.successful(noteDao.delete(id) > 0)
+            })
+          case None => Future.successful(false)
+        }
+      case None => Future.successful(false)
+    }
+  }
+
+  override def undelete(userId: Long, id: Long): Future[Boolean] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      val emotionRecordIdOpt = noteDao.findEmotionRecordIdByNoteId(id)
+      emotionRecordIdOpt match {
+        case Some(emotionRecordId) =>
+          val userEmotionRecordFutOpt = emotionRecordService.findByIdForUser(emotionRecordId, userId)
+          userEmotionRecordFutOpt.flatMap {
+            case Some(_) => Future.successful(noteDao.undelete(id) > 0)
+            case None => Future.successful(false)
+          }
+        case None => Future.successful(false)
+      }
     })
   }
 }

@@ -65,6 +65,9 @@ object model {
                    id: Option[Int],
                    title: Option[String],
                    text: String,
+                   isDeleted: Option[Boolean] = None,
+                   lastUpdated: Option[LocalDateTime] = None,
+                   lastDeleted: Option[LocalDateTime] = None,
                    created: Option[LocalDateTime] = None
                  )
 
@@ -194,12 +197,13 @@ object Note {
     implicit val noteFormat: Format[Note] = Json.format[Note]
 
     implicit val parser: RowParser[Note] = {
-      get[Option[Int]]("note_id") ~
+      get[Option[Int]]("id") ~
         get[Option[String]]("title") ~
         str("text") ~
+        get[Option[Boolean]]("is_deleted") ~
         get[Option[LocalDateTime]]("created") map {
-        case noteId ~ title ~ noteText ~ created =>
-          Note(noteId, title, noteText, created)
+        case id ~ title ~ noteText ~ isDeleted ~ created =>
+          Note(id, title, noteText, isDeleted, created)
       }
     }
   }

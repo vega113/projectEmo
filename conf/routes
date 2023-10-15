@@ -26,6 +26,10 @@ GET            /api/emotion/:id/subEmotions                               contro
 GET            /api/emotionRecord/:id/suggestedActions                    controllers.EmotionRecordController.fetchSuggestions(id: Long)
 GET            /api/noteTemplate                                          controllers.NoteController.fetchNoteTemplate()
 
+# Note routes
+PUT            /api/note/delete/:id                                       controllers.NoteController.deleteNote(id: Long)
+PUT            /api/note/undelete/:id                                     controllers.NoteController.undeleteNote(id: Long)
+
 
 # User routes
 

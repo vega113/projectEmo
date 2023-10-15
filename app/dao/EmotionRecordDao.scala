@@ -33,7 +33,7 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
         getOrElse(emotionRecord.emotion) ,
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
       triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id),
-      notes = noteDao.findAllByEmotionRecordId(id),
+      notes = noteDao.findAllNotDeletedByEmotionRecordId(id),
       tags = tagDao.findAllByEmotionRecordId(id)
     )
   }

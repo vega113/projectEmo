@@ -14,20 +14,33 @@ import scala.math.Ordered.orderingToOrdered
 @ImplementedBy(classOf[EmotionRecordServiceImpl])
 trait EmotionRecordService {
   def findAllByUserIdAndDateRange(userId: Long, startDate: String, endDate: String): Future[List[EmotionRecord]]
+
   def findAll(): Future[List[EmotionRecord]]
+
   def findByIdForUser(recordId: Long, userId: Long): Future[Option[EmotionRecord]]
+
   def findAllByUserId(userId: Long): Future[List[EmotionRecord]]
+
   def insert(emotionRecord: EmotionRecord): Future[Option[Long]]
+
   def update(emotionRecord: EmotionRecord): Future[Int]
+
   def delete(id: Long): Future[Int]
+
   def findSuggestionsByEmotionRecord(record: EmotionRecord): Future[List[SuggestedAction]]
+
   def groupRecordsByDate(records: List[EmotionRecord]): List[EmotionRecordDay]
+
   def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
+
   def emotionRecordsToChartData(records: List[EmotionRecord]): List[SunburstData]
+
+  def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]]
 }
 
 class EmotionRecordServiceImpl @Inject()(
                                           emotionRecordDao: EmotionRecordDao,
+                                          noteDao: dao.NoteDao,
                                           emotionDataService: EmotionDataService,
                                           databaseExecutionContext: DatabaseExecutionContext
                                         ) extends EmotionRecordService {
@@ -40,6 +53,12 @@ class EmotionRecordServiceImpl @Inject()(
   override def findByIdForUser(recordId: Long, userId: Long): Future[Option[EmotionRecord]]= {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
       emotionRecordDao.findByIdForUser(recordId, userId)
+    }))
+  }
+
+  override def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]] = {
+    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
+      noteDao.findEmotionRecordIdByNoteId(noteId)
     }))
   }
 

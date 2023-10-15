@@ -18,4 +18,5 @@
 - [ ] Allow all the parameters
 - [ ] Allow to let AI choose the parameters by reading the note
 - [ ] Add an option to create emotion out of text (from a note) and determine all the parameters using AI. Also output explanation for every choice.
-- [ ] Change emotion intensity to have 5 steps, like: calm, normal, agitated etc... and replace the color cue with words and a tooltip that will explain in details the intensity definitions.
+- [ ] Change emotion intensity to have 3 steps, like: low, moderate, high... and replace the color cue with words and a tooltip that will explain in details the intensity definitions.
+- [ ] Idea for a chart - evolution of emotions over time: negative/neutral/positive as there can be more than one emotion per day. this will provide more detailed view on what happened over time.

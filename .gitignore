@@ -14,3 +14,4 @@ db_dump
 package-lock.json
 /public/styles.*.css
 /application.log
+/public/runtime.*.js
