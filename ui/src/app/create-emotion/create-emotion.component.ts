@@ -39,6 +39,8 @@ export class CreateEmotionComponent implements OnInit {
   emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
+  createFromNote = false;
+
   constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
               private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
@@ -49,7 +51,10 @@ export class CreateEmotionComponent implements OnInit {
       emotion: ['', Validators.required],
       trigger: [''],
       subEmotion: [''],
-      emotionDate: [new Date()]
+      emotionDate: [new Date()],
+      isPublic: [false],
+      emotionNote: [''],
+      createFromNote: [false],
     });
   }
 
@@ -76,12 +81,22 @@ export class CreateEmotionComponent implements OnInit {
         });
       }
     });
+
+    this.emotionForm.get('createFromNote')?.valueChanges.subscribe(value => {
+      console.log('createFromNote changed to:', value);
+      // Other logic if needed
+    });
+    this.emotionForm.get('isPublic')?.valueChanges.subscribe(value => {
+      console.log('Public changed to:', value);
+      // Other logic if needed
+    });
   }
 
   async onSubmit(): Promise<void> {
     if (this.emotionForm.valid) {
       const emotionFromData = this.emotionForm.value;
-      const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
+      const emotionRecord = this.createFromNote ? this.convertEmotionFromDataToEmotionRecord(emotionFromData)
+        : this.processNote(emotionFromData);
       console.log(`Emotion record to be inserted: ${JSON.stringify(emotionRecord)}`);
       try {
         from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
@@ -136,6 +151,7 @@ export class CreateEmotionComponent implements OnInit {
       triggers: triggers as Trigger[],
       notes: notes as Note[],
       tags: tags as Tag[],
+      isPublic: emotionFromData.isPublic,
       created: this.dateService.formatDateToIsoString(emotionFromData.emotionDate)
     };
   }
@@ -194,4 +210,32 @@ export class CreateEmotionComponent implements OnInit {
       return [];
     }
   }
+
+  processNote(emotionFromData: any): EmotionRecord {
+    const decodedToken = this.authService.fetchDecodedToken();
+    let emotion: any = null;
+    emotion = {};
+    emotion.id = "Love"
+    const subEmotions: any[] = [];
+
+    const triggers: any[] = [];
+
+    const notes: any[] = [];
+
+    const tags: any[] = [];
+
+    return {
+      userId: decodedToken.userId,
+      emotionType: "Positive",
+      intensity: 1,
+      emotion: emotion as Emotion,
+      subEmotions: subEmotions as SubEmotion[],
+      triggers: triggers as Trigger[],
+      notes: notes as Note[],
+      tags: tags as Tag[],
+      isPublic: emotionFromData.isPublic,
+      created: this.dateService.formatDateToIsoString(emotionFromData.emotionDate)
+    };
+  }
+
 }

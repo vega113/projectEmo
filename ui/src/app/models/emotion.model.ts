@@ -60,6 +60,7 @@ export interface EmotionRecord {
   triggers: Trigger[];
   notes: Note[];
   tags: Tag[];
+  isPublic: boolean;
   created?: string;
 }
 

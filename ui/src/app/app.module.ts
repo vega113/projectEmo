@@ -46,6 +46,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatTabsModule} from "@angular/material/tabs";
 import {NgxChartsModule} from "@swimlane/ngx-charts";
 import { CustomDatePickerComponent } from './custom-date-picker/custom-date-picker.component';
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import { EmotionNoteFormComponent } from './emotion-note-form/emotion-note-form.component';
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -74,38 +76,40 @@ export const MAT_DATE_FNS_FORMATS = {
     ScreenSizeDirective,
     EmotionCalendarComponent,
     DayComponent,
-    CustomDatePickerComponent
+    CustomDatePickerComponent,
+    EmotionNoteFormComponent
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    FormsModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    MatToolbarModule,
-    MatCardModule,
-    MatButtonModule,
-    MatInputModule,
-    MatIconModule,
-    MatListModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatSliderModule,
-    MatSnackBarModule,
-    MatChipsModule,
-    MatProgressSpinnerModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
-    LayoutModule,
-    MatDatepickerModule,
-    MatGridListModule,
-    MatTooltipModule,
-    MatTabsModule,
-    NgxChartsModule
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        FormsModule,
+        HttpClientModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        MatToolbarModule,
+        MatCardModule,
+        MatButtonModule,
+        MatInputModule,
+        MatIconModule,
+        MatListModule,
+        MatSidenavModule,
+        MatSelectModule,
+        MatSliderModule,
+        MatSnackBarModule,
+        MatChipsModule,
+        MatProgressSpinnerModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatSortModule,
+        LayoutModule,
+        MatDatepickerModule,
+        MatGridListModule,
+        MatTooltipModule,
+        MatTabsModule,
+        NgxChartsModule,
+        MatSlideToggleModule
 
-  ],
+    ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {
     provide: DateAdapter,
     useClass: DateFnsAdapter,

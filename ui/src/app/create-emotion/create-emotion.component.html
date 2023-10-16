@@ -2,61 +2,84 @@
   <mat-spinner diameter="48"></mat-spinner>
   <h2>Loading...</h2>
 </div>
+
 <ng-container *ngIf="!isLoadingEmotionCache">
-
-
-
   <div class="create-emotion-container">
     <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
-      <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
-      <mat-form-field>
-        <mat-label>Emotion Type</mat-label>
-        <mat-select formControlName="emotionType">
-          <mat-option *ngFor="let emotionType of makeEmotionTypesList()"
-                      [value]="emotionType">{{ emotionType }}</mat-option>
-        </mat-select>
-      </mat-form-field>
 
-      <div class="intensity-container">
-        <span class="intensity-label">Emotion Intensity  </span>
-        <mat-slider
-          discrete
-          showTickMarks
-          min="1"
-          max="10"
-          step="1"
-          (input)="changeSliderColor($event)"
-        >
-          <input matSliderThumb formControlName="intensity">
-        </mat-slider>
-        <div class="intensity-color" [ngStyle]="{ 'background': sliderColor }"></div>
+      <mat-slide-toggle formControlName="createFromNote"
+                        aria-label="Toggle between manual emotion input and note-based input">
+        Create from Note
+      </mat-slide-toggle>
+
+
+
+      <!-- Existing form fields wrapped with ngIf for conditional display -->
+      <ng-container *ngIf="!emotionForm.get('createFromNote')?.value">
+
+        <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
+        <mat-form-field>
+          <mat-label>Emotion Category</mat-label>
+          <mat-select formControlName="emotionType">
+            <mat-option *ngFor="let emotionType of makeEmotionTypesList()"
+                        [value]="emotionType">{{ emotionType }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="intensity-container">
+          <label class="intensity-label">Emotion Intensity</label>
+          <mat-slider
+            discrete
+            showTickMarks
+            min="1"
+            max="10"
+            step="1"
+            (input)="changeSliderColor($event)">
+            <input matSliderThumb formControlName="intensity">
+          </mat-slider>
+          <div class="intensity-color" [ngStyle]="{ 'background': sliderColor }"></div>
+        </div>
+
+        <mat-form-field>
+          <mat-label>Main Emotion</mat-label>
+          <mat-select formControlName="emotion">
+            <mat-option *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
+                        [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Associated Emotion</mat-label>
+          <mat-select formControlName="subEmotion">
+            <mat-option *ngFor="let subEmotion of makeSubEmotionsList()"
+                        [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Reason</mat-label>
+          <mat-select formControlName="trigger">
+            <mat-option *ngFor="let trigger of makeTriggersList()"
+                        [value]="trigger">{{ trigger.description }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+      </ng-container>
+
+      <ng-container *ngIf="emotionForm.get('createFromNote')?.value">
+        <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
+        <app-emotion-note-form></app-emotion-note-form>
+      </ng-container>
+
+      <div class="toggle-container">
+        <mat-slide-toggle formControlName="isPublic" >Publicly Share
+        </mat-slide-toggle>
       </div>
 
-      <mat-form-field>
-        <mat-label>Emotion</mat-label>
-        <mat-select formControlName="emotion">
-          <mat-option *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
-                      [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
-        </mat-select>
-      </mat-form-field>
 
-      <mat-form-field>
-        <mat-label>Sub-Emotion</mat-label>
-        <mat-select formControlName="subEmotion">
-          <mat-option *ngFor="let subEmotion of makeSubEmotionsList()"
-                      [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <!-- Existing submit button -->
+      <button mat-raised-button color="primary" type="submit" [disabled]="emotionForm.invalid">Save</button>
 
-      <mat-form-field>
-        <mat-label>Trigger</mat-label>
-        <mat-select formControlName="trigger">
-          <mat-option *ngFor="let trigger of makeTriggersList()"
-                      [value]="trigger">{{ trigger.description }}</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <button mat-raised-button color="primary" type="submit" [disabled]="emotionForm.invalid">Submit</button>
     </form>
   </div>
 </ng-container>

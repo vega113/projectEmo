@@ -21,9 +21,6 @@ export class DisplayEmotionComponent {
               private snackBar: MatSnackBar,
               private noteService: NoteService,
               public dateService: DateService) {
-    this.noteForm = this.fb.group({
-      note: ['', Validators.required]
-    });
   }
 
   noteTemplates: NoteTemplate[] | null = null;
@@ -32,13 +29,9 @@ export class DisplayEmotionComponent {
   isLoadingNotes: boolean = false;
   isLoadingActions: boolean = false;
 
-  noteSaved: boolean = false;
-
 
   isLoading: boolean = true;
 
-
-  noteForm: FormGroup;
 
   emotion: EmotionRecord | null = null;
 
@@ -80,55 +73,5 @@ export class DisplayEmotionComponent {
       this.noteTemplates = noteTemplates;
       console.log('note templates received');
     });
-  }
-
-  async onSubmitNote(): Promise<void> {
-    this.isLoadingNotes = true;
-
-    if (this.noteForm.valid) {
-      const note = {
-        text: this.noteForm.value.note,
-      } as Note;
-      if(this.emotion?.id)
-      {
-        this.emotionService.addNoteToEmotionRecord(this.emotion.id, note).subscribe({
-          next: (response) => {
-            this.emotionStateService.updateNewEmotion(response);
-            this.noteForm.reset();
-            console.log('Note inserted successfully', response);
-            this.noteSaved = true;
-            this.isLoadingNotes = false;
-          },
-          error: (error) => {
-            console.error('Error inserting note', error);
-            this.isLoadingNotes = false;
-            this.snackBar.open('Error inserting note', 'Close', {
-              duration: 5000,
-            });
-          }
-        });
-      }
-    }
-  }
-
-  onTemplateSelected(event: MatSelectChange) {
-    this.noteForm.get('note')?.setValue(event.value);
-  }
-
-  deleteNote(note: Note): void {
-    this.noteService.deleteNote(note.id!)
-      .subscribe(isDeleted => {
-        if (isDeleted) {
-          if(this.emotion?.notes) {
-            this.emotion.notes = this.emotion.notes?.filter((n: Note) => {
-              return n.id !== note.id;
-            });
-            this.emotionStateService.updateNewEmotion(this.emotion);
-            this.noteForm.reset();
-          }
-        }
-        console.log('Note deleted successfully');
-
-      });
   }
 }
