@@ -26,16 +26,17 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
   }
 
   def insert(emotionRecordId: Long, note: Note)(implicit connection: Connection): Option[Long] = {
-    val noteIdOpt: Option[Long] = SQL(
+    val noteId: Option[Long] = SQL(
       """
-      INSERT INTO notes (title, text)
-      VALUES ({title}, {text})""").
+          INSERT INTO notes (title, text)
+          VALUES ({title}, {text})""").
       on("title" -> note.title, "text" -> note.text).
       executeInsert()
-    noteIdOpt
+    noteId.foreach(id => linkNoteToEmotionRecord(id, emotionRecordId))
+    noteId
   }
 
-  def linkNoteToEmotionRecord(noteId: Long, emotionRecordId: Long)(implicit connection: Connection): Int = {
+  private def linkNoteToEmotionRecord(noteId: Long, emotionRecordId: Long)(implicit connection: Connection): Int = {
     SQL(
       """
       INSERT INTO emotion_record_notes (note_id, emotion_record_id)
@@ -60,29 +61,44 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
       .executeUpdate()
   }
 
-  def delete(id: Long)(implicit connection: Connection): Int = {
-    SQL(
-      """
-      UPDATE notes
-      SET is_deleted = true, last_deleted = {lastDeleted}
-      WHERE id = {id}
-    """).on("id" -> id,
-      "lastDeleted" -> dateTimeService.now())
-      .executeUpdate()
+  def delete(emotionRecordId: Long, noteId: Long)(implicit connection: Connection): Int = {
+    if(checkNoteExistsForEmotionRecord(emotionRecordId, noteId)){
+      SQL(
+        """
+        UPDATE notes
+        SET is_deleted = true, last_deleted = {lastDeleted}
+        WHERE id = {id}
+      """).on("id" -> noteId,
+          "lastDeleted" -> dateTimeService.now())
+        .executeUpdate()
+    } else {
+      0
+    }
+
   }
 
-  def undelete(id: Long)(implicit connection: Connection): Int = {
-    SQL(
-      """
-      UPDATE notes
-      SET is_deleted = false, last_updated = {lastUpdated}
-      WHERE id = {noteId}
-    """).on("id" -> id,
-      "lastUpdated" -> dateTimeService.now())
-      .executeUpdate()
+  def undelete(emotionRecordId: Long, noteId: Long)(implicit connection: Connection): Int = {
+    if(checkNoteExistsForEmotionRecord(emotionRecordId, noteId)){
+      SQL(
+        """
+        UPDATE notes
+        SET is_deleted = false, last_updated = {lastUpdated}
+        WHERE id = {noteId}
+      """).on("id" -> noteId,
+          "lastUpdated" -> dateTimeService.now())
+        .executeUpdate()
+    } else {
+      0
+    }
   }
 
   def findAllNoteTemplates()(implicit connection: Connection): List[NoteTemplate] = {
     SQL("SELECT * FROM note_template").as(NoteTemplate.parser.*)
+  }
+
+  private def checkNoteExistsForEmotionRecord(emotionRecordId: Long, noteId: Long)(implicit connection: Connection): Boolean = {
+    SQL("SELECT count(*) FROM notes inner join emotion_record_notes on id = note_id  WHERE emotion_record_id = " +
+      "{emotionRecordId} and note_id = {noteId}").
+      on("emotionRecordId" -> emotionRecordId, "noteId" -> noteId).as(SqlParser.scalar[Int].single) > 0
   }
 }

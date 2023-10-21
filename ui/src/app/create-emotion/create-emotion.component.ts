@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, OnInit, Output, QueryList, ViewChildren} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -6,7 +6,7 @@ import {EmotionCacheService} from '../services/emotion-cache.service';
 
 import {
   Emotion,
-  EmotionData,
+  EmotionData, EmotionFromNoteResult,
   EmotionRecord,
   EmotionTypesWithEmotions,
   EmotionWithSubEmotions, Note,
@@ -15,10 +15,11 @@ import {
   Trigger
 } from "../models/emotion.model";
 import {AuthService} from "../services/auth.service";
-import {from} from "rxjs";
+import {from, Subscription} from "rxjs";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {Router} from "@angular/router";
 import {DateService} from "../services/date.service";
+import {MatOption} from "@angular/material/core";
 
 
 @Component({
@@ -27,7 +28,7 @@ import {DateService} from "../services/date.service";
   styleUrls: ['./create-emotion.component.css'],
   providers: []
 })
-export class CreateEmotionComponent implements OnInit {
+export class CreateEmotionComponent implements OnInit, AfterViewInit {
   isLoadingEmotionCache: boolean = true;
 
   emotionForm: FormGroup;
@@ -40,6 +41,15 @@ export class CreateEmotionComponent implements OnInit {
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
   createFromNote = false;
+  noteText: string | null = null;
+
+  @ViewChildren('emotionOptions') emotionOptions!: QueryList<MatOption>;
+  @ViewChildren('subEmotionOptions') subEmotionOptions!: QueryList<MatOption>;
+  @ViewChildren('triggerOptions') triggerOptions!: QueryList<MatOption>;
+
+  private emotionSelectSubscription!: Subscription;
+  private subEmotionSelectSubscription!: Subscription;
+  private triggerSubscription!: Subscription;
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
               private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar,
@@ -48,7 +58,7 @@ export class CreateEmotionComponent implements OnInit {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
-      emotion: ['', Validators.required],
+      emotion: [''],
       trigger: [''],
       subEmotion: [''],
       emotionDate: [new Date()],
@@ -57,6 +67,12 @@ export class CreateEmotionComponent implements OnInit {
       createFromNote: [false],
     });
   }
+
+
+  ngAfterViewInit() {
+
+  }
+
 
   ngOnInit(): void {
     this.emotionCacheService.emotionCache$.subscribe((cachedEmotionData) => {
@@ -95,8 +111,7 @@ export class CreateEmotionComponent implements OnInit {
   async onSubmit(): Promise<void> {
     if (this.emotionForm.valid) {
       const emotionFromData = this.emotionForm.value;
-      const emotionRecord = this.createFromNote ? this.convertEmotionFromDataToEmotionRecord(emotionFromData)
-        : this.processNote(emotionFromData);
+      const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
       console.log(`Emotion record to be inserted: ${JSON.stringify(emotionRecord)}`);
       try {
         from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
@@ -137,10 +152,9 @@ export class CreateEmotionComponent implements OnInit {
       triggers.push({triggerId: emotionFromData.trigger.triggerId});
     }
     const notes: any[] = [];
-    if (emotionFromData.notes) {
-      notes.push({note: emotionFromData.note.text});
+    if (emotionFromData.emotionNote) {
+      notes.push({text: emotionFromData.emotionNote});
     }
-    const tags: any[] = [];
 
     return {
       userId: decodedToken.userId,
@@ -150,8 +164,7 @@ export class CreateEmotionComponent implements OnInit {
       subEmotions: subEmotions as SubEmotion[],
       triggers: triggers as Trigger[],
       notes: notes as Note[],
-      tags: tags as Tag[],
-      isPublic: emotionFromData.isPublic,
+      tags: [] as Tag[],
       created: this.dateService.formatDateToIsoString(emotionFromData.emotionDate)
     };
   }
@@ -211,31 +224,39 @@ export class CreateEmotionComponent implements OnInit {
     }
   }
 
-  processNote(emotionFromData: any): EmotionRecord {
-    const decodedToken = this.authService.fetchDecodedToken();
-    let emotion: any = null;
-    emotion = {};
-    emotion.id = "Love"
-    const subEmotions: any[] = [];
+  handleNoteSubmission($event: EmotionFromNoteResult) {
 
-    const triggers: any[] = [];
+    const emotionDetected = $event.emotionDetection;
 
-    const notes: any[] = [];
+    this.noteText = $event.note.text;
+    this.emotionForm.get('createFromNote')?.setValue(false);
+    this.emotionForm.get('note')?.setValue(this.noteText);
 
-    const tags: any[] = [];
+    this.emotionForm.controls['emotionNote'].setValue(this.noteText);
 
-    return {
-      userId: decodedToken.userId,
-      emotionType: "Positive",
-      intensity: 1,
-      emotion: emotion as Emotion,
-      subEmotions: subEmotions as SubEmotion[],
-      triggers: triggers as Trigger[],
-      notes: notes as Note[],
-      tags: tags as Tag[],
-      isPublic: emotionFromData.isPublic,
-      created: this.dateService.formatDateToIsoString(emotionFromData.emotionDate)
-    };
+    this.emotionForm.controls['emotionType'].setValue(emotionDetected.emotionType);
+    this.emotionForm.controls['intensity'].setValue(emotionDetected.intensity);
+
+    this.emotionForm.controls['emotionType'].valueChanges.subscribe((value) => {
+      this.makeEmotionsList();
+    });
+
+    this.emotionSelectSubscription = this.emotionOptions.changes.subscribe((options) => {
+      this.emotionOptions.find(option =>
+        option.value.emotion.id === emotionDetected.mainEmotionId)?.select();
+      this.emotionSelectSubscription.unsubscribe();
+    });
+
+    this.subEmotionSelectSubscription = this.subEmotionOptions.changes.subscribe((options) => {
+      this.subEmotionOptions.find(option =>
+        option.value.subEmotionId === emotionDetected.subEmotionId)?.select();
+      this.subEmotionSelectSubscription.unsubscribe();
+    });
+
+    this.triggerSubscription = this.triggerOptions.changes.subscribe((options) => {
+      this.triggerOptions.find(option =>
+        option.value.triggerName === emotionDetected.triggers[0]?.triggerName)?.select();
+      this.triggerSubscription.unsubscribe();
+    });
   }
-
 }

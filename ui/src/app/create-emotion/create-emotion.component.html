@@ -32,18 +32,17 @@
             discrete
             showTickMarks
             min="1"
-            max="10"
+            max="3"
             step="1"
-            (input)="changeSliderColor($event)">
+            >
             <input matSliderThumb formControlName="intensity">
           </mat-slider>
-          <div class="intensity-color" [ngStyle]="{ 'background': sliderColor }"></div>
         </div>
 
         <mat-form-field>
           <mat-label>Main Emotion</mat-label>
           <mat-select formControlName="emotion">
-            <mat-option *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
+            <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
                         [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -51,7 +50,7 @@
         <mat-form-field>
           <mat-label>Associated Emotion</mat-label>
           <mat-select formControlName="subEmotion">
-            <mat-option *ngFor="let subEmotion of makeSubEmotionsList()"
+            <mat-option #subEmotionOptions *ngFor="let subEmotion of makeSubEmotionsList()"
                         [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -59,7 +58,7 @@
         <mat-form-field>
           <mat-label>Reason</mat-label>
           <mat-select formControlName="trigger">
-            <mat-option *ngFor="let trigger of makeTriggersList()"
+            <mat-option #triggerOptions *ngFor="let trigger of makeTriggersList()"
                         [value]="trigger">{{ trigger.description }}</mat-option>
           </mat-select>
         </mat-form-field>
@@ -67,19 +66,13 @@
       </ng-container>
 
       <ng-container *ngIf="emotionForm.get('createFromNote')?.value">
-        <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
-        <app-emotion-note-form></app-emotion-note-form>
+        <app-emotion-note-form (noteSubmitted)="handleNoteSubmission($event)" [noteText]=noteText></app-emotion-note-form>
       </ng-container>
 
-      <div class="toggle-container">
-        <mat-slide-toggle formControlName="isPublic" >Publicly Share
-        </mat-slide-toggle>
-      </div>
-
-
-      <!-- Existing submit button -->
-      <button mat-raised-button color="primary" type="submit" [disabled]="emotionForm.invalid">Save</button>
-
+      <ng-container *ngIf="!emotionForm.get('createFromNote')?.value">
+        <!-- Existing submit button -->
+        <button mat-raised-button color="primary" type="submit" [disabled]="emotionForm.invalid">Save</button>
+      </ng-container>
     </form>
   </div>
 </ng-container>

@@ -10,7 +10,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class EmotionDataController @Inject()(cc: ControllerComponents,
                                       emotionDataService: EmotionDataService,
-                                      noteService: NoteService,
                                       authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc) {
   def fetchEmotionData(): Action[AnyContent] = Action andThen authenticatedAction async {

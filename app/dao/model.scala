@@ -53,16 +53,16 @@ object model {
                                records: List[EmotionRecord]
                              )
   case class Trigger(
-                      triggerId: Option[Int],
+                      triggerId: Option[Long],
                       triggerName: Option[String],
-                      parentId: Option[Int],
-                      createdByUser: Option[Int],
+                      parentId: Option[Long],
+                      createdByUser: Option[Long],
                       description: Option[String],
                       created: Option[LocalDateTime] = None
                     )
 
   case class Note(
-                   id: Option[Int],
+                   id: Option[Long],
                    title: Option[String],
                    text: String,
                    isDeleted: Option[Boolean] = None,
@@ -78,9 +78,9 @@ object model {
                 )
 
   @unused
-  case class EmotionRecordTag(emotionRecordId: Int, tagId: Int)
+  case class EmotionRecordTag(emotionRecordId: Long, tagId: Long)
   @unused
-  case class NoteTag(noteId: Int, tagId: Int)
+  case class NoteTag(noteId: Long, tagId: Long)
 
   case class SuggestedAction(
                               id: Option[String],
@@ -167,10 +167,10 @@ object model {
     implicit val triggerFormat: Format[Trigger] = Json.format[Trigger]
 
     implicit val parser: RowParser[Trigger] = {
-      get[Option[Int]]("trigger_id") ~
+      get[Option[Long]]("trigger_id") ~
         get[Option[String]]("trigger_name") ~
-        get[Option[Int]]("trigger_parent_id") ~
-        get[Option[Int]]("created_by_user") ~
+        get[Option[Long]]("trigger_parent_id") ~
+        get[Option[Long]]("created_by_user") ~
         get[Option[String]]("description") ~
         get[Option[LocalDateTime]]("created")map {
         case triggerId ~ triggerName ~ parentId ~ createdByUser ~ description ~ created =>
@@ -197,7 +197,7 @@ object Note {
     implicit val noteFormat: Format[Note] = Json.format[Note]
 
     implicit val parser: RowParser[Note] = {
-      get[Option[Int]]("id") ~
+      get[Option[Long]]("id") ~
         get[Option[String]]("title") ~
         str("text") ~
         get[Option[Boolean]]("is_deleted") ~

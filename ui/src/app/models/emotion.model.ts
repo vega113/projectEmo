@@ -60,7 +60,6 @@ export interface EmotionRecord {
   triggers: Trigger[];
   notes: Note[];
   tags: Tag[];
-  isPublic: boolean;
   created?: string;
 }
 
@@ -131,3 +130,16 @@ export interface SunburstData {
   color?: string;
 }
 
+export interface EmotionDetectionResult {
+  emotionType: string;
+  intensity: number;
+  mainEmotionId: string;
+  subEmotionId: string;
+  triggers: Trigger[];
+  tags: Tag[];
+}
+
+export interface EmotionFromNoteResult {
+  emotionDetection: EmotionDetectionResult;
+  note: Note;
+}

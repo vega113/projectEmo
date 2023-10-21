@@ -29,8 +29,6 @@
         </mat-card-content>
       </mat-card>
 
-      <app-emotion-note-form [emotion]="emotion"></app-emotion-note-form>
-
       <div *ngIf="emotion && emotion.tags.length > 0" class="tags-container">
         <h3>Tags:</h3>
         <mat-card class="tags">
@@ -41,6 +39,8 @@
           </mat-card-content>
         </mat-card>
       </div>
+
+      <app-emotion-note-form [emotion]="emotion"></app-emotion-note-form>
 
 
     </div>
