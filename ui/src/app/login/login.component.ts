@@ -29,7 +29,7 @@ export class LoginComponent {
         localStorage.setItem('auth_token', response.token);
 
         // Redirect the user to the main app or another desired route
-        this.router.navigate(['/']);
+        this.router.navigate(['/emotions-timeline']);
       } catch (error) {
         // Handle any errors from the API, such as incorrect credentials
         console.error('Login failed:', error);

@@ -11,17 +11,24 @@
           <div>
             <strong>Emotion Type:</strong> {{ emotion.emotionType }}
           </div>
-          <div>
+          <div *ngIf="emotion.emotion">
             <strong>Emotion:</strong> {{ emotion.emotion.emotionName }}
           </div>
           <div>
             <strong>Intensity:</strong> {{ emotion.intensity }}
           </div>
-          <div>
+          <div *ngIf="emotion.subEmotions[0]">
             <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0].subEmotionName }}
           </div>
-          <div>
+          <div *ngIf="emotion.triggers[0]">
             <strong>Trigger:</strong> {{ emotion.triggers[0].description }}
+          </div>
+          <div *ngIf="emotion.tags[0]">
+            <!-- display all tags as references on one line-->
+            <strong>Tags:</strong>
+            <span *ngFor="let tag of emotion.tags; let last = last">
+              {{ tag.tagName }}{{ last ? '' : ', ' }}
+            </span>
           </div>
           <div>
             <strong>Created:</strong> {{  this.dateService.formatDateFromDb( emotion.created!) }}
@@ -29,68 +36,9 @@
         </mat-card-content>
       </mat-card>
 
-      <div *ngIf="emotion && emotion.notes.length > 0">
-        <h3>Notes:</h3>
-        <div class="notes-list">
-          <div *ngFor="let noteElem of emotion.notes">
-            <mat-card class="note">
-              <mat-card-content>{{ noteElem.text }}</mat-card-content>
-              <button mat-icon-button (click)="deleteNote(noteElem)">
-                <mat-icon>delete</mat-icon>
-              </button>
-            </mat-card>
-          </div>
-        </div>
-      </div>
+      <app-emotion-note-form [emotion]="emotion"></app-emotion-note-form>
 
-      <div *ngIf="emotion && emotion.tags.length > 0" class="tags-container">
-        <h3>Tags:</h3>
-        <mat-card class="tags">
-          <mat-card-content>
-            <mat-chip-set>
-              <mat-chip-option disabled *ngFor="let tag of emotion.tags">{{ tag.tagName }}</mat-chip-option>
-            </mat-chip-set>
-          </mat-card-content>
-        </mat-card>
 
-      </div>
-
-      <div class="actions-container">
-        <button mat-raised-button color="primary" (click)="getSuggestedActions()" [disabled]="isLoadingActions">
-          <mat-spinner *ngIf="isLoadingActions" diameter="24" [style.marginRight.px]="4"></mat-spinner>
-          Get Suggested Actions
-        </button>
-        <div *ngIf="suggestedActions">
-          <mat-list>
-            <mat-list-item *ngFor="let action of suggestedActions">{{ action.name }}</mat-list-item>
-          </mat-list>
-        </div>
-      </div>
-
-      <div class="form-wrapper">
-        <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
-          <label for="note">Add a note (max 240 chars):</label>
-
-          <mat-form-field class="full-width">
-            <mat-label>Template</mat-label>
-            <mat-select (selectionChange)="onTemplateSelected($event)">
-              <mat-option *ngFor="let template of noteTemplates" [value]="template.value">
-                {{template.label}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Note</mat-label>
-            <textarea id="note" matInput formControlName="note" rows="4" maxlength="240" placeholder="Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note."></textarea>
-          </mat-form-field>
-          <p *ngIf="noteForm.get('note')?.value?.length >= 240">Note limit reached.</p>
-          <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid || isLoadingNotes">
-            <mat-spinner *ngIf="isLoadingNotes" diameter="24" [style.marginRight.px]="4"></mat-spinner>
-            Submit Note
-          </button>
-        </form>
-      </div>
     </div>
   </div>
 </ng-container>

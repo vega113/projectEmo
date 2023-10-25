@@ -29,18 +29,20 @@ trait EmotionRecordService {
 
   def findSuggestionsByEmotionRecord(record: EmotionRecord): Future[List[SuggestedAction]]
 
+  def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long): Future[Option[Long]]
+
+  def findEmotionRecordIdByUserIdTagId(userId: Long, id: Long): Future[Option[Long]]
+
   def groupRecordsByDate(records: List[EmotionRecord]): List[EmotionRecordDay]
 
   def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
 
   def emotionRecordsToChartData(records: List[EmotionRecord]): List[SunburstData]
-
-  def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]]
 }
 
 class EmotionRecordServiceImpl @Inject()(
                                           emotionRecordDao: EmotionRecordDao,
-                                          noteDao: dao.NoteDao,
+                                          noteService: NoteService,
                                           emotionDataService: EmotionDataService,
                                           databaseExecutionContext: DatabaseExecutionContext
                                         ) extends EmotionRecordService {
@@ -56,11 +58,6 @@ class EmotionRecordServiceImpl @Inject()(
     }))
   }
 
-  override def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]] = {
-    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      noteDao.findEmotionRecordIdByNoteId(noteId)
-    }))
-  }
 
   override def findAllByUserId(userId: Long): Future[List[EmotionRecord]] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
@@ -105,9 +102,16 @@ class EmotionRecordServiceImpl @Inject()(
     ListMap(listOfPairs: _*)
   }
 
+  private def preProcessEmotionRecord(emotionRecord: EmotionRecord): EmotionRecord = {
+    emotionRecord.copy(notes = emotionRecord.notes.map(note => {
+      note.copy(title = Option(noteService.makeTitle(note.text)))
+    }), tags = emotionRecord.tags ++ noteService.extractTags(emotionRecord.notes.map(_.text).mkString(" ")))
+  }
+
   override def insert(emotionRecord: EmotionRecord): Future[Option[Long]] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.insert(emotionRecord)
+      val processedEmotionRecord = preProcessEmotionRecord(emotionRecord)
+      emotionRecordDao.insert(processedEmotionRecord)
     }))
   }
 
@@ -162,7 +166,8 @@ class EmotionRecordServiceImpl @Inject()(
 
     val chartData = recordsByType.flatMap { case (emotionType, recordsForType) =>
       // Second grouping by emotionName within each emotionType
-      val recordsByEmotion: Map[String, List[EmotionRecord]] = recordsForType.groupBy(record => record.emotion.flatMap(_.emotionName).getOrElse("undefined"))
+      val recordsByEmotion: Map[String, List[EmotionRecord]] = recordsForType.groupBy(record =>
+        record.emotion.flatMap(_.emotionName).getOrElse("undefined"))
 
       val secondLevel = recordsByEmotion.flatMap { case (emotionName, recordsForEmotion) =>
         // Third grouping by subEmotionName within each emotion
@@ -181,5 +186,17 @@ class EmotionRecordServiceImpl @Inject()(
 
     chartData.map(data => data.copy(color = computeColor(data.name)))
   }
+
+  override def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long): Future[Option[Long]] =
+    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
+      emotionRecordDao.findEmotionRecordIdByUserIdNoteId(userId, noteId)
+    }))
+
+  override def findEmotionRecordIdByUserIdTagId(userId: Long, noteId: Long): Future[Option[Long]] =
+    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
+      emotionRecordDao.findEmotionRecordIdByUserIdTagId(userId, noteId)
+    }))
+
+
 }
 

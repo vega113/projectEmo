@@ -1,24 +1,31 @@
-import {Component, OnInit} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnInit,
+  QueryList,
+  ViewChildren
+} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {EmotionCacheService} from '../services/emotion-cache.service';
 
 import {
-  Emotion,
-  EmotionData,
-  EmotionRecord,
-  EmotionTypesWithEmotions,
-  EmotionWithSubEmotions, Note,
-  SubEmotion,
-  SubEmotionWithActions, Tag,
-  Trigger
+    Emotion,
+    EmotionData, EmotionDetectionResult, EmotionFromNoteResult,
+    EmotionRecord,
+    EmotionTypesWithEmotions,
+    EmotionWithSubEmotions, Note,
+    SubEmotion,
+    SubEmotionWithActions, Tag,
+    Trigger
 } from "../models/emotion.model";
 import {AuthService} from "../services/auth.service";
-import {from} from "rxjs";
+import {from, Subscription} from "rxjs";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {Router} from "@angular/router";
 import {DateService} from "../services/date.service";
+import {MatOption} from "@angular/material/core";
 
 
 @Component({
@@ -27,7 +34,7 @@ import {DateService} from "../services/date.service";
   styleUrls: ['./create-emotion.component.css'],
   providers: []
 })
-export class CreateEmotionComponent implements OnInit {
+export class CreateEmotionComponent implements OnInit, AfterViewInit {
   isLoadingEmotionCache: boolean = true;
 
   emotionForm: FormGroup;
@@ -39,6 +46,18 @@ export class CreateEmotionComponent implements OnInit {
   emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
+  createFromNote = false;
+  noteText: string | null = null;
+
+  @ViewChildren('emotionOptions') emotionOptions!: QueryList<MatOption>;
+  @ViewChildren('subEmotionOptions') subEmotionOptions!: QueryList<MatOption>;
+  @ViewChildren('triggerOptions') triggerOptions!: QueryList<MatOption>;
+
+  private emotionSelectSubscription!: Subscription;
+  private subEmotionSelectSubscription!: Subscription;
+  private triggerSubscription!: Subscription;
+  private emotionDetected: EmotionDetectionResult | undefined;
+
   constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
               private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
@@ -46,11 +65,20 @@ export class CreateEmotionComponent implements OnInit {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
-      emotion: ['', Validators.required],
+      emotion: [''],
       trigger: [''],
       subEmotion: [''],
-      emotionDate: [new Date()]
+      emotionDate: [new Date()],
+      isPublic: [false],
+      emotionNote: [''],
+      createFromNote: [false],
+      tags: [[]]
     });
+  }
+
+
+  ngAfterViewInit() {
+
   }
 
   ngOnInit(): void {
@@ -59,26 +87,38 @@ export class CreateEmotionComponent implements OnInit {
         this.emotionCache = cachedEmotionData;
         this.isLoadingEmotionCache = false;
       } else {
-        this.emotionService.getEmotionCache().subscribe({
-          next: (emotionCache) => {
-            this.emotionCache = emotionCache;
-            this.emotionCacheService.updateEmotionCache(emotionCache);
-          },
-          error: (error) => {
-            console.error('Error fetching emotion cache:', error);
-            this.isLoadingEmotionCache = false;
-            this.snackBar.open('Failed to fetch emotion cache', 'Close', {});
-          },
-          complete: () => {
-            console.log('Emotion cache fetch completed');
-            this.isLoadingEmotionCache = false;
-          }
-        });
+          this.updateEmotionCache();
       }
+    });
+
+    this.emotionForm.get('createFromNote')?.valueChanges.subscribe(value => {
+      console.log('createFromNote changed to:', value);
+      // Other logic if needed
+    });
+    this.emotionForm.get('isPublic')?.valueChanges.subscribe(value => {
+      console.log('Public changed to:', value);
     });
   }
 
-  async onSubmit(): Promise<void> {
+    private updateEmotionCache() {
+        this.emotionService.getEmotionCache().subscribe({
+            next: (emotionCache) => {
+                this.emotionCache = emotionCache;
+                this.emotionCacheService.updateEmotionCache(emotionCache);
+            },
+            error: (error) => {
+                console.error('Error fetching emotion cache:', error);
+                this.isLoadingEmotionCache = false;
+                this.snackBar.open('Failed to fetch emotion cache', 'Close', {});
+            },
+            complete: () => {
+                console.log('Emotion cache fetch completed');
+                this.isLoadingEmotionCache = false;
+            }
+        });
+    }
+
+    async onSubmit(): Promise<void> {
     if (this.emotionForm.valid) {
       const emotionFromData = this.emotionForm.value;
       const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
@@ -122,10 +162,16 @@ export class CreateEmotionComponent implements OnInit {
       triggers.push({triggerId: emotionFromData.trigger.triggerId});
     }
     const notes: any[] = [];
-    if (emotionFromData.notes) {
-      notes.push({note: emotionFromData.note.text});
+    if (emotionFromData.emotionNote) {
+      notes.push({text: emotionFromData.emotionNote});
     }
-    const tags: any[] = [];
+
+    const tags: Tag[] = [];
+    if (emotionFromData.tags) {
+      emotionFromData.tags.forEach((tag: Tag) => {
+        tags.push(tag);
+      });
+    }
 
     return {
       userId: decodedToken.userId,
@@ -141,6 +187,7 @@ export class CreateEmotionComponent implements OnInit {
   }
 
   changeSliderColor(event: any) {
+    // TODO: remove this method
     const intensity = (event.target as HTMLInputElement).valueAsNumber;
     const r = Math.round(255 * (intensity / 10));
     const g = Math.round(255 * (1 - intensity / 10));
@@ -192,6 +239,81 @@ export class CreateEmotionComponent implements OnInit {
       return this.emotionCache.triggers;
     } else {
       return [];
+    }
+  }
+
+  handleNoteSubmission($event: EmotionFromNoteResult) {
+
+    this.emotionDetected = $event.emotionDetection;
+    this.noteText = $event.note.text;
+
+    const findTriggerOptionToSelect = (triggerName: string | undefined) => {
+      return this.triggerOptions.find(option =>
+          option.value.triggerName === triggerName);
+    }
+
+    if(this.emotionDetected == null) {
+      this.createFromNote = false;
+      this.emotionForm.get('createFromNote')?.setValue(false);
+    } else {
+      console.log('Emotion detected from note');
+      this.emotionForm.get('createFromNote')?.setValue(false);
+      this.emotionForm.get('note')?.setValue(this.noteText);
+
+      this.emotionForm.controls['emotionNote'].setValue(this.noteText);
+
+      this.emotionForm.controls['emotionType'].setValue(this.emotionDetected.emotionType);
+      this.emotionForm.controls['intensity'].setValue(this.emotionDetected.intensity);
+
+      this.emotionForm.controls['emotionType'].valueChanges.subscribe((value) => {
+        this.makeEmotionsList();
+      });
+
+      this.emotionSelectSubscription = this.emotionOptions.changes.subscribe((options) => {
+        this.emotionOptions.find(option =>
+          option.value.emotion.id === this.emotionDetected?.mainEmotionId)?.select();
+        this.makeSubEmotionsList();
+        this.emotionSelectSubscription.unsubscribe();
+      });
+
+      this.subEmotionSelectSubscription = this.subEmotionOptions.changes.subscribe((options: QueryList<MatOption>) => {
+        console.log("subEmotionOptions changed", options);
+        const subEmotionId = this.emotionDetected?.subEmotionId;
+
+        const optionToSelect = options.find(option =>
+            option.value.subEmotionName === subEmotionId);
+
+
+        if(optionToSelect) {
+          optionToSelect.select();
+        } else {
+          const subEmotionsFromOptions = options.map(option => option.value.subEmotionName).join(', ');
+          console.warn(`Associated emotion ${subEmotionId} not found in the list of sub emotions: ${subEmotionsFromOptions}.`);
+        }
+        this.subEmotionSelectSubscription.unsubscribe();
+      });
+
+      this.triggerSubscription = this.triggerOptions.changes.subscribe((options) => {
+        if(this.emotionDetected?.triggers != null && this.emotionDetected?.triggers.length > 0) {
+          const triggerName = this.emotionDetected?.triggers[0].triggerName;
+          findTriggerOptionToSelect.call(this, triggerName)?.select();
+        }
+        this.triggerSubscription.unsubscribe();
+      });
+
+      if (this.emotionDetected?.triggers != null && this.emotionDetected?.triggers.length > 0) {
+        this.triggerOptions.find(option =>
+          option.value.triggerName === this.emotionDetected?.triggers[0]?.triggerName)?.select();
+      }
+
+      if(this.emotionDetected?.tags != null && this.emotionDetected?.tags.length > 0) {
+        this.emotionForm.controls['tags'].setValue(this.emotionDetected?.tags);
+      }
+
+      this.snackBar.open(this.emotionDetected?.description + "\n" + this.emotionDetected?.suggestion, 'Close', {
+        duration: 40000,
+        panelClass: ['emotion-snackbar']
+      });
     }
   }
 }

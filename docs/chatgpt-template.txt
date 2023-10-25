@@ -1,0 +1,20 @@
+Answer with a json. include only json in answer.
+Example input text: I had a pleasant talk with my wife, I asked he how was her day and she talked to me about how she helped a child.
+ Example output:
+ {\"emotionType\":\"Positive\",\"intensity\":2,\"mainEmotionId\":\"Interest\",\"subEmotionId\":\"Curiosity\",\"description\":\"The specific words used make me think the person was happy when talking to wife\",\"triggers\":[{\"triggerName\":\"People\"},{\"triggerName\":\"Family\"},{\"triggerName\":\"Wife\"}], \"tags\":[{\"tagName\":\"help\"},{\"tagName\":\"child\"}]}
+
+  emotionType: Positive, Negative, Neutral.
+
+   intensity: 1,2,3,4,5
+
+    Positive main emotions with sub-emotions:
+     Joy/Joy/Admiration/Adoration/Amusement/Contentment/Ecstasy/Enthusiasm/Excitement/Interest/Satisfaction/Triumph, Love/Love/AestheticAppreciation/Entrancement/Romance, Gratitude/Gratitude, Hope/Hope/Determination/Relief, Affection/Affection/Calmness/Joy/Love,
+     Inspiration/Inspiration/Awe.
+
+    Negative: Anger/Anger/Annoyance/Contempt/Disapproval/Disgust/Envy, Sadness/Disappointment/Embarrassment/Empathic Pain/Guilt/Horror/Pain/Sadness/Shame, Fear/Anxiety/Awkwardness/Confusion/Doubt/Fear, Frustration/Boredom/Craving/Distress/Tiredness, Surprise/Surprise (negative).
+
+   Neutral: Curiosity/Awe/Interest/Realization, Reflection/Contemplation/Nostalgia, Uncertainty/Craving/Desire/Doubt, Concentration/Concentration, Ambivalence/Sarcasm.
+
+    Possible main values for triggers are: People, Situations, Places, Other. Include one or more main triggers, and maybe a more specific triggers chosen by you. Trigger is the cause of emotion. Tag is keyword that categorizes the emotion.
+
+    Try to make the description informative, so the user will understand the specific choice of fields.

@@ -23,7 +23,7 @@ export interface EmotionWithSubEmotions {
 
 export interface SubEmotionWithActions {
   subEmotion: SubEmotion;
-  suggestedActions: SuggestedAction[];
+  suggestedActions?: SuggestedAction[];
 }
 
 export interface User {
@@ -130,3 +130,18 @@ export interface SunburstData {
   color?: string;
 }
 
+export interface EmotionDetectionResult {
+  emotionType: string;
+  intensity: number;
+  mainEmotionId?: string;
+  subEmotionId?: string;
+  triggers: Trigger[];
+  tags: Tag[];
+  description: string;
+  suggestion: string;
+}
+
+export interface EmotionFromNoteResult {
+  emotionDetection?: EmotionDetectionResult;
+  note: Note;
+}

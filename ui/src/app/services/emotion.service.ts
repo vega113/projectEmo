@@ -1,18 +1,19 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {
-  EmotionData,
+  Emotion,
+  EmotionData, EmotionFromNoteResult,
   EmotionRecord,
   EmotionRecordDay,
-  Note,
-  SuggestedAction, SunburstData
+  Note, SubEmotion,
+  SuggestedAction, SunburstData, Tag, Trigger
 } from '../models/emotion.model';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, delay, map, tap} from 'rxjs/operators';
 import {AuthService} from './auth.service';
 import {ErrorService} from "./error.service";
-import {Observable} from "rxjs";
+import {Observable, of} from "rxjs";
 import {DateService} from "./date.service";
-import { startOfMonth, endOfMonth } from 'date-fns';
+import {startOfMonth, endOfMonth} from 'date-fns';
 import {environment} from "../../environments/environment";
 
 
@@ -102,15 +103,13 @@ export class EmotionService {
 
     return this.http.get<EmotionRecord[]>(
       `${environment.baseUrl}/emotionRecord/user/month/${startOfMonthDateString}/${endOfMonthDateString}`,
-      {headers}).
-    pipe(catchError(resp => this.errorService.handleError(resp)));
+      {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 
-  fetchEmotionSunburnChartDataForDateRange(dateRange: {start: string, end: string}) {
+  fetchEmotionSunburnChartDataForDateRange(dateRange: { start: string, end: string }) {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.get<SunburstData[]>(
       `${environment.baseUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
-      {headers}).
-    pipe(catchError(resp => this.errorService.handleError(resp)));
+      {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 }
