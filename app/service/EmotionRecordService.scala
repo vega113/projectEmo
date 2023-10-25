@@ -31,6 +31,8 @@ trait EmotionRecordService {
 
   def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long): Future[Option[Long]]
 
+  def findEmotionRecordIdByUserIdTagId(userId: Long, id: Long): Future[Option[Long]]
+
   def groupRecordsByDate(records: List[EmotionRecord]): List[EmotionRecordDay]
 
   def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
@@ -103,7 +105,7 @@ class EmotionRecordServiceImpl @Inject()(
   private def preProcessEmotionRecord(emotionRecord: EmotionRecord): EmotionRecord = {
     emotionRecord.copy(notes = emotionRecord.notes.map(note => {
       note.copy(title = Option(noteService.makeTitle(note.text)))
-    }), tags = noteService.extractTags(emotionRecord.notes.map(_.text).mkString(" ")))
+    }), tags = emotionRecord.tags ++ noteService.extractTags(emotionRecord.notes.map(_.text).mkString(" ")))
   }
 
   override def insert(emotionRecord: EmotionRecord): Future[Option[Long]] = {
@@ -189,5 +191,12 @@ class EmotionRecordServiceImpl @Inject()(
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
       emotionRecordDao.findEmotionRecordIdByUserIdNoteId(userId, noteId)
     }))
+
+  override def findEmotionRecordIdByUserIdTagId(userId: Long, noteId: Long): Future[Option[Long]] =
+    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
+      emotionRecordDao.findEmotionRecordIdByUserIdTagId(userId, noteId)
+    }))
+
+
 }
 

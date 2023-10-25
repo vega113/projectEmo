@@ -1,3 +1,22 @@
+<div *ngIf="emotion && emotion.tags.length > 0" class="tags-container">
+  <mat-form-field class="example-chip-list">
+    <mat-label>Note Tags</mat-label>
+    <mat-chip-grid #chipGrid aria-label="Enter Tags">
+      <mat-chip-row *ngFor="let tag of emotion.tags"
+                    (removed)="deleteTag(tag)"
+                    [editable]="false">
+        {{tag.tagName}}
+        <button matChipRemove [attr.aria-label]="'remove ' + tag.tagName">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+      <input [matChipInputFor]="chipGrid"
+             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+             [matChipInputAddOnBlur]="addOnBlur"/>
+    </mat-chip-grid>
+  </mat-form-field>
+</div>
+
 <div *ngIf="emotion && emotion.notes.length > 0">
   <h3>Notes:</h3>
   <div class="notes-list">
@@ -10,6 +29,37 @@
       </mat-card>
     </div>
   </div>
+
+  <div *ngFor="let noteElem of emotion.notes">
+    <mat-accordion class="example-headers-align">
+      <mat-expansion-panel  >
+        <mat-expansion-panel-header>
+          <mat-panel-description>
+            {{noteElem.title}}
+            <button mat-icon-button (click)="deleteNote(noteElem)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        {{noteElem.text}}
+      </mat-expansion-panel>
+
+      <mat-expansion-panel   hideToggle>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Suggestion
+          </mat-panel-title>
+          <mat-panel-description>
+            The description of the note by AI
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        Here goes the actual AI description
+      </mat-expansion-panel>
+
+
+
+    </mat-accordion>
+  </div>
 </div>
 
 <div class="form-wrapper">
@@ -18,7 +68,7 @@
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Note</mat-label>
-      <textarea id="note" matInput formControlName="note" rows="4" maxlength="240"  [placeholder]=placeHolderText></textarea>
+      <textarea id="note" matInput formControlName="note" rows="4" maxlength="480"  [placeholder]=placeHolderText></textarea>
     </mat-form-field>
     <p *ngIf="noteForm.get('note')?.value?.length >= 480">Note limit reached.</p>
     <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid || isLoadingNotes">

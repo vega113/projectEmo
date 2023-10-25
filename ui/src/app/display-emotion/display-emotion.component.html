@@ -11,34 +11,30 @@
           <div>
             <strong>Emotion Type:</strong> {{ emotion.emotionType }}
           </div>
-          <div>
+          <div *ngIf="emotion.emotion">
             <strong>Emotion:</strong> {{ emotion.emotion.emotionName }}
           </div>
           <div>
             <strong>Intensity:</strong> {{ emotion.intensity }}
           </div>
-          <div>
+          <div *ngIf="emotion.subEmotions[0]">
             <strong>Sub-Emotion:</strong> {{ emotion.subEmotions[0].subEmotionName }}
           </div>
-          <div>
+          <div *ngIf="emotion.triggers[0]">
             <strong>Trigger:</strong> {{ emotion.triggers[0].description }}
+          </div>
+          <div *ngIf="emotion.tags[0]">
+            <!-- display all tags as references on one line-->
+            <strong>Tags:</strong>
+            <span *ngFor="let tag of emotion.tags; let last = last">
+              {{ tag.tagName }}{{ last ? '' : ', ' }}
+            </span>
           </div>
           <div>
             <strong>Created:</strong> {{  this.dateService.formatDateFromDb( emotion.created!) }}
           </div>
         </mat-card-content>
       </mat-card>
-
-      <div *ngIf="emotion && emotion.tags.length > 0" class="tags-container">
-        <h3>Tags:</h3>
-        <mat-card class="tags">
-          <mat-card-content>
-            <mat-chip-set>
-              <mat-chip-option disabled *ngFor="let tag of emotion.tags">{{ tag.tagName }}</mat-chip-option>
-            </mat-chip-set>
-          </mat-card-content>
-        </mat-card>
-      </div>
 
       <app-emotion-note-form [emotion]="emotion"></app-emotion-note-form>
 

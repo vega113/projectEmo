@@ -97,6 +97,22 @@ object model {
 
   case class SunburstData(name: String, value: Option[Int], children: List[SunburstData], color: Option[String] = None)
 
+  case class EmotionDetectionResult(
+                                     emotionType: String,
+                                     intensity: Int,
+                                     mainEmotionId: Option[String],
+                                     subEmotionId: Option[String],
+                                     triggers: Option[List[Trigger]],
+                                     tags: Option[List[Tag]],
+                                     description: String,
+                                     suggestion: String
+                                   )
+
+  case class EmotionFromNoteResult(
+                                    emotionDetection: EmotionDetectionResult,
+                                    note: Note
+                                  )
+
 
   object User {
     implicit val userFormat: Format[User] = Json.format[User]
@@ -236,6 +252,14 @@ object Note {
           NoteTemplate(id, label, value, created)
       }
     }
+  }
+
+  object EmotionDetectionResult {
+    implicit val emotionDetectionResultFormat: Format[EmotionDetectionResult] = Json.format[EmotionDetectionResult]
+  }
+
+  object EmotionFromNoteResult {
+    implicit val emotionFromNoteResultFormat: Format[EmotionFromNoteResult] = Json.format[EmotionFromNoteResult]
   }
 
   object SunburstData {

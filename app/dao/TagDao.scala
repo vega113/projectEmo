@@ -6,6 +6,21 @@ import dao.model.Tag
 import java.sql.Connection
 
 class TagDao {
+
+  def delete(emotionRecordId: Long, tagId: Long)(implicit connection: Connection): Int = {
+    if (checkTagExistsForEmotionRecord(emotionRecordId, tagId)) {
+      val tagsDeletedCount = SQL("DELETE FROM tags WHERE id = {id}").on("id" -> tagId).executeUpdate()
+      val unLinkedCount =  unlinkTagToEmotionRecord(emotionRecordId, tagId)
+      if (tagsDeletedCount == 1 && unLinkedCount == 1) {
+        1
+      } else {
+        0
+      }
+    } else {
+      0
+    }
+
+  }
   def findAllByEmotionRecordId(id: Long)(implicit connection: Connection): List[Tag] = {
     SQL("SELECT * FROM tags inner join emotion_record_tags on  tag_id = id WHERE emotion_record_id = {id}").on("id" -> id).as(Tag.parser.*)
   }
@@ -29,5 +44,16 @@ class TagDao {
       INSERT INTO emotion_record_tags (tag_id, emotion_record_id)
       VALUES ({tagId}, {emotionRecordId})""").
       on("tagId" -> tagId, "emotionRecordId" -> emotionRecordId).executeUpdate()
+  }
+
+  private def unlinkTagToEmotionRecord(emotionRecordId: Long, tagId: Long)(implicit connection: Connection): Int = {
+    SQL("DELETE FROM emotion_record_tags WHERE emotion_record_id = {emotionRecordId} and tag_id = {tagId}").
+      on("emotionRecordId" -> emotionRecordId, "tagId" -> tagId).executeUpdate()
+  }
+
+  private def checkTagExistsForEmotionRecord(emotionRecordId: Long, tagId: Long)(implicit connection: Connection): Boolean = {
+    SQL("SELECT count(*) FROM tags inner join emotion_record_tags on id = tag_id  WHERE emotion_record_id = " +
+      "{emotionRecordId} and tag_id = {tagId}").
+      on("emotionRecordId" -> emotionRecordId, "tagId" -> tagId).as(SqlParser.scalar[Int].single) > 0
   }
 }

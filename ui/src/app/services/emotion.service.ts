@@ -8,7 +8,7 @@ import {
   Note, SubEmotion,
   SuggestedAction, SunburstData, Tag, Trigger
 } from '../models/emotion.model';
-import {catchError, map, tap} from 'rxjs/operators';
+import {catchError, delay, map, tap} from 'rxjs/operators';
 import {AuthService} from './auth.service';
 import {ErrorService} from "./error.service";
 import {Observable, of} from "rxjs";
@@ -111,21 +111,5 @@ export class EmotionService {
     return this.http.get<SunburstData[]>(
       `${environment.baseUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
       {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
-  }
-
-  detectEmotion(text: string): Observable<EmotionFromNoteResult> {
-    return of({
-      emotionDetection: {
-        emotionType: 'Positive',
-        intensity: 3,
-        mainEmotionId: 'Interest',
-        subEmotionId: 'Curiosity',
-        triggers: [{triggerName: "Family"}],
-        tags: []
-      },
-      note: {
-        text: text,
-      }
-    } as EmotionFromNoteResult)
   }
 }

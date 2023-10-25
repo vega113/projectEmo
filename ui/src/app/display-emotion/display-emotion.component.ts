@@ -1,11 +1,12 @@
 import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import {EmotionFromNoteResult, EmotionRecord, Note, NoteTemplate, SuggestedAction} from '../models/emotion.model';
+import { EmotionRecord, Note, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
 import {FormBuilder} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {NoteService} from '../services/note.service';
 import {DateService} from "../services/date.service";
+
 
 @Component({
   selector: 'app-display-emotion',
@@ -38,7 +39,6 @@ export class DisplayEmotionComponent {
 
   suggestedActions: SuggestedAction[] | null = null;
 
-// Add this method to get suggested actions
   async getSuggestedActions(): Promise<void> {
     this.isLoadingActions = true;
     if (this.emotion != null && this.emotion.id != null) {

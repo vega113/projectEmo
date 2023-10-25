@@ -9,12 +9,9 @@
 
       <mat-slide-toggle formControlName="createFromNote"
                         aria-label="Toggle between manual emotion input and note-based input">
-        Create from Note
+        Write a note to detect emotions with AI
       </mat-slide-toggle>
 
-
-
-      <!-- Existing form fields wrapped with ngIf for conditional display -->
       <ng-container *ngIf="!emotionForm.get('createFromNote')?.value">
 
         <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
@@ -32,7 +29,7 @@
             discrete
             showTickMarks
             min="1"
-            max="3"
+            max="5"
             step="1"
             >
             <input matSliderThumb formControlName="intensity">
@@ -41,6 +38,7 @@
 
         <mat-form-field>
           <mat-label>Main Emotion</mat-label>
+
           <mat-select formControlName="emotion">
             <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
                         [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
@@ -70,7 +68,6 @@
       </ng-container>
 
       <ng-container *ngIf="!emotionForm.get('createFromNote')?.value">
-        <!-- Existing submit button -->
         <button mat-raised-button color="primary" type="submit" [disabled]="emotionForm.invalid">Save</button>
       </ng-container>
     </form>
