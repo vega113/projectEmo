@@ -46,6 +46,8 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8"
 libraryDependencies += "org.fusesource.jansi" % "jansi" % "2.4.0"
 libraryDependencies += "com.google.inject" % "guice" % "5.0.0"
 
+libraryDependencies += ws
+
 
 
 libraryDependencies += "org.mockito" % "mockito-core" % "5.2.0" % "test"

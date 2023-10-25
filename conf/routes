@@ -29,6 +29,8 @@ GET            /api/noteTemplate                                          contro
 # Note routes
 PUT            /api/note/delete/:id                                       controllers.NoteController.deleteNote(id: Long)
 PUT            /api/note/undelete/:id                                     controllers.NoteController.undeleteNote(id: Long)
+POST           /api/note/emotion/detect                                   controllers.NoteController.detectEmotion
+DELETE         /api/note/tag/:id                                          controllers.NoteController.deleteTag(id: Long)
 
 
 # User routes

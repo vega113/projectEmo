@@ -15,6 +15,7 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
   trait TestData {
     val mockEmotionRecordDao = mock[EmotionRecordDao]
     val mockEmotionDataService = mock[EmotionDataService]
+    val mockNoteService = mock[NoteService]
     val connection = mock[java.sql.Connection]
     val fakeDatabaseExecutionContext = new DatabaseExecutionContext {
       override def withConnection[A](block: java.sql.Connection => A): A = {
@@ -51,14 +52,14 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
 
   "EmotionRecordServiceImpl" should {
     "parse emotion data cache into map successfully" in new TestData {
-      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockEmotionDataService, fakeDatabaseExecutionContext)
+      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService, mockEmotionDataService, fakeDatabaseExecutionContext)
       val actual: List[SuggestedAction] = emotionRecordServiceImpl.parseEmotionCacheIntoSuggestions(emotionData).values.flatten.toList
       actual mustEqual suggestions
     }
 
     "find suggestions by EmotionRecord successfully" in new TestData {
 
-      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockEmotionDataService, fakeDatabaseExecutionContext)
+      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService, mockEmotionDataService, fakeDatabaseExecutionContext)
 
 
       when(mockEmotionDataService.fetchEmotionData()).thenReturn(Future.successful(emotionData))
@@ -126,7 +127,7 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
         )
       )
 
-      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockEmotionDataService, fakeDatabaseExecutionContext)
+      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService, mockEmotionDataService, fakeDatabaseExecutionContext)
       // Execute the method
       private val result = emotionRecordServiceImpl.emotionRecordsToChartData(records)
 

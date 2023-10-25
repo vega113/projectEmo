@@ -25,4 +25,9 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="milestone_1_delete-triggers-with-parent" author="yourName">
+        <delete tableName="triggers">
+            <where>trigger_parent_id IS NOT NULL</where>
+        </delete>
+    </changeSet>
 </databaseChangeLog>
