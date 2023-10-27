@@ -27,8 +27,6 @@ export class EmotionNoteFormComponent implements OnInit {
   placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note.";
   submitBtnTxt: string | null = null;
 
-  separatorKeysCodes: number[] = [13, 188];
-  addOnBlur: any = true;
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
               private emotionStateService: EmotionStateService,
@@ -107,29 +105,5 @@ export class EmotionNoteFormComponent implements OnInit {
       });
   }
 
-  deleteTag(tag: Tag) {
-    console.log('remove tag', tag);
-    this.noteService.deleteTag(tag.tagId!)
-      .subscribe({
-        next: (isDeleted) => {
-          if (isDeleted) {
-            if (this.emotion?.tags) {
-              this.emotion.tags = this.emotion.tags?.filter((t: Tag) => {
-                return t.tagId !== tag.tagId;
-              });
-              this.emotionStateService.updateNewEmotion(this.emotion);
-              this.noteForm.reset();
-            }
-          }
-          console.log('Tag deleted successfully');
-        },
-        error: (error) => {
-          console.error('Error deleting tag', error);
-          this.isLoadingNotes = false;
-          this.snackBar.open('Error deleting tag', 'Close', {
-            duration: 5000,
-          });
-        }
-      });
-  }
+
 }

@@ -1,0 +1,912 @@
+Subject: [PATCH] working on accordion for emotion create
+---
+Index: ui/src/app/create-emotion/create-emotion.component.css
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ui/src/app/create-emotion/create-emotion.component.css b/ui/src/app/create-emotion/create-emotion.component.css
+--- a/ui/src/app/create-emotion/create-emotion.component.css	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/ui/src/app/create-emotion/create-emotion.component.css	(date 1698259838197)
+@@ -1,61 +1,129 @@
+-:host {
+-  display: flex;
+-  justify-content: center;
+-  align-items: center;
+-  height: 100%;
+-  padding: 1rem;
+-  width: 100%;
+-}
+-
+-form {
+-  display: flex;
+-  flex-direction: column;
+-  align-items: center;
+-  max-width: 1000px;
+-  width: 100%;
+-  background-color: #fff;
+-  padding: 2rem;
+-  border-radius: 8px;
+-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+-}
+-
+-mat-form-field {
++.create-emotion-accordion {
+   width: 100%;
+-  margin-bottom: 1.5rem;
+ }
+ 
+-button {
+-  width: 100%;
++.mat-expansion-panel-header {
++  font-size: 1.2em;
++  font-weight: bold;
+ }
+-.create-emotion-container {
+-  display: flex;
+-  flex-direction: column;
++
++.create-emotion-accordion .mat-expansion-panel-header-description {
++  justify-content: space-between;
+   align-items: center;
+-  justify-content: center;
++}
++
++.create-emotion-accordion .mat-mdc-form-field + .mat-mdc-form-field {
++  margin-left: 8px;
+ }
+ 
++.mat-form-field,
++.mat-slide-toggle,
+ .mat-slider {
+   width: 100%;
+-  max-width: 300px;
++  margin-bottom: 16px;
+ }
+ 
+ .intensity-container {
+-  width: 100%;
+-  max-width: 300px;
++  display: flex;
++  flex-direction: column;
++  align-items: flex-start;
+   margin-bottom: 16px;
+ }
+ 
+ .intensity-label {
+-  font-size: 16px;
+-  font-weight: 500;
+   margin-bottom: 8px;
+ }
+ 
+-.intensity-color {
++.mat-action-row {
++  display: flex;
++  justify-content: flex-end;
++  margin-top: 16px;
++}
++
++.emotion-cache-loading {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++}
++/* Styling for the notes section */
++.notes-list {
++  display: flex;
++  flex-direction: column;
++  gap: 20px; /* Vertical space between notes */
++  --text-align-direction: left; /* Default alignment direction */
++}
++
++.note {
++  display: flex;
++  align-items: center; /* Vertically center the content */
++  padding: 10px;
++  border: 1px solid #e0e0e0;
++  border-radius: 5px;
++  position: relative;
++  width: 800px;
++}
++
++.mat-card-content {
++  flex-grow: 1; /* Allow the content to take available space */
++  padding: 15px;
++  font-size: 14px;
++  line-height: 1.5;
++  margin-right: 30px; /* Give space for delete button */
++  text-align: var(--text-align-direction); /* Use the CSS variable for text alignment */
++}
++
++button[mat-icon-button] {
++  position: absolute;
++  top: 10px;
++  right: 10px;
++}
++
++/* Styling for the note form */
++.form-wrapper {
++  padding: 20px;
++  background-color: #f5f5f5;
++  border-radius: 5px;
++  width: 500px;
++  margin: 2px;
++}
++
++label {
++  display: block;
++  margin-bottom: 10px;
++  font-weight: 600;
++}
++
++.full-width {
+   width: 100%;
+-  max-width: 300px;
+-  height: 5px;
+-  margin-top: 8px;
+-  border-radius: 3px;
++  margin-bottom: 20px;
++}
++
++textarea {
++  padding: 10px; /* Horizontal padding */
++  resize: vertical; /* Allow vertical resize only */
++  width: 100%; /* Ensure it takes full width */
++  min-height: 200px; /* Set a minimum height */
++  box-sizing: border-box; /* Include padding and border in total width */
++}
++
++button[mat-raised-button] {
++  display: flex;
++  align-items: center;
++  padding: 10px 20px;
++  font-weight: 600;
++  margin-top: 10px; /* Vertical space from the textarea */
+ }
+ 
++.mat-spinner {
++  margin-right: 10px;
++}
++
++
++.full-width {
++  width: 100%;
++}
++
++
++.note-form-card {
++  width: calc(100% - 32px); /* Adjust based on your card's padding */
++}
+Index: ui/src/app/emotion-note-form/emotion-note-form.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ui/src/app/emotion-note-form/emotion-note-form.component.ts b/ui/src/app/emotion-note-form/emotion-note-form.component.ts
+--- a/ui/src/app/emotion-note-form/emotion-note-form.component.ts	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/ui/src/app/emotion-note-form/emotion-note-form.component.ts	(date 1698256972348)
+@@ -27,8 +27,6 @@
+   placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note.";
+   submitBtnTxt: string | null = null;
+ 
+-  separatorKeysCodes: number[] = [13, 188];
+-  addOnBlur: any = true;
+ 
+   constructor(private fb: FormBuilder, private emotionService: EmotionService,
+               private emotionStateService: EmotionStateService,
+@@ -107,29 +105,5 @@
+       });
+   }
+ 
+-  deleteTag(tag: Tag) {
+-    console.log('remove tag', tag);
+-    this.noteService.deleteTag(tag.tagId!)
+-      .subscribe({
+-        next: (isDeleted) => {
+-          if (isDeleted) {
+-            if (this.emotion?.tags) {
+-              this.emotion.tags = this.emotion.tags?.filter((t: Tag) => {
+-                return t.tagId !== tag.tagId;
+-              });
+-              this.emotionStateService.updateNewEmotion(this.emotion);
+-              this.noteForm.reset();
+-            }
+-          }
+-          console.log('Tag deleted successfully');
+-        },
+-        error: (error) => {
+-          console.error('Error deleting tag', error);
+-          this.isLoadingNotes = false;
+-          this.snackBar.open('Error deleting tag', 'Close', {
+-            duration: 5000,
+-          });
+-        }
+-      });
+-  }
++
+ }
+Index: ui/src/app/create-emotion/create-emotion.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ui/src/app/create-emotion/create-emotion.component.html b/ui/src/app/create-emotion/create-emotion.component.html
+--- a/ui/src/app/create-emotion/create-emotion.component.html	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/ui/src/app/create-emotion/create-emotion.component.html	(date 1698325378298)
+@@ -7,69 +7,106 @@
+   <div class="create-emotion-container">
+     <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
+ 
+-      <mat-slide-toggle formControlName="createFromNote"
+-                        aria-label="Toggle between manual emotion input and note-based input">
+-        Write a note to detect emotions with AI
+-      </mat-slide-toggle>
+-
+-      <ng-container *ngIf="!emotionForm.get('createFromNote')?.value">
+-
++      <mat-accordion class="create-emotion-accordion" multi><mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
++        <mat-expansion-panel-header>
++          <mat-panel-title>
++            Date
++          </mat-panel-title>
++          <mat-panel-description>
++            Choose a date for this emotion, or leave it blank to use today's date.
++            <mat-icon>date_range</mat-icon>
++          </mat-panel-description>
++        </mat-expansion-panel-header>
+         <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
+-        <mat-form-field>
+-          <mat-label>Emotion Category</mat-label>
+-          <mat-select formControlName="emotionType">
+-            <mat-option *ngFor="let emotionType of makeEmotionTypesList()"
+-                        [value]="emotionType">{{ emotionType }}</mat-option>
+-          </mat-select>
+-        </mat-form-field>
++      </mat-expansion-panel>
++
++      <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
++        <mat-expansion-panel-header>
++          <mat-panel-title>
++            Emotion Note
++          </mat-panel-title>
++          <mat-panel-description>
++            Write a note to describe this emotion.
++            <mat-icon>edit_note</mat-icon>
++          </mat-panel-description>
++        </mat-expansion-panel-header>
++        <div class="form-wrapper">
++          <label for="note">Add a note (max {{maxNoteLength}} chars):</label>
++          <mat-form-field appearance="outline" class="full-width">
++            <mat-label>Note</mat-label>
++            <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength"
++                      [placeholder]=placeHolderText></textarea>
++          </mat-form-field>
++          <p *ngIf="emotionForm.get('emotionNote')?.value?.length >= maxNoteLength">Note limit reached.</p>
++        </div>
++        <mat-action-row>
++          <button mat-button color="primary" (click)="detectEmotions()">
++            Detect Emotions
++            <mat-spinner *ngIf="isLoadingNotes" diameter="24" [style.marginRight.px]="4"></mat-spinner>
++          </button>
++          <button mat-button color="primary" (click)="skipToManualEntry()">Skip</button>
++        </mat-action-row>
++      </mat-expansion-panel>
++
++        <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
++          <mat-expansion-panel-header>
++            <mat-panel-title>
++              Manual Emotion Input
++            </mat-panel-title>
++          </mat-expansion-panel-header>
++          <mat-form-field>
++            <mat-label>Emotion Category</mat-label>
++            <mat-select formControlName="emotionType">
++              <mat-option #emotionTypeOptions *ngFor="let emotionType of makeEmotionTypesList()"
++                          [value]="emotionType">{{ emotionType }}</mat-option>
++            </mat-select>
++          </mat-form-field>
+ 
+-        <div class="intensity-container">
+-          <label class="intensity-label">Emotion Intensity</label>
+-          <mat-slider
+-            discrete
+-            showTickMarks
+-            min="1"
+-            max="5"
+-            step="1"
++          <div class="intensity-container">
++            <label class="intensity-label">Emotion Intensity</label>
++            <mat-slider
++              discrete
++              showTickMarks
++              min="1"
++              max="5"
++              step="1"
+             >
+-            <input matSliderThumb formControlName="intensity">
+-          </mat-slider>
+-        </div>
++              <input matSliderThumb formControlName="intensity">
++            </mat-slider>
++          </div>
+ 
+-        <mat-form-field>
+-          <mat-label>Main Emotion</mat-label>
++          <mat-form-field>
++            <mat-label>Main Emotion</mat-label>
+ 
+-          <mat-select formControlName="emotion">
+-            <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
+-                        [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
+-          </mat-select>
+-        </mat-form-field>
++            <mat-select formControlName="emotion">
++              <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
++                          [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
++            </mat-select>
++          </mat-form-field>
+ 
+-        <mat-form-field>
+-          <mat-label>Associated Emotion</mat-label>
+-          <mat-select formControlName="subEmotion">
+-            <mat-option #subEmotionOptions *ngFor="let subEmotion of makeSubEmotionsList()"
+-                        [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
+-          </mat-select>
+-        </mat-form-field>
++          <mat-form-field>
++            <mat-label>Associated Emotion</mat-label>
++            <mat-select formControlName="subEmotion">
++              <mat-option #subEmotionOptions *ngFor="let subEmotion of makeSubEmotionsList()"
++                          [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
++            </mat-select>
++          </mat-form-field>
+ 
+-        <mat-form-field>
+-          <mat-label>Reason</mat-label>
+-          <mat-select formControlName="trigger">
+-            <mat-option #triggerOptions *ngFor="let trigger of makeTriggersList()"
+-                        [value]="trigger">{{ trigger.description }}</mat-option>
+-          </mat-select>
+-        </mat-form-field>
+-
+-      </ng-container>
+-
+-      <ng-container *ngIf="emotionForm.get('createFromNote')?.value">
+-        <app-emotion-note-form (noteSubmitted)="handleNoteSubmission($event)" [noteText]=noteText></app-emotion-note-form>
+-      </ng-container>
+-
+-      <ng-container *ngIf="!emotionForm.get('createFromNote')?.value">
+-        <button mat-raised-button color="primary" type="submit" [disabled]="emotionForm.invalid">Save</button>
+-      </ng-container>
++          <mat-form-field>
++            <mat-label>Reason</mat-label>
++            <mat-select formControlName="trigger">
++              <mat-option #triggerOptions *ngFor="let trigger of makeTriggersList()"
++                          [value]="trigger">{{ trigger.description }}</mat-option>
++            </mat-select>
++          </mat-form-field>
++          <mat-action-row>
++            <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid">
++              Save
++              <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24" [style.marginRight.px]="4"></mat-spinner>
++            </button>
++          </mat-action-row>
++        </mat-expansion-panel>
++      </mat-accordion>
+     </form>
+   </div>
+ </ng-container>
+Index: ui/src/app/emotion-note-form/emotion-note-form.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ui/src/app/emotion-note-form/emotion-note-form.component.html b/ui/src/app/emotion-note-form/emotion-note-form.component.html
+--- a/ui/src/app/emotion-note-form/emotion-note-form.component.html	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/ui/src/app/emotion-note-form/emotion-note-form.component.html	(date 1698240906382)
+@@ -1,79 +1,14 @@
+-<div *ngIf="emotion && emotion.tags.length > 0" class="tags-container">
+-  <mat-form-field class="example-chip-list">
+-    <mat-label>Note Tags</mat-label>
+-    <mat-chip-grid #chipGrid aria-label="Enter Tags">
+-      <mat-chip-row *ngFor="let tag of emotion.tags"
+-                    (removed)="deleteTag(tag)"
+-                    [editable]="false">
+-        {{tag.tagName}}
+-        <button matChipRemove [attr.aria-label]="'remove ' + tag.tagName">
+-          <mat-icon>cancel</mat-icon>
+-        </button>
+-      </mat-chip-row>
+-      <input [matChipInputFor]="chipGrid"
+-             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+-             [matChipInputAddOnBlur]="addOnBlur"/>
+-    </mat-chip-grid>
+-  </mat-form-field>
+-</div>
+-
+-<div *ngIf="emotion && emotion.notes.length > 0">
+-  <h3>Notes:</h3>
+-  <div class="notes-list">
+-    <div *ngFor="let noteElem of emotion.notes">
+-      <mat-card class="note">
+-        <mat-card-content>{{ noteElem.text }}</mat-card-content>
+-        <button mat-icon-button (click)="deleteNote(noteElem)">
+-          <mat-icon>delete</mat-icon>
+-        </button>
+-      </mat-card>
+-    </div>
+-  </div>
+-
+-  <div *ngFor="let noteElem of emotion.notes">
+-    <mat-accordion class="example-headers-align">
+-      <mat-expansion-panel  >
+-        <mat-expansion-panel-header>
+-          <mat-panel-description>
+-            {{noteElem.title}}
+-            <button mat-icon-button (click)="deleteNote(noteElem)">
+-              <mat-icon>delete</mat-icon>
+-            </button>
+-          </mat-panel-description>
+-        </mat-expansion-panel-header>
+-        {{noteElem.text}}
+-      </mat-expansion-panel>
+-
+-      <mat-expansion-panel   hideToggle>
+-        <mat-expansion-panel-header>
+-          <mat-panel-title>
+-            Suggestion
+-          </mat-panel-title>
+-          <mat-panel-description>
+-            The description of the note by AI
+-          </mat-panel-description>
+-        </mat-expansion-panel-header>
+-        Here goes the actual AI description
+-      </mat-expansion-panel>
+-
+-
+-
+-    </mat-accordion>
+-  </div>
+-</div>
+-
+-<div class="form-wrapper">
+-  <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
+-    <label for="note">Add a note (max 480 chars):</label>
++<div class="tags-container">
++  <div class="form-wrapper">
++    <form [formGroup]="noteForm" (ngSubmit)="onSubmitNote()">
++      <label for="note">Add a note (max 480 chars):</label>
+ 
+-    <mat-form-field appearance="outline" class="full-width">
+-      <mat-label>Note</mat-label>
+-      <textarea id="note" matInput formControlName="note" rows="4" maxlength="480"  [placeholder]=placeHolderText></textarea>
+-    </mat-form-field>
+-    <p *ngIf="noteForm.get('note')?.value?.length >= 480">Note limit reached.</p>
+-    <button mat-raised-button color="primary" type="submit" [disabled]="noteForm.invalid || isLoadingNotes">
+-      <mat-spinner *ngIf="isLoadingNotes" diameter="24" [style.marginRight.px]="4"></mat-spinner>
+-      {{ submitBtnTxt }}
+-    </button>
+-  </form>
++      <mat-form-field appearance="outline" class="full-width">
++        <mat-label>Note</mat-label>
++        <textarea id="note" matInput formControlName="note" rows="4" maxlength="480"
++                  [placeholder]=placeHolderText></textarea>
++      </mat-form-field>
++      <p *ngIf="noteForm.get('note')?.value?.length >= 480">Note limit reached.</p>
++    </form>
++  </div>
+ </div>
+Index: conf/application.conf
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/conf/application.conf b/conf/application.conf
+--- a/conf/application.conf	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/conf/application.conf	(date 1698239713178)
+@@ -66,7 +66,7 @@
+   # Allow specific headers
+   allowedHttpHeaders = ["Accept", "Origin", "Content-Type", "X-Requested-With", "Authorization"]
+   allowedHttpMethods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+-  allowedOrigins = ["https://emoproject-650de3a95c97.herokuapp.com", "https://emosig.com", "http://localhost:9000", "*"]
++  allowedOrigins = ["https://emoproject-650de3a95c97.herokuapp.com", "https://www.emosig.com", "http://localhost:9000", "*"]
+   allowedOrigins = [${?ALLOWED_ORIGINS}]
+ }
+ 
+Index: app/service/EmotionDetectionService.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/service/EmotionDetectionService.scala b/app/service/EmotionDetectionService.scala
+--- a/app/service/EmotionDetectionService.scala	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/app/service/EmotionDetectionService.scala	(date 1698312249694)
+@@ -19,7 +19,7 @@
+ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configuration)(implicit ec: ExecutionContext) extends EmotionDetectionService {
+ 
+   private final val logger: Logger = play.api.Logger(getClass)
+-  private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Inspiration\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"YouTube\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
++  private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Serenity\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"YouTube\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
+ 
+   override def detectEmotion(txt: String): Future[EmotionDetectionResult] = {
+     if(txt.startsWith("FAKE")) {
+@@ -64,7 +64,9 @@
+                 case JsSuccess(result, _) =>
+                   logger.info(s"Deserialization successful: $result")
+                   val content = result.choices.head.message.content
+-                  Json.parse(content).as[EmotionDetectionResult]
++                  val emotionDetectionResult = Json.parse(content).as[EmotionDetectionResult]
++                  //TODO: validate the result, check that fields are not empty and are from the expected set
++                  emotionDetectionResult
+                 case JsError(errors) =>
+                   logger.error(s"Deserialization failed: $errors, response: ${response.json}")
+                   throw new Exception(s"Deserialization failed: $errors")
+Index: ui/src/app/display-emotion/display-emotion.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ui/src/app/display-emotion/display-emotion.component.html b/ui/src/app/display-emotion/display-emotion.component.html
+--- a/ui/src/app/display-emotion/display-emotion.component.html	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/ui/src/app/display-emotion/display-emotion.component.html	(date 1698242032333)
+@@ -24,7 +24,6 @@
+             <strong>Trigger:</strong> {{ emotion.triggers[0].description }}
+           </div>
+           <div *ngIf="emotion.tags[0]">
+-            <!-- display all tags as references on one line-->
+             <strong>Tags:</strong>
+             <span *ngFor="let tag of emotion.tags; let last = last">
+               {{ tag.tagName }}{{ last ? '' : ', ' }}
+@@ -36,9 +35,67 @@
+         </mat-card-content>
+       </mat-card>
+ 
+-      <app-emotion-note-form [emotion]="emotion"></app-emotion-note-form>
++      <mat-form-field class="example-chip-list">
++        <mat-label>Note Tags</mat-label>
++        <mat-chip-grid #chipGrid>
++          <mat-chip-row *ngFor="let tag of emotion.tags"
++                        (removed)="deleteTag(tag)"
++                        [editable]="false">
++            {{tag.tagName}}
++            <button matChipRemove [attr.aria-label]="'remove ' + tag.tagName">
++              <mat-icon>cancel</mat-icon>
++            </button>
++          </mat-chip-row>
++          <input [matChipInputFor]="chipGrid"
++                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
++                 [matChipInputAddOnBlur]="addOnBlur"/>
++        </mat-chip-grid>
++      </mat-form-field>
++    </div>
+ 
++    <div *ngIf="emotion && emotion.notes.length > 0">
++      <h3>Notes:</h3>
++      <div *ngFor="let noteElem of emotion.notes">
++        <mat-accordion class="example-headers-align">
++          <mat-expansion-panel  >
++            <mat-expansion-panel-header>
++              <mat-panel-title>
++                Emotion summary
++              </mat-panel-title>
++              <mat-panel-description>
++                {{noteElem.title}}
++              </mat-panel-description>
++            </mat-expansion-panel-header>
++            {{noteElem.text}}
++          </mat-expansion-panel>
+ 
++          <mat-expansion-panel>
++            <mat-expansion-panel-header>
++              <mat-panel-title>
++                Emotion description
++              </mat-panel-title>
++              <mat-panel-description>
++                The description of the note by AI
++              </mat-panel-description>
++            </mat-expansion-panel-header>
++            Here goes the actual AI description
++          </mat-expansion-panel>
++
++          <mat-expansion-panel>
++            <mat-expansion-panel-header>
++              <mat-panel-title>
++                Suggestion
++              </mat-panel-title>
++              <mat-panel-description>
++                Suggested actions to take
++              </mat-panel-description>
++            </mat-expansion-panel-header>
++            Here goes the actual AI suggested actions
++          </mat-expansion-panel>
++        </mat-accordion>
++      </div>
+     </div>
+-  </div>
++
++
++    </div>
+ </ng-container>
+Index: ui/src/app/create-emotion/create-emotion.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/ui/src/app/create-emotion/create-emotion.component.ts b/ui/src/app/create-emotion/create-emotion.component.ts
+--- a/ui/src/app/create-emotion/create-emotion.component.ts	(revision 4ad2d542ddab56875f047750eec6f580eae9ef4b)
++++ b/ui/src/app/create-emotion/create-emotion.component.ts	(date 1698326077073)
+@@ -1,6 +1,6 @@
+ import {
+   AfterViewInit,
+-  Component,
++  Component, OnDestroy,
+   OnInit,
+   QueryList,
+   ViewChildren
+@@ -26,6 +26,7 @@
+ import {Router} from "@angular/router";
+ import {DateService} from "../services/date.service";
+ import {MatOption} from "@angular/material/core";
++import {NoteService} from "../services/note.service";
+ 
+ 
+ @Component({
+@@ -34,7 +35,7 @@
+   styleUrls: ['./create-emotion.component.css'],
+   providers: []
+ })
+-export class CreateEmotionComponent implements OnInit, AfterViewInit {
++export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy {
+   isLoadingEmotionCache: boolean = true;
+ 
+   emotionForm: FormGroup;
+@@ -46,21 +47,37 @@
+   emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
+   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
+ 
+-  createFromNote = false;
+   noteText: string | null = null;
+ 
++  step = 0;
++
++  maxNoteLength = 500;
++
++  isLoadingNotes: boolean = false;
++  isSavingEmotionRecord: boolean = false;
++
++  emotionTypes: string[] = [];
++
++
++  @ViewChildren('emotionTypeOptions') emotionTypeOptions!: QueryList<MatOption>;
+   @ViewChildren('emotionOptions') emotionOptions!: QueryList<MatOption>;
+   @ViewChildren('subEmotionOptions') subEmotionOptions!: QueryList<MatOption>;
+   @ViewChildren('triggerOptions') triggerOptions!: QueryList<MatOption>;
+ 
++  private emotionTypesSubscription!: Subscription;
+   private emotionSelectSubscription!: Subscription;
+   private subEmotionSelectSubscription!: Subscription;
+   private triggerSubscription!: Subscription;
+   private emotionDetected: EmotionDetectionResult | undefined;
+ 
+-  constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
+-              private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar,
++  placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note.";
++
++  constructor(private fb: FormBuilder, private emotionService: EmotionService,
++              private authService: AuthService,
++              private emotionStateService: EmotionStateService,
++              private router: Router, private snackBar: MatSnackBar,
+               private emotionCacheService: EmotionCacheService,
++              private noteService: NoteService,
+               private dateService: DateService) {
+     this.emotionForm = this.fb.group({
+       emotionType: ['', Validators.required],
+@@ -71,14 +88,45 @@
+       emotionDate: [new Date()],
+       isPublic: [false],
+       emotionNote: [''],
+-      createFromNote: [false],
+-      tags: [[]]
++      tags: [[]],
++    });
++  }
++
++  ngOnDestroy(): void {
++    }
++
++
++
++  setStep(index: number) {
++    this.step = index;
++  }
++
++  detectEmotions() {
++    this.isLoadingNotes = true;
++    console.log('Detecting emotion for text: ', this.emotionForm.get("emotionNote")?.value);
++    this.noteService.detectEmotion(this.emotionForm.get("emotionNote")?.value).subscribe({
++      next: (response) => {
++        console.log('Emotion detected successfully', response);
++        this.handleNoteSubmission(response);
++        this.isLoadingNotes = false;
++        this.setStep(1);
++      },
++      error: (error) => {
++        console.error('Error detecting emotion', error);
++        this.isLoadingNotes = false;
++        this.snackBar.open('Error detecting emotion', 'Close', {
++          duration: 5000,
++        });
++      }
+     });
+   }
+ 
++  skipToManualEntry() {
++    this.setStep(1); // Move to manual entry without detecting
++  }
+ 
+   ngAfterViewInit() {
+-
++    this.makeAllLists()
+   }
+ 
+   ngOnInit(): void {
+@@ -91,10 +139,6 @@
+       }
+     });
+ 
+-    this.emotionForm.get('createFromNote')?.valueChanges.subscribe(value => {
+-      console.log('createFromNote changed to:', value);
+-      // Other logic if needed
+-    });
+     this.emotionForm.get('isPublic')?.valueChanges.subscribe(value => {
+       console.log('Public changed to:', value);
+     });
+@@ -119,20 +163,24 @@
+     }
+ 
+     async onSubmit(): Promise<void> {
++      console.log('Submitting emotion record: ', this.isSavingEmotionRecord);
+     if (this.emotionForm.valid) {
+       const emotionFromData = this.emotionForm.value;
+       const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
+       console.log(`Emotion record to be inserted: ${JSON.stringify(emotionRecord)}`);
+       try {
++        this.isSavingEmotionRecord = true;
+         from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
+           {
+             next: (response) => {
+               console.log('Emotion record inserted successfully', response);
+               this.emotionStateService.updateNewEmotion(response);
++              this.isSavingEmotionRecord = false;
+               this.router.navigate(['/display-emotion']);
+             },
+             error: (error) => {
+               console.error('Error inserting emotion record', error);
++              this.isSavingEmotionRecord = false;
+               this.snackBar.open('Failed to submit the emotion record', 'Close', {
+                 duration: 5000,
+                 panelClass: ['error-snackbar']
+@@ -186,21 +234,11 @@
+     };
+   }
+ 
+-  changeSliderColor(event: any) {
+-    // TODO: remove this method
+-    const intensity = (event.target as HTMLInputElement).valueAsNumber;
+-    const r = Math.round(255 * (intensity / 10));
+-    const g = Math.round(255 * (1 - intensity / 10));
+-    this.sliderColor = `rgb(${r}, ${g}, 0)`;
+-    if (intensity) {
+-      this.emotionIntensityValue = intensity;
+-    }
+-  }
+-
+   makeEmotionTypesList(): string[] {
+     if (this.emotionCache && this.emotionCache.emotionTypes) {
+       this.emotionTypesWithEmotions = this.emotionCache.emotionTypes;
+-      return this.emotionCache.emotionTypes.map(emotionTypeObject => emotionTypeObject.emotionType);
++      this.emotionTypes = this.emotionCache.emotionTypes.map(emotionTypeObject => emotionTypeObject.emotionType);
++      return this.emotionTypes
+     } else {
+       return [];
+     }
+@@ -242,37 +280,60 @@
+     }
+   }
+ 
+-  handleNoteSubmission($event: EmotionFromNoteResult) {
++  private makeAllLists(): void {
++    this.makeEmotionTypesList();
++    this.makeEmotionsList();
++    this.makeSubEmotionsList();
++    this.makeTriggersList();
++  }
++
+ 
+-    this.emotionDetected = $event.emotionDetection;
+-    this.noteText = $event.note.text;
++
++  handleNoteSubmission(detectionResult: EmotionFromNoteResult) {
++
++    this.emotionDetected = detectionResult.emotionDetection;
++    this.noteText = detectionResult.note.text;
+ 
+     const findTriggerOptionToSelect = (triggerName: string | undefined) => {
+       return this.triggerOptions.find(option =>
+           option.value.triggerName === triggerName);
+     }
+ 
+-    if(this.emotionDetected == null) {
+-      this.createFromNote = false;
+-      this.emotionForm.get('createFromNote')?.setValue(false);
+-    } else {
++    if(this.emotionDetected != null) {
+       console.log('Emotion detected from note');
+-      this.emotionForm.get('createFromNote')?.setValue(false);
+-      this.emotionForm.get('note')?.setValue(this.noteText);
+ 
++      this.makeEmotionsList();
+       this.emotionForm.controls['emotionNote'].setValue(this.noteText);
++      this.emotionTypeOptions.changes.subscribe((options: QueryList<MatOption>) => {
++        const emotionType = this.emotionDetected?.emotionType;
++        const optionToSelect = options.find(option =>
++          option.value.emotionType === emotionType);
++        if(optionToSelect == null) {
++          console.warn(`Associated emotion type ${emotionType} not found in the list of emotion types.`);
++        } else {
++          optionToSelect.select();
++          console.log("emotionType selected:", optionToSelect.value.emotionType);
++        }
++      });
+ 
+-      this.emotionForm.controls['emotionType'].setValue(this.emotionDetected.emotionType);
+-      this.emotionForm.controls['intensity'].setValue(this.emotionDetected.intensity);
+ 
+-      this.emotionForm.controls['emotionType'].valueChanges.subscribe((value) => {
++      this.emotionTypesSubscription = this.emotionForm.controls['emotion'].valueChanges.subscribe((value) => {
+         this.makeEmotionsList();
++        this.emotionOptions.notifyOnChanges();
++        this.emotionTypesSubscription.unsubscribe();
+       });
+ 
+-      this.emotionSelectSubscription = this.emotionOptions.changes.subscribe((options) => {
+-        this.emotionOptions.find(option =>
+-          option.value.emotion.id === this.emotionDetected?.mainEmotionId)?.select();
+-        this.makeSubEmotionsList();
++      this.emotionSelectSubscription = this.emotionForm.controls['emotionType'].valueChanges.subscribe((options: QueryList<MatOption>) => {
++        console.log("Main emotion changed", options);
++        const emotionOptionToSelect = options.find(option =>
++          option.value.emotion.emotionName === this.emotionDetected?.mainEmotionId);
++        if(emotionOptionToSelect == null) {
++          console.warn(`Associated emotion ${this.emotionDetected?.mainEmotionId} not found in the list of emotions.`);
++        }else {
++          console.log("emotionOption selected:", emotionOptionToSelect?.value.emotion.emotionName);
++          emotionOptionToSelect?.select();
++          this.makeSubEmotionsList();
++        }
+         this.emotionSelectSubscription.unsubscribe();
+       });
+ 
+@@ -281,11 +342,12 @@
+         const subEmotionId = this.emotionDetected?.subEmotionId;
+ 
+         const optionToSelect = options.find(option =>
+-            option.value.subEmotionName === subEmotionId);
++          option.value.subEmotionName === subEmotionId);
+ 
+ 
+         if(optionToSelect) {
+           optionToSelect.select();
++          console.log("subEmotionOption selected:", optionToSelect.value.subEmotionName);
+         } else {
+           const subEmotionsFromOptions = options.map(option => option.value.subEmotionName).join(', ');
+           console.warn(`Associated emotion ${subEmotionId} not found in the list of sub emotions: ${subEmotionsFromOptions}.`);
+@@ -314,6 +376,8 @@
+         duration: 40000,
+         panelClass: ['emotion-snackbar']
+       });
++    } else {
++      console.log('Emotion not detected from note');
+     }
+   }
+ }

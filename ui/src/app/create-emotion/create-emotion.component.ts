@@ -1,6 +1,6 @@
 import {
-  AfterViewInit,
-  Component,
+  AfterViewInit, ChangeDetectorRef,
+  Component, OnDestroy,
   OnInit,
   QueryList,
   ViewChildren
@@ -26,6 +26,7 @@ import {EmotionStateService} from "../services/emotion-state.service";
 import {Router} from "@angular/router";
 import {DateService} from "../services/date.service";
 import {MatOption} from "@angular/material/core";
+import {NoteService} from "../services/note.service";
 
 
 @Component({
@@ -34,7 +35,7 @@ import {MatOption} from "@angular/material/core";
   styleUrls: ['./create-emotion.component.css'],
   providers: []
 })
-export class CreateEmotionComponent implements OnInit, AfterViewInit {
+export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy {
   isLoadingEmotionCache: boolean = true;
 
   emotionForm: FormGroup;
@@ -46,22 +47,39 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit {
   emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
-  createFromNote = false;
   noteText: string | null = null;
 
+  step = 0;
+
+  maxNoteLength = 500;
+
+  isLoadingNotes: boolean = false;
+  isSavingEmotionRecord: boolean = false;
+
+  emotionTypes: string[] = [];
+
+
+  @ViewChildren('emotionTypeOptions') emotionTypeOptions!: QueryList<MatOption>;
   @ViewChildren('emotionOptions') emotionOptions!: QueryList<MatOption>;
   @ViewChildren('subEmotionOptions') subEmotionOptions!: QueryList<MatOption>;
   @ViewChildren('triggerOptions') triggerOptions!: QueryList<MatOption>;
 
+  private emotionTypesSubscription!: Subscription;
   private emotionSelectSubscription!: Subscription;
   private subEmotionSelectSubscription!: Subscription;
   private triggerSubscription!: Subscription;
   private emotionDetected: EmotionDetectionResult | undefined;
 
-  constructor(private fb: FormBuilder, private emotionService: EmotionService, private authService: AuthService,
-              private emotionStateService: EmotionStateService, private router: Router, private snackBar: MatSnackBar,
+  placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note.";
+
+  constructor(private fb: FormBuilder, private emotionService: EmotionService,
+              private authService: AuthService,
+              private emotionStateService: EmotionStateService,
+              private router: Router, private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
-              private dateService: DateService) {
+              private noteService: NoteService,
+              private dateService: DateService,
+              private cdr: ChangeDetectorRef) {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
@@ -71,11 +89,55 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit {
       emotionDate: [new Date()],
       isPublic: [false],
       emotionNote: [''],
-      createFromNote: [false],
-      tags: [[]]
+      tags: [[]],
     });
   }
 
+  ngOnDestroy(): void {
+    // Unsubscribe from all Observables
+    if (this.emotionTypesSubscription) {
+      this.emotionTypesSubscription.unsubscribe();
+    }
+    if (this.emotionSelectSubscription) {
+      this.emotionSelectSubscription.unsubscribe();
+    }
+    if (this.subEmotionSelectSubscription) {
+      this.subEmotionSelectSubscription.unsubscribe();
+    }
+    if (this.triggerSubscription) {
+      this.triggerSubscription.unsubscribe();
+    }
+  }
+
+
+
+  setStep(index: number) {
+    this.step = index;
+  }
+
+  detectEmotions() {
+    this.isLoadingNotes = true;
+    console.log('Detecting emotion for text: ', this.emotionForm.get("emotionNote")?.value);
+    this.noteService.detectEmotion(this.emotionForm.get("emotionNote")?.value).subscribe({
+      next: (response) => {
+        console.log('Emotion detected successfully', response);
+        this.handleNoteSubmission(response);
+        this.isLoadingNotes = false;
+        this.setStep(1);
+      },
+      error: (error) => {
+        console.error('Error detecting emotion', error);
+        this.isLoadingNotes = false;
+        this.snackBar.open('Error detecting emotion', 'Close', {
+          duration: 5000,
+        });
+      }
+    });
+  }
+
+  skipToManualEntry() {
+    this.setStep(1); // Move to manual entry without detecting
+  }
 
   ngAfterViewInit() {
 
@@ -91,13 +153,6 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit {
       }
     });
 
-    this.emotionForm.get('createFromNote')?.valueChanges.subscribe(value => {
-      console.log('createFromNote changed to:', value);
-      // Other logic if needed
-    });
-    this.emotionForm.get('isPublic')?.valueChanges.subscribe(value => {
-      console.log('Public changed to:', value);
-    });
   }
 
     private updateEmotionCache() {
@@ -119,20 +174,24 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit {
     }
 
     async onSubmit(): Promise<void> {
+      console.log('Submitting emotion record: ', this.isSavingEmotionRecord);
     if (this.emotionForm.valid) {
       const emotionFromData = this.emotionForm.value;
       const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
       console.log(`Emotion record to be inserted: ${JSON.stringify(emotionRecord)}`);
       try {
+        this.isSavingEmotionRecord = true;
         from(this.emotionService.insertEmotionRecord(emotionRecord)).subscribe(
           {
             next: (response) => {
               console.log('Emotion record inserted successfully', response);
               this.emotionStateService.updateNewEmotion(response);
+              this.isSavingEmotionRecord = false;
               this.router.navigate(['/display-emotion']);
             },
             error: (error) => {
               console.error('Error inserting emotion record', error);
+              this.isSavingEmotionRecord = false;
               this.snackBar.open('Failed to submit the emotion record', 'Close', {
                 duration: 5000,
                 panelClass: ['error-snackbar']
@@ -186,21 +245,11 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit {
     };
   }
 
-  changeSliderColor(event: any) {
-    // TODO: remove this method
-    const intensity = (event.target as HTMLInputElement).valueAsNumber;
-    const r = Math.round(255 * (intensity / 10));
-    const g = Math.round(255 * (1 - intensity / 10));
-    this.sliderColor = `rgb(${r}, ${g}, 0)`;
-    if (intensity) {
-      this.emotionIntensityValue = intensity;
-    }
-  }
-
   makeEmotionTypesList(): string[] {
     if (this.emotionCache && this.emotionCache.emotionTypes) {
       this.emotionTypesWithEmotions = this.emotionCache.emotionTypes;
-      return this.emotionCache.emotionTypes.map(emotionTypeObject => emotionTypeObject.emotionType);
+      this.emotionTypes = this.emotionCache.emotionTypes.map(emotionTypeObject => emotionTypeObject.emotionType);
+      return this.emotionTypes
     } else {
       return [];
     }
@@ -242,18 +291,26 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit {
     }
   }
 
-  handleNoteSubmission($event: EmotionFromNoteResult) {
+  private makeAllLists(): void {
+    this.makeEmotionTypesList();
+    this.makeEmotionsList();
+    this.makeSubEmotionsList();
+    this.makeTriggersList();
+  }
 
-    this.emotionDetected = $event.emotionDetection;
-    this.noteText = $event.note.text;
+
+
+  handleNoteSubmission(emotionFromResult: EmotionFromNoteResult) {
+
+    this.emotionDetected = emotionFromResult.emotionDetection;
+    this.noteText = emotionFromResult.note.text;
 
     const findTriggerOptionToSelect = (triggerName: string | undefined) => {
       return this.triggerOptions.find(option =>
-          option.value.triggerName === triggerName);
+        option.value.triggerName === triggerName);
     }
 
     if(this.emotionDetected == null) {
-      this.createFromNote = false;
       this.emotionForm.get('createFromNote')?.setValue(false);
     } else {
       console.log('Emotion detected from note');
@@ -265,40 +322,25 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit {
       this.emotionForm.controls['emotionType'].setValue(this.emotionDetected.emotionType);
       this.emotionForm.controls['intensity'].setValue(this.emotionDetected.intensity);
 
-      this.emotionForm.controls['emotionType'].valueChanges.subscribe((value) => {
-        this.makeEmotionsList();
-      });
+      this.emotionOptions.find(option =>
+        option.value.emotion.id === this.emotionDetected?.mainEmotionId)?.select();
 
-      this.emotionSelectSubscription = this.emotionOptions.changes.subscribe((options) => {
-        this.emotionOptions.find(option =>
-          option.value.emotion.id === this.emotionDetected?.mainEmotionId)?.select();
-        this.makeSubEmotionsList();
-        this.emotionSelectSubscription.unsubscribe();
-      });
 
       this.subEmotionSelectSubscription = this.subEmotionOptions.changes.subscribe((options: QueryList<MatOption>) => {
         console.log("subEmotionOptions changed", options);
         const subEmotionId = this.emotionDetected?.subEmotionId;
 
         const optionToSelect = options.find(option =>
-            option.value.subEmotionName === subEmotionId);
+          option.value.subEmotionName === subEmotionId);
 
 
         if(optionToSelect) {
-          optionToSelect.select();
+          Promise.resolve().then(() => optionToSelect.select());
         } else {
           const subEmotionsFromOptions = options.map(option => option.value.subEmotionName).join(', ');
           console.warn(`Associated emotion ${subEmotionId} not found in the list of sub emotions: ${subEmotionsFromOptions}.`);
         }
         this.subEmotionSelectSubscription.unsubscribe();
-      });
-
-      this.triggerSubscription = this.triggerOptions.changes.subscribe((options) => {
-        if(this.emotionDetected?.triggers != null && this.emotionDetected?.triggers.length > 0) {
-          const triggerName = this.emotionDetected?.triggers[0].triggerName;
-          findTriggerOptionToSelect.call(this, triggerName)?.select();
-        }
-        this.triggerSubscription.unsubscribe();
       });
 
       if (this.emotionDetected?.triggers != null && this.emotionDetected?.triggers.length > 0) {
