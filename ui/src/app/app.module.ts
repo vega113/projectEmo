@@ -49,6 +49,7 @@ import { CustomDatePickerComponent } from './custom-date-picker/custom-date-pick
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatExpansionModule} from "@angular/material/expansion";
+import {MatProgressBarModule} from "@angular/material/progress-bar";
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -109,7 +110,8 @@ export const MAT_DATE_FNS_FORMATS = {
         NgxChartsModule,
         MatSlideToggleModule,
         MatAutocompleteModule,
-        MatExpansionModule
+        MatExpansionModule,
+        MatProgressBarModule
 
     ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {

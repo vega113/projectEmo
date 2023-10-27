@@ -5,6 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { Router } from '@angular/router';
 import { EmotionStateService } from '../services/emotion-state.service';
 import {MatSort} from "@angular/material/sort";
+import {EmotionRecord} from "../models/emotion.model";
 
 
 @Component({
@@ -15,23 +16,21 @@ import {MatSort} from "@angular/material/sort";
 export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = [
     'date',
-    'emotionType',
     'intensity',
-    'emotion',
     'subEmotion',
-    'trigger'
+    'noteTitle'
   ];
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<EmotionRecord>;
 
   @ViewChild(MatPaginator, { static: false }) paginator!: MatPaginator;
 
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
-    private emotionService: EmotionService,
-    private router: Router,
-    private emotionStateService: EmotionStateService,
-    private changeDetector: ChangeDetectorRef
+      private emotionService: EmotionService,
+      private router: Router,
+      private emotionStateService: EmotionStateService,
+      private changeDetector: ChangeDetectorRef
   ) {
     this.dataSource = new MatTableDataSource();
   }
@@ -55,10 +54,12 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
           return this.getDateForSorting(data);
         case 'subEmotion':
           return data.subEmotions[0]?.subEmotionName || '';
-        case 'trigger':
-          return data.triggers[0]?.description || '';
+        case 'noteTitle':
+          return data.notes[0]?.title || '';
+          case 'intensity':
+            return data.intensity;
         default:
-          return data[sortHeaderId];
+          return this.getDateForSorting(data);
       }
     };
     this.changeDetector.detectChanges();
@@ -72,5 +73,4 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
   getDateForSorting(data: any): number {
     return new Date(data.created).getTime();
   }
-
 }

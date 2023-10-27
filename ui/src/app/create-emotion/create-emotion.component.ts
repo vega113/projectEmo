@@ -24,7 +24,7 @@ import {from, Subscription} from "rxjs";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {Router} from "@angular/router";
 import {DateService} from "../services/date.service";
-import {MatOption} from "@angular/material/core";
+import {MatOption, ThemePalette} from "@angular/material/core";
 import {NoteService} from "../services/note.service";
 
 
@@ -351,4 +351,18 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
       });
     }
   }
+
+  getSliderColor(emotionType: string): ThemePalette {
+    switch (emotionType) {
+      case 'Positive':
+        return 'primary';
+      case 'Neutral':
+        return 'accent';
+      case 'Negative':
+        return 'warn';
+      default:
+        return undefined;
+    }
+  }
+
 }

@@ -66,7 +66,7 @@ export class EmotionService {
       );
   }
 
-  fetchEmotionRecordsForCurrentUser() {
+  fetchEmotionRecordsForCurrentUser(): Observable<EmotionRecord[]> {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.get<EmotionRecord[]>(`${environment.baseUrl}/emotionRecord/user`, {headers}).pipe(
       catchError((error: HttpErrorResponse) => {

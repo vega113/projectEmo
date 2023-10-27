@@ -132,23 +132,29 @@ export class EmotionCalendarComponent implements OnInit {
     let color = 'grey';
     let emotionType = '';
 
+    // Define the colors corresponding to the Angular Material theme colors
+    const primaryColor = '#3f51b5'; // blue
+    const accentColor = '#ffb74d'; // pink
+    const warnColor = '#e57373'; // red
+
     if (intensitiesPerType.length > 0) {
       const sortedIntensities = intensitiesPerType.sort((a, b) => b.averageIntensity - a.averageIntensity);
       emotionType = sortedIntensities[0].emotionType;
     }
 
     if(emotionType === 'Negative') {
-      color = 'red';
+      color = warnColor;
     } else if (emotionType === 'Positive') {
-      color = 'green';
+      color = primaryColor;
     } else if (emotionType === 'Neutral') {
-      color = 'blue';
+      color = accentColor;
     }
     else if (!hasRecords) {
       color = 'grey';
     }
     return color;
   }
+
 
 
   calculateIntensityPerEmotion(records: EmotionRecord[]): {emotionType: string, averageIntensity: number}[] {

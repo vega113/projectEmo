@@ -61,15 +61,19 @@
           <div class="intensity-container">
             <label class="intensity-label">Emotion Intensity</label>
             <mat-slider
-              discrete
-              showTickMarks
-              min="1"
-              max="5"
-              step="1"
+                    discrete
+                    showTickMarks
+                    min="1"
+                    max="5"
+                    step="1"
+                    [color]="emotionForm.get('emotionType') ? getSliderColor(emotionForm.get('emotionType')?.value) : undefined"
             >
               <input matSliderThumb formControlName="intensity">
             </mat-slider>
           </div>
+
+
+
 
           <mat-form-field>
             <mat-label>Main Emotion</mat-label>
