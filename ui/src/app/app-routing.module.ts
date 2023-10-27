@@ -13,7 +13,7 @@ import { MatListModule } from '@angular/material/list';
 import {EmotionCalendarComponent} from "./emotion-calendar/emotion-calendar.component";
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'emotions-timeline', pathMatch: 'full' },
   {
     path: '',
     component: MainLayoutComponent,

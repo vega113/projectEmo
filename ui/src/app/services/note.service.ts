@@ -48,12 +48,4 @@ export class NoteService {
         return {emotionDetection: emotionDetectionResult, note: note} as EmotionFromNoteResult;
       }));
   }
-
-  deleteTag(tagId: number): Observable<boolean> {
-    const headers = this.authService.getAuthorizationHeader();
-    return this.http.delete<boolean>(environment.baseUrl + '/note/tag/' + tagId, { headers, observe: 'response' }).pipe(
-      map(response => response.status === 200)
-    )
-      ;
-  }
 }

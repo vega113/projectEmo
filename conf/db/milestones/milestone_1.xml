@@ -25,9 +25,23 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="milestone_1_delete-triggers-with-parent" author="yourName">
+    <changeSet id="milestone_1_delete-triggers-with-parent" author="vega">
         <delete tableName="triggers">
             <where>trigger_parent_id IS NOT NULL</where>
         </delete>
     </changeSet>
+
+    <changeSet id="add_description_suggestion_to_notes" author="vega">
+        <addColumn tableName="notes">
+            <column name="description" type="varchar(255)" />
+            <column name="suggestion" type="varchar(255)" />
+        </addColumn>
+    </changeSet>
+    <changeSet id="modify_suggestion_to_text" author="vega">
+        <modifyDataType tableName="notes" columnName="suggestion" newDataType="TEXT" />
+    </changeSet>
+    <changeSet id="modify_description_to_text" author="vega">
+        <modifyDataType tableName="notes" columnName="description" newDataType="TEXT" />
+    </changeSet>
+
 </databaseChangeLog>

@@ -90,6 +90,8 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
       isPublic: [false],
       emotionNote: [''],
       tags: [[]],
+      description: [''],
+      suggestion: [''],
     });
   }
 
@@ -222,7 +224,12 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
     }
     const notes: any[] = [];
     if (emotionFromData.emotionNote) {
-      notes.push({text: emotionFromData.emotionNote});
+      const note: Note = {
+        text: emotionFromData.emotionNote,
+        description: emotionFromData.description,
+        suggestion: emotionFromData.suggestion
+      }
+      notes.push(note);
     }
 
     const tags: Tag[] = [];
@@ -305,17 +312,14 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
     this.emotionDetected = emotionFromResult.emotionDetection;
     this.noteText = emotionFromResult.note.text;
 
-    const findTriggerOptionToSelect = (triggerName: string | undefined) => {
-      return this.triggerOptions.find(option =>
-        option.value.triggerName === triggerName);
-    }
-
     if(this.emotionDetected == null) {
       this.emotionForm.get('createFromNote')?.setValue(false);
     } else {
       console.log('Emotion detected from note');
       this.emotionForm.get('createFromNote')?.setValue(false);
       this.emotionForm.get('note')?.setValue(this.noteText);
+      this.emotionForm.get('suggestion')?.setValue(this.emotionDetected.suggestion);
+      this.emotionForm.get('description')?.setValue(this.emotionDetected.description);
 
       this.emotionForm.controls['emotionNote'].setValue(this.noteText);
 

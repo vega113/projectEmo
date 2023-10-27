@@ -23,7 +23,7 @@ trait NoteService {
 
   def makeTitle(text: String): String
 
-  def extractTags(text: String): List[Tag]
+  def extractTags(text: String): Set[Tag]
 }
 
 class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
@@ -39,10 +39,11 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
     }
   }
 
-  def extractTags(text: String): List[Tag] = {
-    val tagRegex = "#[a-zA-Z0-9]+".r
-    tagRegex.findAllIn(text).toList.map(tag => Tag(None, tag)).groupBy(_.tagName).map(_._2.head).toList
+  def extractTags(text: String): Set[Tag] = {
+    val tagRegex = "(?<=#)[a-zA-Z0-9]+".r
+    tagRegex.findAllIn(text).toList.map(tag => Tag(None, tag)).groupBy(_.tagName).map(_._2.head).toSet
   }
+
 
   override def insert(emotionRecordId: Long, note: Note): Future[Option[Long]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
@@ -61,7 +62,7 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
     val tags = extractTags(note.text)
     val existingTags = tagDao.findAllByEmotionRecordId(emotionRecordId)
     val newTags = tags.filter(tag => !existingTags.map(_.tagName).contains(tag.tagName))
-    tagDao.insert(emotionRecordId, newTags)
+    tagDao.insert(emotionRecordId, newTags.toList)
   }
 
   override def findAllNoteTemplates(): Future[List[NoteTemplate]] = {

@@ -28,9 +28,9 @@ class NoteDao @Inject()(dateTimeService: DateTimeService) {
   def insert(emotionRecordId: Long, note: Note)(implicit connection: Connection): Option[Long] = {
     val noteId: Option[Long] = SQL(
       """
-          INSERT INTO notes (title, text)
-          VALUES ({title}, {text})""").
-      on("title" -> note.title, "text" -> note.text).
+          INSERT INTO notes (title, text, description, suggestion)
+          VALUES ({title}, {text}, {description}, {suggestion})""").
+      on("title" -> note.title, "text" -> note.text, "description" -> note.description, "suggestion" -> note.suggestion).
       executeInsert()
     noteId.foreach(id => linkNoteToEmotionRecord(id, emotionRecordId))
     noteId

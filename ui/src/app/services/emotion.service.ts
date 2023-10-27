@@ -112,4 +112,23 @@ export class EmotionService {
       `${environment.baseUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
       {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
   }
+
+  deleteTag(tagId: number): Observable<boolean> {
+    const headers = this.authService.getAuthorizationHeader();
+    return this.http.delete<boolean>(environment.baseUrl + '/note/tag/' + tagId, { headers, observe: 'response' }).pipe(
+      map(response => response.status === 200)
+    );
+  }
+
+  addTag(tagName: string, emotionRecordId: number): Observable<boolean> {
+    const headers = this.authService.getAuthorizationHeader();
+    const body = {
+      tagName: tagName,
+      emotionRecordId: emotionRecordId
+    };
+    return this.http.post<boolean>(environment.baseUrl + '/note/tag', body,
+      { headers, observe: 'response' }).pipe(
+      map(response => response.status === 200)
+    )
+  }
 }

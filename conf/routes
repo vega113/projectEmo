@@ -19,6 +19,8 @@ GET            /api/emotionRecord/id                                      contro
 GET            /api/emotionRecord/user/days                               controllers.EmotionRecordController.findAllDaysByUserId()
 GET            /api/emotionRecord/user/month/:monthStart/:monthEnd        controllers.EmotionRecordController.findRecordsByUserIdForMonth(monthStart: String, monthEnd)
 GET            /api/charts/user/month/:monthStart/:monthEnd               controllers.EmotionRecordController.findAllByUserIdAndDateRangeForCharts(monthStart: String, monthEnd)
+DELETE         /api/note/tag/:id                                          controllers.EmotionRecordController.deleteTag(id: Long)
+POST           /api/note/tag                                              controllers.EmotionRecordController.addTag
 
 GET            /api/emotion                                               controllers.EmotionController.findAll()
 GET            /api/trigger                                               controllers.TriggerController.findAll()
@@ -30,7 +32,6 @@ GET            /api/noteTemplate                                          contro
 PUT            /api/note/delete/:id                                       controllers.NoteController.deleteNote(id: Long)
 PUT            /api/note/undelete/:id                                     controllers.NoteController.undeleteNote(id: Long)
 POST           /api/note/emotion/detect                                   controllers.NoteController.detectEmotion
-DELETE         /api/note/tag/:id                                          controllers.NoteController.deleteTag(id: Long)
 
 
 # User routes

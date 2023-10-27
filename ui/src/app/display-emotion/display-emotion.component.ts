@@ -6,6 +6,7 @@ import {FormBuilder} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {NoteService} from '../services/note.service';
 import {DateService} from "../services/date.service";
+import {MatChipInputEvent} from "@angular/material/chips";
 
 
 @Component({
@@ -38,6 +39,9 @@ export class DisplayEmotionComponent {
   note: string = '';
 
   suggestedActions: SuggestedAction[] | null = null;
+
+  separatorKeysCodes: number[] = [13, 188];
+  addOnBlur: any = true;
 
   async getSuggestedActions(): Promise<void> {
     this.isLoadingActions = true;
@@ -72,5 +76,52 @@ export class DisplayEmotionComponent {
       this.noteTemplates = noteTemplates;
       console.log('note templates received');
     });
+  }
+
+  deleteTag(tag: Tag) {
+    console.log('remove tag', tag);
+    this.emotionService.deleteTag(tag.tagId!)
+      .subscribe({
+        next: (isDeleted) => {
+          if (isDeleted) {
+            if (this.emotion?.tags) {
+              this.emotion.tags = this.emotion.tags?.filter((t: Tag) => {
+                return t.tagId !== tag.tagId;
+              });
+              this.emotionStateService.updateNewEmotion(this.emotion);
+              // this.noteForm.reset();
+            }
+          }
+          console.log('Tag deleted successfully');
+        },
+        error: (error) => {
+          console.error('Error deleting tag', error);
+          this.isLoadingNotes = false;
+          this.snackBar.open('Error deleting tag', 'Close', {
+            duration: 5000,
+          });
+        }
+      });
+  }
+  addTag(event: MatChipInputEvent) {
+    const tagName = (event.value || '').trim();
+    console.log('Add tag', tagName);
+    this.emotionService.addTag(tagName!, this.emotion!.id!)
+      .subscribe({
+        next: (isAdded) => {
+          if (isAdded) {
+            this.emotion?.tags?.push({tagName: tagName});
+          }
+          event.chipInput!.clear();
+          console.log('Tag added successfully');
+        },
+        error: (error) => {
+          console.error('Error adding tag', error);
+          this.isLoadingNotes = false;
+          this.snackBar.open('Error adding tag', 'Close', {
+            duration: 5000,
+          });
+        }
+      });
   }
 }

@@ -1,122 +1,34 @@
-:host {
+.loading-screen {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  padding: 1rem;
-}
-
-form {
+  height: 100vh;
   flex-direction: column;
-  align-items: center;
-  max-width: 100%; /* Change the max-width to 100% */
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 100%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-mat-form-field {
-  width: 100%;
-  margin-bottom: 1.5rem;
+.display-emotion-container {
+  padding: 20px;
 }
 
-button {
-  width: 100%;
-}
-
-.mat-card {
-  width: 500px;
-  margin-bottom: 1rem;
-}
-
-mat-card-content {
-  text-align: left;
-}
-
-.tags {
-  width: 100%;
-
-  overflow: auto;
-  padding: 8px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 8px;
-}
-
-/* ... */
 .card-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  margin-top: 20px;
 }
-
-
 
 mat-card {
+  margin-bottom: 20px;
+}
+
+mat-card-content div {
+  margin-bottom: 10px;
+}
+
+.example-chip-list {
   width: 100%;
-  max-width: 500px;
-}
-.form-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 500px;
+  max-width: 100%;
 }
 
-.mat-form-field {
-  width: 100%;
+.example-headers-align {
+  margin-top: 20px;
 }
-
-.mat-chip-option {
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 16px;
-  padding: 8px;
-}
-
-.tags-container {
-  text-align: left;
-  flex-direction: column;
-}
-
-.actions-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 500px;
-  /*padding: 16px;*/
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  background-color: #fff;
-  /*margin-bottom: 1rem;*/
-}
-
-.actions-container button {
-  margin-bottom: 1rem;
-}
-
-.actions-container h3 {
-  margin-bottom: 0.5rem;
-}
-
-.mat-list-item {
-  padding: 2px;
-  text-align: left;
-}
-
-
-.loading-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-}
-
-
-
-
