@@ -78,8 +78,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
               private router: Router, private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
               private noteService: NoteService,
-              private dateService: DateService,
-              private cdr: ChangeDetectorRef) {
+              private dateService: DateService) {
     this.emotionForm = this.fb.group({
       emotionType: ['', Validators.required],
       intensity: [''],
@@ -297,14 +296,6 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
       return [];
     }
   }
-
-  private makeAllLists(): void {
-    this.makeEmotionTypesList();
-    this.makeEmotionsList();
-    this.makeSubEmotionsList();
-    this.makeTriggersList();
-  }
-
 
 
   handleNoteSubmission(emotionFromResult: EmotionFromNoteResult) {
