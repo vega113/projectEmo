@@ -7,7 +7,7 @@ import { CreateEmotionComponent } from './create-emotion.component';
 import { EmotionService } from '../services/emotion.service';
 
 import { of } from 'rxjs';
-import {Emotion, EmotionRecord, SubEmotion} from "../models/emotion.model";
+import {Emotion, SubEmotion} from "../models/emotion.model";
 import {MatSliderModule} from "@angular/material/slider";
 import {HttpClientModule} from "@angular/common/http";
 import {MatSelectModule} from "@angular/material/select";
@@ -95,25 +95,14 @@ describe('CreateEmotionComponent', () => {
 
     component.emotionForm.controls["emotionType"].setValue('positive');
     component.emotionForm.controls["intensity"].setValue(5);
-    component.changeSliderColor({ target: { valueAsNumber: 5 } })
+
 
     component.onSubmit();
 
     expect(emotionService.insertEmotionRecord).toHaveBeenCalled();
   });
 
-  it('should change the slider color', () => {
-    const event = {
-      target: {
-        valueAsNumber: 5,
-      },
-    };
 
-    component.changeSliderColor(event);
-
-    expect(component.sliderColor).toBe('rgb(128, 128, 0)');
-    expect(component.emotionIntensityValue).toBe(5);
-  });
 
   it('should submit the form with all optional values', () => {
     spyOn(emotionService, 'insertEmotionRecord').and.callThrough();
@@ -123,7 +112,6 @@ describe('CreateEmotionComponent', () => {
     component.emotionForm.controls['emotion'].setValue({emotion: {"id": "Joy", "emotionType": "positive", "emotionName": "Joy"} as Emotion});
     component.emotionForm.controls['trigger'].setValue({"triggerId": 2, "triggerName": "Family"});
     component.emotionForm.controls['subEmotion'].setValue({"subEmotionId": "Gratitude", "subEmotionName": "Gratitude"} as SubEmotion);
-    component.changeSliderColor({ target: { valueAsNumber: 5 } })
 
     component.onSubmit();
 

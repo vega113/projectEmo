@@ -48,7 +48,7 @@ mat-sidenav {
   display: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .menu-button {
     display: block;
   }
@@ -74,7 +74,7 @@ mat-sidenav {
 }
 
 /* Mobile view adjustments */
-@media (max-width: 600px) {
+@media (max-width: 900px) {
   .menu-button {
     display: block;
   }

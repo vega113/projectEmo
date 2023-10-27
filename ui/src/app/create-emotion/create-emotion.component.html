@@ -30,14 +30,12 @@
             <mat-icon>edit_note</mat-icon>
           </mat-panel-description>
         </mat-expansion-panel-header>
-        <div class="form-wrapper">
+        <div class="note-field-wrapper">
           <label for="note">Add a note (max {{maxNoteLength}} chars):</label>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Note</mat-label>
-            <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength"
-                      [placeholder]=placeHolderText></textarea>
+            <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength" [placeholder]="placeHolderText"></textarea>
           </mat-form-field>
-          <p *ngIf="emotionForm.get('emotionNote')?.value?.length >= maxNoteLength">Note limit reached.</p>
         </div>
         <mat-action-row>
           <button mat-button color="primary"  type="button" (click)="detectEmotions()">

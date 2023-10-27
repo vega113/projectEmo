@@ -23,6 +23,8 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
                                         authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc) {
 
+  val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
+
   def findById(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
     emotionRecordService.findByIdForUser(id, token.user.userId).map {
       case Some(emotionRecord) => Ok(Json.toJson(emotionRecord))
@@ -47,17 +49,23 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def insert(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+    logger.info(s"Inserting emotion record for user: ${token.user.userId}")
     token.body.validate[EmotionRecord].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
         if (!validateRequestUserId(emotionRecord.userId, token.user.userId)) {
+          logger.warn(s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")
           Future.successful(BadRequest(Json.obj("message" -> s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
         } else {
           emotionRecordService.insert(emotionRecord).flatMap {
-            case Some(id) => fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))
-            case None => Future.successful(InternalServerError)
+            case Some(id) =>
+              logger.info(s"Inserted emotion record for user: ${token.user.userId} recordId: $id")
+              fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))
+            case None =>
+              logger.error(s"Failed to insert emotion record for user: ${token.user.userId}")
+              Future.successful(InternalServerError)
           }
         }
       }
@@ -65,14 +73,14 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def insertNote(emotionRecordId: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+    logger.info(s"Inserting note for user: ${token.user.userId} recordId: $emotionRecordId")
     token.body.validate[Note].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       note => {
-
         noteService.insert(emotionRecordId, note).flatMap {
-          case Some(id) => fetchRecord(emotionRecordId, token.user.userId).map(record => Ok(Json.toJson(record)))
+          case Some(_) => fetchRecord(emotionRecordId, token.user.userId).map(record => Ok(Json.toJson(record)))
           case None => Future.successful(InternalServerError)
         }
       }
