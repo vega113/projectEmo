@@ -47,7 +47,6 @@ import {MatTabsModule} from "@angular/material/tabs";
 import {NgxChartsModule} from "@swimlane/ngx-charts";
 import { CustomDatePickerComponent } from './custom-date-picker/custom-date-picker.component';
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
-import { EmotionNoteFormComponent } from './emotion-note-form/emotion-note-form.component';
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatExpansionModule} from "@angular/material/expansion";
 
@@ -78,8 +77,7 @@ export const MAT_DATE_FNS_FORMATS = {
     ScreenSizeDirective,
     EmotionCalendarComponent,
     DayComponent,
-    CustomDatePickerComponent,
-    EmotionNoteFormComponent
+    CustomDatePickerComponent
   ],
     imports: [
         BrowserModule,

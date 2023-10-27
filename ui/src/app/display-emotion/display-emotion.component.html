@@ -24,7 +24,6 @@
             <strong>Trigger:</strong> {{ emotion.triggers[0].description }}
           </div>
           <div *ngIf="emotion.tags[0]">
-            <!-- display all tags as references on one line-->
             <strong>Tags:</strong>
             <span *ngFor="let tag of emotion.tags; let last = last">
               {{ tag.tagName }}{{ last ? '' : ', ' }}
@@ -36,9 +35,68 @@
         </mat-card-content>
       </mat-card>
 
-      <app-emotion-note-form [emotion]="emotion"></app-emotion-note-form>
+      <mat-form-field class="example-chip-list">
+        <mat-label>Note Tags</mat-label>
+        <mat-chip-grid #chipGrid>
+          <mat-chip-row *ngFor="let tag of emotion.tags"
+                        (removed)="deleteTag(tag)"
+                        [editable]="false">
+            {{tag.tagName}}
+            <button matChipRemove [attr.aria-label]="'remove ' + tag.tagName">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip-row>
+          <input [matChipInputFor]="chipGrid"
+                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                 [matChipInputAddOnBlur]="addOnBlur"
+                 (matChipInputTokenEnd)="addTag($event)"/>
+        </mat-chip-grid>
+      </mat-form-field>
+    </div>
+
+    <div *ngIf="emotion && emotion.notes.length > 0">
+      <h3>Notes:</h3>
+      <div *ngFor="let noteElem of emotion.notes">
+        <mat-accordion class="example-headers-align">
+          <mat-expansion-panel  >
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Emotion summary
+              </mat-panel-title>
+              <mat-panel-description>
+                {{noteElem.title}}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            {{noteElem.text}}
+          </mat-expansion-panel>
+
+          <mat-expansion-panel *ngIf="noteElem.description">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Emotion description
+              </mat-panel-title>
+              <mat-panel-description>
+                The description of the note by AI
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            {{noteElem.description}}
+          </mat-expansion-panel>
+
+          <mat-expansion-panel *ngIf="noteElem.suggestion">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Suggestion
+              </mat-panel-title>
+              <mat-panel-description>
+                Suggested actions to take
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            {{noteElem.suggestion}}
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
 
 
     </div>
-  </div>
 </ng-container>

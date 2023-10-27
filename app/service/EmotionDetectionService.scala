@@ -19,7 +19,7 @@ trait EmotionDetectionService {
 class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configuration)(implicit ec: ExecutionContext) extends EmotionDetectionService {
 
   private final val logger: Logger = play.api.Logger(getClass)
-  private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Inspiration\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"YouTube\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
+  private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Serenity\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"Other\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
 
   override def detectEmotion(txt: String): Future[EmotionDetectionResult] = {
     if(txt.startsWith("FAKE")) {
@@ -64,7 +64,9 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
                 case JsSuccess(result, _) =>
                   logger.info(s"Deserialization successful: $result")
                   val content = result.choices.head.message.content
-                  Json.parse(content).as[EmotionDetectionResult]
+                  val emotionDetectionResult = Json.parse(content).as[EmotionDetectionResult]
+                  //TODO: validate the result, check that fields are not empty and are from the expected set
+                  emotionDetectionResult
                 case JsError(errors) =>
                   logger.error(s"Deserialization failed: $errors, response: ${response.json}")
                   throw new Exception(s"Deserialization failed: $errors")

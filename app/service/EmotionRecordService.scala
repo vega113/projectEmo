@@ -105,7 +105,8 @@ class EmotionRecordServiceImpl @Inject()(
   private def preProcessEmotionRecord(emotionRecord: EmotionRecord): EmotionRecord = {
     emotionRecord.copy(notes = emotionRecord.notes.map(note => {
       note.copy(title = Option(noteService.makeTitle(note.text)))
-    }), tags = emotionRecord.tags ++ noteService.extractTags(emotionRecord.notes.map(_.text).mkString(" ")))
+    }), tags = (emotionRecord.tags.toSet ++ noteService.extractTags(emotionRecord.notes.map(_.text).mkString(" "))).
+      toList)
   }
 
   override def insert(emotionRecord: EmotionRecord): Future[Option[Long]] = {

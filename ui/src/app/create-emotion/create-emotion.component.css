@@ -1,61 +1,129 @@
-:host {
-  display: flex;
-  justify-content: center;
+.create-emotion-accordion {
+  width: 100%;
+}
+
+.mat-expansion-panel-header {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.create-emotion-accordion .mat-expansion-panel-header-description {
+  justify-content: space-between;
   align-items: center;
-  height: 100%;
-  padding: 1rem;
-  width: 100%;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 1000px;
-  width: 100%;
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.create-emotion-accordion .mat-mdc-form-field + .mat-mdc-form-field {
+  margin-left: 8px;
 }
 
-mat-form-field {
-  width: 100%;
-  margin-bottom: 1.5rem;
-}
-
-button {
-  width: 100%;
-}
-.create-emotion-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
+.mat-form-field,
+.mat-slide-toggle,
 .mat-slider {
   width: 100%;
-  max-width: 300px;
+  margin-bottom: 16px;
 }
 
 .intensity-container {
-  width: 100%;
-  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 16px;
 }
 
 .intensity-label {
-  font-size: 16px;
-  font-weight: 500;
   margin-bottom: 8px;
 }
 
-.intensity-color {
-  width: 100%;
-  max-width: 300px;
-  height: 5px;
-  margin-top: 8px;
-  border-radius: 3px;
+.mat-action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 
+.emotion-cache-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* Styling for the notes section */
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Vertical space between notes */
+  --text-align-direction: left; /* Default alignment direction */
+}
+
+.note {
+  display: flex;
+  align-items: center; /* Vertically center the content */
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  position: relative;
+  width: 800px;
+}
+
+.mat-card-content {
+  flex-grow: 1; /* Allow the content to take available space */
+  padding: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-right: 30px; /* Give space for delete button */
+  text-align: var(--text-align-direction); /* Use the CSS variable for text alignment */
+}
+
+button[mat-icon-button] {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+/* Styling for the note form */
+.form-wrapper {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 5px;
+  width: 500px;
+  margin: 2px;
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+textarea {
+  padding: 10px; /* Horizontal padding */
+  resize: vertical; /* Allow vertical resize only */
+  width: 100%; /* Ensure it takes full width */
+  min-height: 200px; /* Set a minimum height */
+  box-sizing: border-box; /* Include padding and border in total width */
+}
+
+button[mat-raised-button] {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-weight: 600;
+  margin-top: 10px; /* Vertical space from the textarea */
+}
+
+.mat-spinner {
+  margin-right: 10px;
+}
+
+
+.full-width {
+  width: 100%;
+}
+
+
+.note-form-card {
+  width: calc(100% - 32px); /* Adjust based on your card's padding */
+}

@@ -65,6 +65,8 @@ object model {
                    id: Option[Long],
                    title: Option[String],
                    text: String,
+                   description: Option[String] = None,
+                   suggestion: Option[String] = None,
                    isDeleted: Option[Boolean] = None,
                    lastUpdated: Option[LocalDateTime] = None,
                    lastDeleted: Option[LocalDateTime] = None,
@@ -216,10 +218,12 @@ object Note {
       get[Option[Long]]("id") ~
         get[Option[String]]("title") ~
         str("text") ~
+        get[Option[String]]("description") ~
+        get[Option[String]]("suggestion") ~
         get[Option[Boolean]]("is_deleted") ~
         get[Option[LocalDateTime]]("created") map {
-        case id ~ title ~ noteText ~ isDeleted ~ created =>
-          Note(id, title, noteText, isDeleted, created)
+        case id ~ title ~ noteText ~ description ~ suggestion ~ isDeleted ~ created =>
+          Note(id, title, noteText, description, suggestion, isDeleted, created)
       }
     }
   }

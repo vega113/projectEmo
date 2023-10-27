@@ -2,21 +2,24 @@
 package controllers
 
 import auth.AuthenticatedAction
+import controllers.model.TagData
 import dao.model.{EmotionRecord, Note}
 import play.api.libs.json._
 import play.api.mvc._
-import service.{EmotionRecordService, NoteService}
+import service.{EmotionRecordService, NoteService, TagService}
 
 import java.time.ZonedDateTime
 import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util._
+import model.EmotionData._
 
 
 class EmotionRecordController @Inject()(cc: ControllerComponents,
                                         emotionRecordService: EmotionRecordService,
                                         noteService: NoteService,
+                                        tagService: TagService,
                                         authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc) {
 
@@ -139,4 +142,31 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
         map(emotionRecordsChartData => Ok(Json.toJson(emotionRecordsChartData)))
     }
 
+  def deleteTag(id: Long): Action[AnyContent] =
+    Action andThen authenticatedAction async { implicit token =>
+      emotionRecordService.findEmotionRecordIdByUserIdTagId(token.user.userId, id).flatMap {
+        case Some(emotionRecordId) => tagService.delete(emotionRecordId, id).map {
+          case true => Ok
+          case false => BadRequest(Json.obj("message" -> s"Invalid tag id: $id"))
+        }
+        case None => Future.successful(BadRequest(Json.obj("message" -> s"Invalid tag id: $id")))
+      }
+    }
+
+  def addTag(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+    token.body.validate[TagData].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
+      },
+      tagData => {
+        emotionRecordService.findByIdForUser(tagData.emotionRecordId, token.user.userId).flatMap {
+          case Some(_) => tagService.add(tagData.emotionRecordId, tagData.tagName).map {
+            case true => Ok
+            case false => BadRequest(Json.obj("message" -> s"Invalid tag name: ${tagData.tagName}"))
+          }
+          case None => Future.successful(BadRequest(Json.obj("message" -> s"Invalid tag id: ${tagData.tagName}")))
+        }
+      }
+    )
+  }
 }

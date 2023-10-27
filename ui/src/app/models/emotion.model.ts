@@ -76,6 +76,8 @@ export interface Note {
   id?: number;
   title?: string;
   text: string;
+  description?: string;
+  suggestion?: string;
   created?: string;
 }
 

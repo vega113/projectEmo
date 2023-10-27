@@ -60,15 +60,4 @@ class NoteController @Inject()(cc: ControllerComponents,
         }
       })
     }
-
-  def deleteTag(id: Long): Action[AnyContent] =
-    Action andThen authenticatedAction async { implicit token =>
-      emotionRecordService.findEmotionRecordIdByUserIdTagId(token.user.userId, id).flatMap {
-        case Some(emotionRecordId) => tagService.delete(emotionRecordId, id).map {
-          case true => Ok
-          case false => BadRequest(Json.obj("message" -> s"Invalid tag id: $id"))
-        }
-        case None => Future.successful(BadRequest(Json.obj("message" -> s"Invalid tag id: $id")))
-      }
-    }
 }
