@@ -105,13 +105,15 @@ export class EmotionCalendarComponent implements OnInit {
         return isSameDay(new Date(this.dateService.formatDateFromDb(dayRecord.created!)), currentDay);
       });
 
-      if (dayRecords) {
-        const averageIntensity = this.calculateAverageIntensity(dayRecords);
+      if (dayRecords.length > 0) {
+        const averageIntensitiesPerType:{emotionType: string, averageIntensity: number}[] = this.calculateIntensityPerEmotion(dayRecords);
+        const averageIntensity = averageIntensitiesPerType.length > 0 ?
+            averageIntensitiesPerType.reduce((sum, {averageIntensity}) => sum + averageIntensity, 0) / averageIntensitiesPerType.length : 0;
         return {
           date: day,
           records: dayRecords,
           averageIntensity: averageIntensity,
-          dayColor: this.getColorForDay(averageIntensity, dayRecords.length > 0)
+          dayColor: this.getColorForDay(averageIntensitiesPerType, dayRecords.length > 0)
         };
       }
     }
@@ -125,34 +127,48 @@ export class EmotionCalendarComponent implements OnInit {
   }
 
 
+  getColorForDay(intensitiesPerType:{emotionType: string, averageIntensity: number}[], hasRecords: boolean) {
+    // find the emotion with the highest intensity
+    let color = 'grey';
+    let emotionType = '';
 
-  getColorForDay(averageIntensity: number, hasRecords: boolean) {
+    if (intensitiesPerType.length > 0) {
+      const sortedIntensities = intensitiesPerType.sort((a, b) => b.averageIntensity - a.averageIntensity);
+      emotionType = sortedIntensities[0].emotionType;
+    }
 
-    let color = 'blue';
-    if(averageIntensity < 0) {
+    if(emotionType === 'Negative') {
       color = 'red';
-    } else if (averageIntensity > 0) {
+    } else if (emotionType === 'Positive') {
       color = 'green';
-    } else if (!hasRecords) {
+    } else if (emotionType === 'Neutral') {
+      color = 'blue';
+    }
+    else if (!hasRecords) {
       color = 'grey';
     }
     return color;
   }
 
-  calculateAverageIntensity(records: EmotionRecord[]): number {
-    return records.length > 0 ? records.reduce((a, b) =>
-      a + b.intensity * this.mapEmotionTypeToMultiplier(b.emotionType), 0) / records.length : 0;
+
+  calculateIntensityPerEmotion(records: EmotionRecord[]): {emotionType: string, averageIntensity: number}[] {
+    let emotionSums: {[key: string]: {sum: number, count: number}} = {};
+
+    records.forEach(record => {
+      if (!emotionSums[record.emotionType]) {
+        emotionSums[record.emotionType] = {sum: 0, count: 0};
+      }
+      emotionSums[record.emotionType].sum += record.intensity;
+      emotionSums[record.emotionType].count++;
+    });
+
+    return Object.entries(emotionSums).map(([emotionType, {sum, count}]) => ({
+      emotionType,
+      averageIntensity: sum / count
+    }));
   }
 
-  private mapEmotionTypeToMultiplier(emotionType: string): number {
-    if (emotionType === 'Positive') {
-      return 1;
-    } else if(emotionType === 'Negative') {
-      return -1;
-    } else {
-      return 0;
-    }
-  }
+
 
   chosenYearHandler(normalizedYear: Date) {
     this.date = setYear(this.date, getYear(normalizedYear));

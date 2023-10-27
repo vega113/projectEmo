@@ -1,6 +1,5 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
-  Component, OnDestroy,
+  AfterViewInit, Component, OnDestroy,
   OnInit,
   QueryList,
   ViewChildren
@@ -39,7 +38,6 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
   isLoadingEmotionCache: boolean = true;
 
   emotionForm: FormGroup;
-  emotionIntensityValue: number = 1;
   sliderColor = 'rgba(75, 192, 192, 0.2)';
 
   emotionCache: EmotionData | undefined;
@@ -241,7 +239,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
     return {
       userId: decodedToken.userId,
       emotionType: emotionFromData.emotionType,
-      intensity: this.emotionIntensityValue,
+      intensity: emotionFromData.intensity,
       emotion: emotion as Emotion,
       subEmotions: subEmotions as SubEmotion[],
       triggers: triggers as Trigger[],
