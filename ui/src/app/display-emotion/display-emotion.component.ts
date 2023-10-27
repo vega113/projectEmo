@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import { EmotionRecord, Note, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
+import { EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
 import {FormBuilder} from "@angular/forms";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {NoteService} from '../services/note.service';

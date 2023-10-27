@@ -1,17 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {
-  Emotion,
-  EmotionData, EmotionFromNoteResult,
-  EmotionRecord,
+  EmotionData, EmotionRecord,
   EmotionRecordDay,
-  Note, SubEmotion,
-  SuggestedAction, SunburstData, Tag, Trigger
+  Note, SuggestedAction, SunburstData
 } from '../models/emotion.model';
-import {catchError, delay, map, tap} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 import {AuthService} from './auth.service';
 import {ErrorService} from "./error.service";
-import {Observable, of} from "rxjs";
+import {Observable} from "rxjs";
 import {DateService} from "./date.service";
 import {startOfMonth, endOfMonth} from 'date-fns';
 import {environment} from "../../environments/environment";
@@ -21,7 +18,6 @@ import {environment} from "../../environments/environment";
   providedIn: 'root',
 })
 export class EmotionService {
-  private apiUrl = 'http://localhost:4200/api';
 
   constructor(private http: HttpClient, private authService: AuthService, private errorService: ErrorService,
               private dateService: DateService) {
