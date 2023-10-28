@@ -1,4 +1,4 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" #header *ngIf="isHeaderVisible">
   <mat-toolbar-row>
     <button *ngIf="(isAuthenticated | async) === true" mat-icon-button (click)="sidenav.toggle()" class="menu-button">
       <mat-icon>menu</mat-icon>

@@ -70,18 +70,11 @@ mat-sidenav {
 }
 
 .menu-button {
-  display: none;
+  display: block;
 }
 
 /* Mobile view adjustments */
 @media (max-width: 900px) {
-  .menu-button {
-    display: block;
-  }
-
-  mat-sidenav {
-    width: 100%;
-  }
 
   .button-container {
     display: none;
