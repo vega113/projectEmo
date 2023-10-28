@@ -58,13 +58,13 @@
       <h3>Notes:</h3>
       <div *ngFor="let noteElem of emotion.notes">
         <mat-accordion class="example-headers-align">
-          <mat-expansion-panel  >
+          <mat-expansion-panel  expanded="true">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                Emotion summary
+                Emotion
               </mat-panel-title>
               <mat-panel-description>
-                {{noteElem.title}}
+                Title: {{noteElem.title}}
               </mat-panel-description>
             </mat-expansion-panel-header>
             {{noteElem.text}}
@@ -73,7 +73,7 @@
           <mat-expansion-panel *ngIf="noteElem.description">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                Emotion description
+                Description
               </mat-panel-title>
               <mat-panel-description>
                 The description of the note by AI
@@ -85,7 +85,7 @@
           <mat-expansion-panel *ngIf="noteElem.suggestion">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                Suggestion
+                Suggestions
               </mat-panel-title>
               <mat-panel-description>
                 Suggested actions to take

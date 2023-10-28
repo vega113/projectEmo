@@ -37,10 +37,10 @@
         </div>
         <mat-action-row>
           <button mat-button color="primary"  type="button" (click)="detectEmotions()">
-            Detect Emotions
+            Analyze Emotion with AI
             <mat-spinner *ngIf="isLoadingNotes" diameter="24" [style.marginRight.px]="4"></mat-spinner>
           </button>
-          <button mat-button color="primary"  type="button" (click)="skipToManualEntry()">Skip</button>
+          <button mat-button color="primary"  type="button" (click)="skipToManualEntry()">Next</button>
         </mat-action-row>
       </mat-expansion-panel>
 

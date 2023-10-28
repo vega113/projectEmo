@@ -7,6 +7,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {NoteService} from '../services/note.service';
 import {DateService} from "../services/date.service";
 import {MatChipInputEvent} from "@angular/material/chips";
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -21,7 +22,8 @@ export class DisplayEmotionComponent {
               private emotionStateService: EmotionStateService,
               private snackBar: MatSnackBar,
               private noteService: NoteService,
-              public dateService: DateService) {
+              public dateService: DateService,
+              private router: Router) {
   }
 
   noteTemplates: NoteTemplate[] | null = null;
@@ -64,19 +66,26 @@ export class DisplayEmotionComponent {
   }
 
   ngOnInit(): void {
-    this.emotionStateService.newEmotionRecord$.subscribe((newEmotion) => {
-      if (newEmotion) {
-        this.emotion = newEmotion;
-        this.isLoading = false;
-        console.log('New emotion received:', newEmotion);
-      }
-    });
+    this.isLoading = true;
+    this.emotionStateService.newEmotionRecord$
+        .subscribe((newEmotion) => {
+          if (newEmotion) {
+            this.emotion = newEmotion;
+            this.isLoading = false;
+            console.log('New emotion received:', newEmotion);
+          } else {
+            this.router.navigate(['/emotions-timeline']).
+            then(() => console.log('Navigated to emotions-timeline page'));
+            this.isLoading = false;
+          }
+        });
 
     this.noteService.getNoteTemplates().subscribe((noteTemplates) => {
       this.noteTemplates = noteTemplates;
       console.log('note templates received');
     });
   }
+
 
   deleteTag(tag: Tag) {
     console.log('remove tag', tag);
