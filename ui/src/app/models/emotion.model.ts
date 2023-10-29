@@ -103,8 +103,28 @@ export interface EmotionRecordWeek {
   days: EmotionRecordDay[];
 }
 
+export interface LineChartData  {
+  recordsCount: number;
+  intensitySum: number;
+}
+
+export interface LineChartTrendDataRow {
+  date: Date;
+  emotionTypeAccumulated: { [key: string]: LineChartData };
+  triggersAccumulated: { [key: string]: LineChartData };
+}
+
+export interface LineChartTrendDataSet {
+  rows: LineChartTrendDataRow[];
+  emotionTypes: string[];
+  triggerTypes: string[];
+  colors: { [key: string]: string };
+}
+
+
 export interface DayOfWeek {
   date: number;
+  dateTime?: Date;
   records: EmotionRecord[];
   averageIntensity: number;
   dayColor: string;
@@ -130,6 +150,18 @@ export interface SunburstData {
   value?: number;
   children: SunburstData[];
   color?: string;
+}
+
+export interface DoughnutData {
+  name: string;
+  recordsCount: number;
+  intensitySum: number;
+  color?: string;
+}
+
+export interface EmotionTypesTriggersDoughnutData {
+  emotionTypes: DoughnutData[];
+  triggers: DoughnutData[];
 }
 
 export interface EmotionDetectionResult {

@@ -7,7 +7,8 @@
   <div class="create-emotion-container">
     <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
 
-      <mat-accordion class="create-emotion-accordion" multi><mat-expansion-panel (opened)="setStep(0)" hideToggle>
+      <mat-accordion class="create-emotion-accordion" multi>
+        <mat-expansion-panel (opened)="setStep(0)" hideToggle>
         <mat-expansion-panel-header>
           <mat-panel-title>
             Date

@@ -17,7 +17,7 @@ class EmotionController @Inject()(cc: ControllerComponents,
   extends AbstractController(cc) {
 
 
-  def findAll: Action[AnyContent] = Action async { // TODO allow only for admins
+  def findAll(): Action[AnyContent] = Action async { // TODO allow only for admins
     emotionService.findAll().map(emotions => Ok(Json.toJson(emotions)))
   }
 }

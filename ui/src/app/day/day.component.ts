@@ -1,5 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {DayOfWeek} from "../models/emotion.model";
+import { DayInfoDialogComponent } from '../day-info-dialog/day-info-dialog.component';
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-day',
@@ -8,6 +10,21 @@ import {DayOfWeek} from "../models/emotion.model";
 })
 export class DayComponent {
   @Input() day: DayOfWeek | null = null;
+
+
+  constructor(public dialog: MatDialog) {}
+
+  showDayInfo() {
+    this.dialog.open(DayInfoDialogComponent, {
+      data: {
+        day: this.day,
+        getAverageIntensity: () => this.getAverageIntensity()
+      },
+      hasBackdrop: true,       // this will show a backdrop behind the dialog (default is true)
+      disableClose: false
+    });
+  }
+
 
   getColor() {
     return this.day?.dayColor
@@ -25,22 +42,19 @@ export class DayComponent {
       for (let i = 0; i < day.records.length && i < 5; i++) {
         let record = day.records[i];
 
-        info += `#${i + 1}:`;
-        if(record.emotion){
-          info += `Emotion: ${record.emotion.emotionName}\n`;
+        if (record.subEmotions.length > 0) {
+          info += ` Emotion: ${record.subEmotions[0].subEmotionName},`;
         }
-        info += `Intensity: ${record.intensity}\n`;
+        info += ` Intensity : ${record.intensity},`;
 
         // Assuming there is at most one SubEmotion and Trigger per EmotionRecord
-        if (record.subEmotions.length > 0) {
-          info += `Sub-Emotion: ${record.subEmotions[0].subEmotionName}\n`;
-        }
+
         if (record.triggers.length > 0) {
-          info += `Trigger: ${record.triggers[0].triggerName}\n`;
+          info += ` Trigger: ${record.triggers[0].triggerName},`;
         }
 
-        if(record.created) {
-          info += `Created: ${new Date(record.created).toLocaleString()}\n\n`;
+       if(record.notes.length > 0) {
+          info += ` : ${record.notes[0]?.title}`;
         }
       }
 
@@ -50,5 +64,19 @@ export class DayComponent {
       return info;
     }
     return '';
+  }
+
+  private hoverTimeout: any;
+
+  onMouseEnter() {
+    this.hoverTimeout = setTimeout(() => {
+      this.showDayInfo();
+    }, 500);
+  }
+
+  onMouseLeave() {
+    clearTimeout(this.hoverTimeout);
+    // Close the dialog here
+
   }
 }
