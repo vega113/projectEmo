@@ -2,7 +2,7 @@ package service
 
 import com.google.inject.{ImplementedBy, Inject}
 import controllers.model
-import dao.model.{EmotionRecord, EmotionRecordDay, SuggestedAction, SunburstData}
+import dao.model._
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
 
 import java.time.{Instant, LocalDate}
@@ -37,7 +37,12 @@ trait EmotionRecordService {
 
   def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
 
-  def emotionRecordsToChartData(records: List[EmotionRecord]): List[SunburstData]
+  def emotionRecordsToSunburstChartData(records: List[EmotionRecord]): List[SunburstData]
+
+  def emotionRecordsToDoughnutEmotionTypeTriggerChartData(records: List[EmotionRecord]): DoughnutEmotionTypesTriggersChartData
+  def generateLineChartTrendDataSetForEmotionTypesTriggers(days: List[EmotionRecordDay]): LineChartTrendDataSet
+
+
 }
 
 class EmotionRecordServiceImpl @Inject()(
@@ -46,6 +51,36 @@ class EmotionRecordServiceImpl @Inject()(
                                           emotionDataService: EmotionDataService,
                                           databaseExecutionContext: DatabaseExecutionContext
                                         ) extends EmotionRecordService {
+  def emotionRecordsToDoughnutTriggerChartData(records: List[EmotionRecord]): List[DoughnutChartData] = {
+    val recordsByTrigger: Map[String, List[EmotionRecord]] = records.groupBy(record => {
+      record.triggers match {
+        case Nil => "Empty"
+        case triggers => triggers.head.triggerName.getOrElse("undefined")
+      }
+    })
+    val triggersDoughnutChartData = recordsByTrigger.map { case (triggerName, recordsForTrigger) =>
+      val intensitySum = recordsForTrigger.map(_.intensity).sum
+      DoughnutChartData(triggerName, recordsForTrigger.length, intensitySum, Color.fromName(triggerName).map(_.value))
+    }.toList
+    triggersDoughnutChartData.sortWith((d1, d2) => {
+      val order = List("People", "Places", "Situations", "Other", "Empty")
+      order.indexOf(d1.name) < order.indexOf(d2.name)
+    })
+  }
+
+  def emotionRecordsToDoughnutEmotionTypeChartData(records: List[EmotionRecord]):List[DoughnutChartData] = {
+    val recordsByType: Map[String, List[EmotionRecord]] = records.groupBy(_.emotionType)
+    val chartData = recordsByType.map { case (emotionType, recordsForType) =>
+      val intensitySum = recordsForType.map(_.intensity).sum
+      DoughnutChartData(emotionType, recordsForType.length, intensitySum, Color.fromName(emotionType).map(_.value))
+    }.toList
+    chartData.sortWith((d1, d2) => {
+      val order = List("Positive", "Negative", "Neutral")
+      order.indexOf(d1.name) < order.indexOf(d2.name)
+    })
+    chartData
+  }
+
   override def findAll(): Future[List[EmotionRecord]] = {
     Future.successful(databaseExecutionContext.withConnection { implicit connection =>
       emotionRecordDao.findAll()
@@ -80,6 +115,36 @@ class EmotionRecordServiceImpl @Inject()(
       d1.date > d2.date
     })
     out
+  }
+
+  def generateLineChartTrendDataSetForEmotionTypesTriggers(days: List[EmotionRecordDay]): LineChartTrendDataSet = {
+    val emotionTypes: List[String] = List("Positive", "Negative", "Neutral")
+    val triggerTypes:List[String] = List("People", "Places", "Situations", "Other", "Empty")
+    LineChartTrendDataSet(
+      rows = generateLineChartTrendDataRowsForEmotionTypesTriggers(days),
+      emotionTypes = emotionTypes,
+      triggerTypes = triggerTypes,
+      colors = Color.toMap,
+    )
+
+  }
+  private[service] def generateLineChartTrendDataRowsForEmotionTypesTriggers(days: List[EmotionRecordDay]): List[LineChartTrendDataRow] = {
+    def extractData[T](records: List[EmotionRecord], groupByCriteria: EmotionRecord => T): Map[T, LineChartData] = {
+      records.groupBy(groupByCriteria).map(entry => {
+        val intensitySum = entry._2.map(_.intensity).sum
+        val recordsCount = entry._2.length
+        entry._1 -> LineChartData(recordsCount, intensitySum)
+      })
+    }
+
+    for {
+      day <- days
+    } yield {
+      val emotionTypes: Map[String, LineChartData] = extractData(day.records, _.emotionType)
+      val triggers: Map[String, LineChartData] = extractData(day.records, _.triggers.headOption.flatMap(_.triggerName).
+        getOrElse("Empty"))
+      LineChartTrendDataRow(day.date, emotionTypes, triggers)
+    }
   }
 
 
@@ -142,26 +207,16 @@ class EmotionRecordServiceImpl @Inject()(
     }))
   }
 
-  import model._
-
-  import model._
-
-  import model._
-
-  import model._
-
-  import model._
-
   private def computeColor(name: String): Option[String] = {
     name match {
-      case "Positive" => Some("green")
-      case "Negative" => Some("red")
-      case "Neutral" => Some("blue")
-      case _ => Some("gray")
+      case "Positive" => Some("#3f51b5")
+      case "Negative" => Some("#ffb74d")
+      case "Neutral" => Some("#e57373")
+      case _ => Some("#D3D3D3")
     }
   }
 
-  def emotionRecordsToChartData(records: List[EmotionRecord]): List[SunburstData] = {
+  def emotionRecordsToSunburstChartData(records: List[EmotionRecord]): List[SunburstData] = {
     // First grouping by emotionType
     val recordsByType: Map[String, List[EmotionRecord]] = records.groupBy(_.emotionType)
 
@@ -198,6 +253,10 @@ class EmotionRecordServiceImpl @Inject()(
       emotionRecordDao.findEmotionRecordIdByUserIdTagId(userId, noteId)
     }))
 
-
+  override def emotionRecordsToDoughnutEmotionTypeTriggerChartData(records: List[EmotionRecord]): DoughnutEmotionTypesTriggersChartData =
+    DoughnutEmotionTypesTriggersChartData(
+      emotionRecordsToDoughnutEmotionTypeChartData(records),
+      emotionRecordsToDoughnutTriggerChartData(records)
+    )
 }
 

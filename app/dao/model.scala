@@ -52,6 +52,8 @@ object model {
                                date: LocalDate,
                                records: List[EmotionRecord]
                              )
+
+
   case class Trigger(
                       triggerId: Option[Long],
                       triggerName: Option[String],
@@ -98,6 +100,27 @@ object model {
                          )
 
   case class SunburstData(name: String, value: Option[Int], children: List[SunburstData], color: Option[String] = None)
+
+  case class DoughnutChartData(name: String, recordsCount: Int, intensitySum: Int, color: Option[String] = None)
+  case class DoughnutEmotionTypesTriggersChartData(emotionTypes: List[DoughnutChartData], triggers: List[DoughnutChartData])
+
+  case class LineChartTrendDataRow(
+                                date: LocalDate,
+                                emotionTypeAccumulated: Map[String, LineChartData],
+                                triggersAccumulated: Map[String, LineChartData],
+                              )
+
+  case class LineChartTrendDataSet(
+                                    rows: List[LineChartTrendDataRow],
+                                    emotionTypes: List[String],
+                                    triggerTypes: List[String],
+                                    colors: Map[String, String],
+                                  )
+  case class LineChartData(recordsCount: Int, intensitySum: Int)
+
+
+
+
 
   case class EmotionDetectionResult(
                                      emotionType: String,
@@ -268,5 +291,25 @@ object Note {
 
   object SunburstData {
     implicit val sunburstDataFormat: Format[SunburstData] = Json.format[SunburstData]
+  }
+
+  object DoughnutChartData {
+    implicit val doughnutChartDataFormat: Format[DoughnutChartData] = Json.format[DoughnutChartData]
+  }
+
+  object DoughnutEmotionTypesTriggersChartData {
+    implicit val doughnutEmotionTypesTriggersChartDataFormat: Format[DoughnutEmotionTypesTriggersChartData] = Json.format[DoughnutEmotionTypesTriggersChartData]
+  }
+
+  object LineChartTrendDataRow {
+    implicit val lineChartTrendDataFormat: Format[LineChartTrendDataRow] = Json.format[LineChartTrendDataRow]
+  }
+
+  object LineChartData {
+    implicit val lineChartDataFormat: Format[LineChartData] = Json.format[LineChartData]
+  }
+
+  object LineChartTrendDataSet {
+    implicit val lineChartTrendDataSetFormat: Format[LineChartTrendDataSet] = Json.format[LineChartTrendDataSet]
   }
 }

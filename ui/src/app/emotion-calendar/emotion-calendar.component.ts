@@ -111,6 +111,7 @@ export class EmotionCalendarComponent implements OnInit {
             averageIntensitiesPerType.reduce((sum, {averageIntensity}) => sum + averageIntensity, 0) / averageIntensitiesPerType.length : 0;
         return {
           date: day,
+          dateTime: date,
           records: dayRecords,
           averageIntensity: averageIntensity,
           dayColor: this.getColorForDay(averageIntensitiesPerType, dayRecords.length > 0)
@@ -122,7 +123,7 @@ export class EmotionCalendarComponent implements OnInit {
       date: day,
       records: [],
       averageIntensity: 0,
-      dayColor: 'grey'
+      dayColor: '#D3D3D3'
     };
   }
 
@@ -136,6 +137,7 @@ export class EmotionCalendarComponent implements OnInit {
     const primaryColor = '#3f51b5'; // blue
     const accentColor = '#ffb74d'; // pink
     const warnColor = '#e57373'; // red
+    const greyColor = '#D3D3D3'; // grey
 
     if (intensitiesPerType.length > 0) {
       const sortedIntensities = intensitiesPerType.sort((a, b) => b.averageIntensity - a.averageIntensity);
@@ -150,7 +152,7 @@ export class EmotionCalendarComponent implements OnInit {
       color = accentColor;
     }
     else if (!hasRecords) {
-      color = 'grey';
+      color = greyColor;
     }
     return color;
   }

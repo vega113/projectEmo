@@ -50,6 +50,10 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatProgressBarModule} from "@angular/material/progress-bar";
+import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
+import {MatRadioModule} from "@angular/material/radio";
+import { DayInfoDialogComponent } from './day-info-dialog/day-info-dialog.component';
+import {MatDialogModule} from "@angular/material/dialog";
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -78,7 +82,8 @@ export const MAT_DATE_FNS_FORMATS = {
     ScreenSizeDirective,
     EmotionCalendarComponent,
     DayComponent,
-    CustomDatePickerComponent
+    CustomDatePickerComponent,
+    DayInfoDialogComponent,
   ],
     imports: [
         BrowserModule,
@@ -111,7 +116,10 @@ export const MAT_DATE_FNS_FORMATS = {
         MatSlideToggleModule,
         MatAutocompleteModule,
         MatExpansionModule,
-        MatProgressBarModule
+        MatProgressBarModule,
+        CanvasJSAngularChartsModule,
+        MatRadioModule,
+        MatDialogModule
 
     ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {

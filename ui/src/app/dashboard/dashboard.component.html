@@ -1,33 +1,94 @@
-<div class="date-picker-container">
-  <app-custom-date-picker placeholder="Start Date" [formControl]="startDateControl"></app-custom-date-picker>
-  <app-custom-date-picker placeholder="End Date" [formControl]="endDateControl"></app-custom-date-picker>
-  <button mat-raised-button color="primary" (click)="fetchChartData()">Update Chart</button>
-</div>
+`<div [ngClass]="{'mobile': isMobile, 'desktop': !isMobile}">
 
-<mat-tab-group [(selectedIndex)]="activeTab">
-  <mat-tab label="Emotions by type">
-    <div *ngIf="isLoading" class="loading-screen">
-      <mat-spinner diameter="48"></mat-spinner>
-      <h2>Loading Emotions Chart...</h2>
-    </div>
+  <mat-accordion class="create-emotion-accordion">
 
-    <ng-container *ngIf="!isLoading">
-      <div class="chart-container">
-        <!-- Render the emotions sunburst chart here -->
+    <mat-expansion-panel hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Dates
+        </mat-panel-title>
+        <mat-panel-description>
+          Choose a date range
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <app-custom-date-picker placeholder="Start Date" [formControl]="startDateControl"></app-custom-date-picker>
+      <app-custom-date-picker placeholder="End Date" [formControl]="endDateControl"></app-custom-date-picker>
+      <mat-action-row>
+        <button mat-button color="primary"  type="button" (click)="fetchChartData()">Update Chart</button>
+      </mat-action-row>
+    </mat-expansion-panel>
 
+    <mat-expansion-panel expanded="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Chart Options
+        </mat-panel-title>
+        <mat-panel-description>
+          Weight the data by record count or by intensity
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <mat-action-row class="radio-action-row">
+        <div class="radio-container">
+          <mat-radio-group [(ngModel)]="seriesType" (change)="onToggleSeriesType()">
+            <mat-radio-button value="distribution">Distribution</mat-radio-button>
+            <mat-radio-button value="trend">Trend Over Time</mat-radio-button>
+          </mat-radio-group>
+          <mat-radio-group [(ngModel)]="plotType">
+            <mat-radio-button value="recordCount">Record Count</mat-radio-button>
+            <mat-radio-button value="intensity">Intensity</mat-radio-button>
+          </mat-radio-group>
+          <mat-radio-group [(ngModel)]="chartType">
+            <mat-radio-button value="emotion">Emotions</mat-radio-button>
+            <mat-radio-button value="trigger">Reasons</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </mat-action-row>
+    </mat-expansion-panel>
+
+  </mat-accordion>
+
+  <mat-tab-group [(selectedIndex)]="activeTab">
+
+    <mat-tab [label]=seriesName>
+      <div *ngIf="isLoading" class="loading-screen">
+        <mat-spinner diameter="48"></mat-spinner>
+        <h2>Loading Emotions Chart...</h2>
       </div>
-    </ng-container>
-  </mat-tab>
 
-  <mat-tab label="Tab 2">
-    <!-- Tab 2 content here -->
-  </mat-tab>
+      <ng-container *ngIf="!isLoading">
 
-  <mat-tab label="Tab 3">
-    <!-- Tab 3 content here -->
-  </mat-tab>
+        <div class="chart-container" id="chartContainerId">
+          <canvasjs-chart *ngIf="seriesType === 'distribution' && chartType === 'emotion' && plotType === 'recordCount'"
+                          [options]="doughnutEmotionTypeRecordCountChartOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
+          <canvasjs-chart *ngIf="seriesType === 'distribution' && chartType === 'emotion' && plotType === 'intensity'"
+                          [options]="doughnutEmotionTypeIntensityChartOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
+          <canvasjs-chart *ngIf="seriesType === 'distribution' && chartType === 'trigger' && plotType === 'recordCount'"
+                          [options]="doughnutTriggersRecordCountChartOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
+          <canvasjs-chart *ngIf="seriesType === 'distribution' && chartType === 'trigger' && plotType === 'intensity'"
+                          [options]="doughnutTriggersIntensityChartOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
 
-  <mat-tab label="Tab 4">
-    <!-- Tab 4 content here -->
-  </mat-tab>
-</mat-tab-group>
+          <canvasjs-chart *ngIf="seriesType === 'trend' && chartType === 'emotion' && plotType === 'recordCount'"
+                          [options]="lineChartEmotionTypeCountOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
+          <canvasjs-chart *ngIf="seriesType === 'trend' && chartType === 'emotion' && plotType === 'intensity'"
+                          [options]="lineChartEmotionTypeIntensityOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
+          <canvasjs-chart *ngIf="seriesType === 'trend' && chartType === 'trigger' && plotType === 'recordCount'"
+                          [options]="lineChartTriggerCountOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
+          <canvasjs-chart *ngIf="seriesType === 'trend' && chartType === 'trigger' && plotType === 'intensity'"
+                          [options]="lineChartTriggerIntensityOptions"
+                          [styles]="{width: '100%', height:'300px'}"></canvasjs-chart>
+
+        </div>
+      </ng-container>
+    </mat-tab>
+
+    <!-- Remaining tabs -->
+  </mat-tab-group>
+</div>
+`

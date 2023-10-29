@@ -2,8 +2,9 @@
 package controllers
 
 import auth.AuthenticatedAction
+import auth.model.TokenData
 import controllers.model.TagData
-import dao.model.{EmotionRecord, Note}
+import dao.model.{EmotionRecord, EmotionRecordDay, LineChartTrendDataRow, Note}
 import play.api.libs.json._
 import play.api.mvc._
 import service.{EmotionRecordService, NoteService, TagService}
@@ -21,7 +22,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
                                         noteService: NoteService,
                                         tagService: TagService,
                                         authenticatedAction: AuthenticatedAction)
-  extends AbstractController(cc) {
+  extends EmoBaseController(cc, authenticatedAction) {
 
   val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
 
@@ -121,17 +122,28 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def findAllByUserIdAndDateRange(startDate: String, endDate: String): Action[AnyContent] =
-    Action andThen authenticatedAction async { implicit token =>
-      emotionRecordService.findAllByUserIdAndDateRange(token.user.userId, startDate, endDate).
+    authenticatedActionWithUser { implicit token =>
+      emotionRecordService.findAllByUserIdAndDateRange(token.userId, startDate, endDate).
         map(emotionRecords => Ok(Json.toJson(emotionRecords)))
     }
 
   def findRecordsByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
-    Action andThen authenticatedAction async { implicit token =>
+    authenticatedActionWithUser { implicit token =>
       Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
-        case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.user.userId,
+        case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
           from.toInstant, to.toInstant).map(
           emotionRecords => Ok(Json.toJson(emotionRecords)))
+        case Failure(_) => Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
+      }
+    }
+
+  def findRecordsByDayByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
+    authenticatedActionWithUser { implicit token =>
+      Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
+        case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
+          from.toInstant, to.toInstant).map(emotionRecordService.groupRecordsByDate).
+          map(emotionRecordService.generateLineChartTrendDataSetForEmotionTypesTriggers).
+          map(emotionRecords => Ok(Json.toJson(emotionRecords)))
         case Failure(_) => Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
       }
     }
@@ -142,11 +154,17 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
 
+  def findAllByUserIdAndDateRangeForSunburstChart(startDate: String, endDate: String): Action[AnyContent] =
+    authenticatedActionWithUser { token =>
+      emotionRecordService.findAllByUserIdAndDateRange(token.userId, startDate, endDate).
+        map(emotionRecordService.emotionRecordsToSunburstChartData).
+        map(emotionRecordsChartData => Ok(Json.toJson(emotionRecordsChartData)))
+    }
 
-  def findAllByUserIdAndDateRangeForCharts(startDate: String, endDate: String): Action[AnyContent] =
-    Action andThen authenticatedAction async { implicit token =>
-      emotionRecordService.findAllByUserIdAndDateRange(token.user.userId, startDate, endDate).
-        map(emotionRecordService.emotionRecordsToChartData).
+  def findAllByUserIdAndDateRangeForDoughnutEmotionTypeTriggersChart(startDate: String, endDate: String): Action[AnyContent] =
+    authenticatedActionWithUser { token =>
+      emotionRecordService.findAllByUserIdAndDateRange(token.userId, startDate, endDate).
+        map(emotionRecordService.emotionRecordsToDoughnutEmotionTypeTriggerChartData).
         map(emotionRecordsChartData => Ok(Json.toJson(emotionRecordsChartData)))
     }
 

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {
   EmotionData, EmotionRecord,
-  EmotionRecordDay,
+  EmotionRecordDay, EmotionTypesTriggersDoughnutData, LineChartTrendDataSet,
   Note, SuggestedAction, SunburstData
 } from '../models/emotion.model';
 import {catchError, map, tap} from 'rxjs/operators';
@@ -102,10 +102,25 @@ export class EmotionService {
       {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 
+  fetchMonthEmotionRecordsByDayForCurrentUser(dateRange: { start: string, end: string }) {
+    const headers = this.authService.getAuthorizationHeader();
+
+    return this.http.get<LineChartTrendDataSet>(
+      `${environment.baseUrl}/emotionRecord/day/user/month/${dateRange.start}/${dateRange.end}`,
+      {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
+  }
+
   fetchEmotionSunburnChartDataForDateRange(dateRange: { start: string, end: string }) {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.get<SunburstData[]>(
       `${environment.baseUrl}/charts/user/month/${dateRange.start}/${dateRange.end}`,
+      {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
+  }
+
+  fetchEmotionDoughnutEmotionTypeTriggersChartDataForDateRange(dateRange: { start: string, end: string }): Observable<EmotionTypesTriggersDoughnutData> {
+    const headers = this.authService.getAuthorizationHeader();
+    return this.http.get<EmotionTypesTriggersDoughnutData>(
+      `${environment.baseUrl}/charts/user/doughnut/emotionTypesTrigger/month/${dateRange.start}/${dateRange.end}`,
       {headers}).pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 

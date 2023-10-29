@@ -3,19 +3,81 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;  /* Adjust this value as needed */
+  gap: 0.5rem;
 }
 
 .app-custom-date-picker,
 button {
   flex: 1 0 auto;
-  max-width: 200px;  /* Adjust this value as needed */
+  max-width: 200px;
+  margin-bottom: 0.5rem; /* added this to give space between elements on small screens */
+}
+
+@media (max-width: 768px) {
+  .date-picker-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-custom-date-picker,
+  button {
+    max-width: 100%;
+    flex: 1 0 100%;
+  }
+}
+
+.chart-container {
+  width: 100%;
+}
+
+@media screen and (min-width: 992px) {
+  .chart-container {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  canvasjs-chart {
+    width: 100%!important;
+    height: 400px!important;
+  }
+}
+
+canvasjs-chart {
+  width: 100%!important;
+  height: auto!important;
+  max-height: 50vh;
 }
 
 @media (max-width: 600px) {
-  .app-custom-date-picker,
-  button {
-
-    align-self: flex-end;
+  canvasjs-chart {
+    max-height: 200px;
   }
+}
+
+.toggle-group {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  gap: 0.5rem;
+}
+
+.radio-action-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.radio-label {
+  display: block; /* Ensures the label displays above the radio buttons */
+  margin-bottom: 5px; /* Add some space between the label and the radio buttons */
+}
+
+.radio-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 15px;
 }
