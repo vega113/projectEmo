@@ -23,7 +23,7 @@ export const routes: Routes = [
       { path: 'signup', component: SignupComponent },
       { path: 'create-emotion', component: CreateEmotionComponent , canActivate: [AuthGuard] },
       { path: 'emotions-timeline', component: EmotionsTimelineComponent , canActivate: [AuthGuard] },
-      { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+      { path: 'charts', component: DashboardComponent, canActivate: [AuthGuard] },
       { path: 'display-emotion', component: DisplayEmotionComponent , canActivate: [AuthGuard]},
       { path: 'emotions-calendar', component: EmotionCalendarComponent, canActivate: [AuthGuard] },
     ],
