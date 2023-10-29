@@ -33,11 +33,11 @@ object Color {
   }
   case object Negative extends Color {
     val name = "Negative"
-    val value = "#ffb74d"
+    val value = "#e57373"
   }
   case object Neutral extends Color {
     val name = "Neutral"
-    val value = "#e57373"
+    val value = "#ffb74d"
   }
 
   def fromName(name: String): Option[Color] = name match {
