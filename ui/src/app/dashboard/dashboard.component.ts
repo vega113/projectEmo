@@ -47,7 +47,6 @@ export class DashboardComponent implements OnInit {
 
 
     constructor(
-        private http: HttpClient,
         private emotionService: EmotionService,
         private snackBar: MatSnackBar,
         private dateService: DateService,
@@ -226,7 +225,6 @@ export class DashboardComponent implements OnInit {
     }
 
     onToggleSeriesType() {
-        // log to console seriesType, chartType, plotType
         console.log('this.seriesType', this.seriesType);
         console.log('this.chartType', this.chartType);
         console.log('this.plotType', this.plotType);

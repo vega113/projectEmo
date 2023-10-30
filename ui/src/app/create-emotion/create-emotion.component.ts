@@ -73,7 +73,8 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
               private authService: AuthService,
               private emotionStateService: EmotionStateService,
-              private router: Router, private snackBar: MatSnackBar,
+              private router: Router,
+              private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
               private noteService: NoteService,
               private dateService: DateService) {
