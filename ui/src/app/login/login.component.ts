@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {Router} from "@angular/router";
 import {AuthService} from "../services/auth.service";
 import { lastValueFrom } from 'rxjs';
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,10 @@ import { lastValueFrom } from 'rxjs';
 export class LoginComponent {
   loginForm: FormGroup;
 
-  constructor(private authService: AuthService, private fb: FormBuilder, private router: Router
+  constructor(private authService: AuthService,
+              private fb: FormBuilder,
+              private router: Router,
+              private snackBar: MatSnackBar
   ) {
     this.loginForm = this.fb.group({
       username: ['', Validators.required],
@@ -29,10 +33,14 @@ export class LoginComponent {
         localStorage.setItem('auth_token', response.token);
 
         // Redirect the user to the main app or another desired route
-        this.router.navigate(['/emotions-timeline']);
+        this.router.navigate(['/create-emotion']);
       } catch (error) {
         // Handle any errors from the API, such as incorrect credentials
         console.error('Login failed:', error);
+        this.snackBar.open('Login failed', 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
       }
     }
   }

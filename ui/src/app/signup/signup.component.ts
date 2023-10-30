@@ -3,7 +3,8 @@ import { User } from '../models/emotion.model';
 import { AuthService } from '../services/auth.service';
 import { switchMap, first } from 'rxjs/operators';
 import {firstValueFrom} from "rxjs";
-import { Router } from '@angular/router'; // Import Router here
+import { Router } from '@angular/router';
+import {MatSnackBar} from "@angular/material/snack-bar"; // Import Router here
 
 
 @Component({
@@ -18,7 +19,9 @@ export class SignupComponent {
   firstName = '';
   lastName = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(private authService: AuthService, private router: Router,
+              private snackBar: MatSnackBar,
+  ) { }
 
   signup() {
     const user: User = {
@@ -41,6 +44,10 @@ export class SignupComponent {
       .catch((error) => {
         console.error('Error during signup:', error);
         // Handle error here, e.g. show an error message
+        this.snackBar.open('Signup failed, try another username.', 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
       });
   }
 
