@@ -24,15 +24,15 @@ export class MainLayoutComponent implements AfterViewInit {
   isHeaderVisible = true;
   currentUserName: string = '';
 
-  constructor(private authService: AuthService, private breakpointObserver: BreakpointObserver,
+  constructor(public authService: AuthService, private breakpointObserver: BreakpointObserver,
               private router: Router, private renderer: Renderer2, private cdRef: ChangeDetectorRef) {
     this.isAuthenticated = this.authService.isAuthenticated;
   }
 
   ngOnInit(): void {
     window.addEventListener('scroll', this.handleScroll.bind(this));
-    this.currentUserName = this.authService.fetchDecodedToken().username;
   }
+
 
   ngAfterViewInit(): void {
     this.hideHeaderOnScroll(); // This should ensure header is available when called

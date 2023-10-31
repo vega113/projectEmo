@@ -14,7 +14,8 @@ import {environment} from "../../environments/environment";
 export class AuthService {
   public isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
-
+  jwtHelper = new JwtHelperService();
+  currentUsername: string = '';
 
   constructor(private http: HttpClient, private snackBar: MatSnackBar) {
     const token = localStorage.getItem('auth_token');
@@ -25,7 +26,7 @@ export class AuthService {
     return this.http.post(`${environment.baseUrl}/user`, user)
       .pipe(
         tap((response) => {
-          console.log('User registered successfully', response);
+          console.log('User registered successfully: ' + user, response);
           // Navigate to the login page or display a success message
         })
       );
@@ -37,7 +38,9 @@ export class AuthService {
       .pipe(
         tap((response) => {
           this.isAuthenticatedSubject.next(true);
-          console.log('User logged in successfully', response);
+          console.log('User logged in successfully', this.jwtHelper.decodeToken(response.token));
+          this.currentUsername = username;
+          localStorage.removeItem('auth_token');
           localStorage.setItem('auth_token', response.token);
         }),
         catchError((error: HttpErrorResponse) =>
@@ -69,8 +72,7 @@ export class AuthService {
   }
 
   fetchDecodedToken() {
-    const helper = new JwtHelperService();
     const encodedToken = localStorage.getItem('auth_token');
-    return new JwtHelperService().decodeToken(encodedToken!);
+    return this.jwtHelper.decodeToken(encodedToken!);
   }
 }

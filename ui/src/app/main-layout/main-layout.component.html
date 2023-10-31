@@ -9,7 +9,7 @@
       <button mat-stroked-button color="accent" routerLink="/login">Login</button>
       <button mat-raised-button color="primary" routerLink="/signup">Sign up</button>
     </div>
-    <span *ngIf="(isAuthenticated | async) === true" class="current-user-name">{{currentUserName}}</span>
+    <span *ngIf="(isAuthenticated | async) === true" class="current-user-name">{{this.authService.fetchDecodedToken().username}}</span>
     <button *ngIf="(isAuthenticated | async) === true" mat-stroked-button color="accent" (click)="logout()">Sign out</button>
   </mat-toolbar-row>
 </mat-toolbar>
