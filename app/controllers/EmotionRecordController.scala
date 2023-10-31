@@ -26,13 +26,6 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
 
   val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
 
-  def findById(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
-    emotionRecordService.findByIdForUser(id, token.user.userId).map {
-      case Some(emotionRecord) => Ok(Json.toJson(emotionRecord))
-      case None => NotFound
-    }
-  }
-
   private def validateRequestUserId(bodyUserId: Option[Long], tokenUserId: Long): Boolean = {
     bodyUserId match {
       case Some(id) => id == tokenUserId
@@ -53,6 +46,8 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     logger.info(s"Inserting emotion record for user: ${token.user.userId}")
     token.body.validate[EmotionRecord].fold(
       errors => {
+        logger.info(s"Failed to parse emotion record when inserting, user: ${token.user.userId}," +
+          s" errors: ${JsError.toJson(errors).toString()}")
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
@@ -99,6 +94,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   def update(id: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     token.body.validate[EmotionRecord].fold(
       errors => {
+        logger.info("errors when updating emotion record: " + JsError.toJson(errors).toString)
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
@@ -110,25 +106,21 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     )
   }
 
-  def delete(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
-    emotionRecordService.delete(token.user.userId).map {
-      case 1 => Ok
-      case _ => NotFound
-    }
-  }
-
   def findAllByUserId(): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
+    logger.info("findAllByUserId")
     emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
 
   def findAllByUserIdAndDateRange(startDate: String, endDate: String): Action[AnyContent] =
     authenticatedActionWithUser { implicit token =>
+      logger.info("findAllByUserIdAndDateRange")
       emotionRecordService.findAllByUserIdAndDateRange(token.userId, startDate, endDate).
         map(emotionRecords => Ok(Json.toJson(emotionRecords)))
     }
 
   def findRecordsByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
     authenticatedActionWithUser { implicit token =>
+      logger.info("findRecordsByUserIdForMonth")
       Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
         case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
           from.toInstant, to.toInstant).map(
@@ -139,23 +131,27 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
 
   def findRecordsByDayByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
     authenticatedActionWithUser { implicit token =>
+      logger.info(s"entering findRecordsByDayByUserIdForMonth monthStart: ${monthStart}, monthEnd: ${monthEnd}")
       Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
         case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
           from.toInstant, to.toInstant).map(emotionRecordService.groupRecordsByDate).
           map(emotionRecordService.generateLineChartTrendDataSetForEmotionTypesTriggers).
           map(emotionRecords => Ok(Json.toJson(emotionRecords)))
-        case Failure(_) => Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
+        case Failure(_) =>
+          logger.info(s"failed to parse date for findRecordsByDayByUserIdForMonth monthStart: ${monthStart}, monthEnd: ${monthEnd}")
+          Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
       }
     }
 
-
   def findAllDaysByUserId(): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
+    logger.info("findAllDaysByUserId")
     emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecordService.groupRecordsByDate).
       map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
 
   def findAllByUserIdAndDateRangeForSunburstChart(startDate: String, endDate: String): Action[AnyContent] =
     authenticatedActionWithUser { token =>
+      logger.info("findAllByUserIdAndDateRangeForSunburstChart")
       emotionRecordService.findAllByUserIdAndDateRange(token.userId, startDate, endDate).
         map(emotionRecordService.emotionRecordsToSunburstChartData).
         map(emotionRecordsChartData => Ok(Json.toJson(emotionRecordsChartData)))
@@ -163,6 +159,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
 
   def findAllByUserIdAndDateRangeForDoughnutEmotionTypeTriggersChart(startDate: String, endDate: String): Action[AnyContent] =
     authenticatedActionWithUser { token =>
+      logger.info("findAllByUserIdAndDateRangeForDoughnutEmotionTypeTriggersChart, startDate: " + startDate + " endDate: " + endDate)
       emotionRecordService.findAllByUserIdAndDateRange(token.userId, startDate, endDate).
         map(emotionRecordService.emotionRecordsToDoughnutEmotionTypeTriggerChartData).
         map(emotionRecordsChartData => Ok(Json.toJson(emotionRecordsChartData)))
@@ -170,10 +167,15 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
 
   def deleteTag(id: Long): Action[AnyContent] =
     Action andThen authenticatedAction async { implicit token =>
+      logger.info("deleting tag: " + id)
       emotionRecordService.findEmotionRecordIdByUserIdTagId(token.user.userId, id).flatMap {
         case Some(emotionRecordId) => tagService.delete(emotionRecordId, id).map {
-          case true => Ok
-          case false => BadRequest(Json.obj("message" -> s"Invalid tag id: $id"))
+          case true =>
+            logger.info("deleted tag: " + id)
+            Ok
+          case false =>
+            logger.info("failed to delete tag: " + id)
+            BadRequest(Json.obj("message" -> s"Invalid tag id: $id"))
         }
         case None => Future.successful(BadRequest(Json.obj("message" -> s"Invalid tag id: $id")))
       }
@@ -182,9 +184,11 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   def addTag(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     token.body.validate[TagData].fold(
       errors => {
+        logger.info("failed to parse tag data: " + JsError.toJson(errors).toString)
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       tagData => {
+        logger.info("adding tag: " + tagData.tagName)
         emotionRecordService.findByIdForUser(tagData.emotionRecordId, token.user.userId).flatMap {
           case Some(_) => tagService.add(tagData.emotionRecordId, tagData.tagName).map {
             case true => Ok
