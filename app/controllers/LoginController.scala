@@ -20,7 +20,7 @@ class LoginController @Inject()(
   def login: Action[LoginData] = Action.async(parse.json[LoginData]) { implicit request =>
     val loginData = request.body
     userService.findByUsername(loginData.username).map {
-      case Some(user) if user.password == loginData.password =>
+      case Some(user) if user.password == loginData.password && user.username == loginData.username =>
         val token = jwtService.createToken(user, 365.days) // TODO make expiration configurable
         Ok(Json.obj("token" -> token))
       case _ => Unauthorized(Json.obj("message" -> "Invalid username or password"))
