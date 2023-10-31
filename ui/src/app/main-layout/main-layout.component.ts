@@ -22,6 +22,7 @@ export class MainLayoutComponent implements AfterViewInit {
   isMobile: boolean = false;
   lastScrollTop = 0;
   isHeaderVisible = true;
+  currentUserName: string = '';
 
   constructor(private authService: AuthService, private breakpointObserver: BreakpointObserver,
               private router: Router, private renderer: Renderer2, private cdRef: ChangeDetectorRef) {
@@ -30,6 +31,7 @@ export class MainLayoutComponent implements AfterViewInit {
 
   ngOnInit(): void {
     window.addEventListener('scroll', this.handleScroll.bind(this));
+    this.currentUserName = this.authService.fetchDecodedToken().username;
   }
 
   ngAfterViewInit(): void {

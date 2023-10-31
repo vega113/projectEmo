@@ -86,3 +86,6 @@ mat-sidenav {
   width: 250px;
 }
 
+.current-user-name {
+  margin-right: 10px; /* Space between the user's name and the Sign out button */
+}

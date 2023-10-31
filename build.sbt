@@ -4,7 +4,13 @@ ThisBuild / version := "1.0.3.8"
 
 maintainer := "vega113@gmail.com"
 
-javaOptions += "-Dgraal.CompilationFailureAction=Silent"
+javaOptions ++= Seq(
+  "-Dgraal.CompilationFailureAction=Silent",
+  "-Xms256M",
+  "-Xmx512M",
+  "-Xss1M",
+  "-XX:+CMSClassUnloadingEnabled"
+)
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)

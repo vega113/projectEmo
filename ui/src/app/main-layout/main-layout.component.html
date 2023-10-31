@@ -3,12 +3,13 @@
     <button *ngIf="(isAuthenticated | async) === true" mat-icon-button (click)="sidenav.toggle()" class="menu-button">
       <mat-icon>menu</mat-icon>
     </button>
-    <a [routerLink]="(isAuthenticated | async) ? '/emotions-timeline' : '/landing'" class="app-name">Emotion Signals</a>
+    <a [routerLink]="(isAuthenticated | async) ? '/landing' : '/'" class="app-name">Emotion Signals</a>
     <span class="spacer"></span>
     <div *ngIf="(isAuthenticated | async) === false" class="button-container">
       <button mat-stroked-button color="accent" routerLink="/login">Login</button>
       <button mat-raised-button color="primary" routerLink="/signup">Sign up</button>
     </div>
+    <span *ngIf="(isAuthenticated | async) === true" class="current-user-name">{{currentUserName}}</span>
     <button *ngIf="(isAuthenticated | async) === true" mat-stroked-button color="accent" (click)="logout()">Sign out</button>
   </mat-toolbar-row>
 </mat-toolbar>
