@@ -152,7 +152,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
           this.updateEmotionCache();
       }
     });
-
+    this.emotionForm.controls['intensity'].setValue(1);
   }
 
     private updateEmotionCache() {
