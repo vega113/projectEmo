@@ -6,8 +6,7 @@ maintainer := "vega113@gmail.com"
 
 javaOptions ++= Seq(
   "-Dgraal.CompilationFailureAction=Silent",
-  "-Xms256M",
-  "-Xmx512M",
+  "-Xmx300M",
   "-Xss1M",
   "-XX:+CMSClassUnloadingEnabled"
 )
@@ -28,6 +27,8 @@ resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases
 resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/"
 resolvers += "Atlassian's Maven Public Repository" at "https://packages.atlassian.com/maven-public/"
 resolvers += Resolver.jcenterRepo
+
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.11.4"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
 dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
@@ -53,6 +54,9 @@ libraryDependencies += "org.fusesource.jansi" % "jansi" % "2.4.0"
 libraryDependencies += "com.google.inject" % "guice" % "5.0.0"
 
 libraryDependencies += ws
+
+libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4"
+
 
 
 

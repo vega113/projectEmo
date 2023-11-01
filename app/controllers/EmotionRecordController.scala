@@ -15,6 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util._
 import model.EmotionData._
+import net.logstash.logback.argument.StructuredArguments._
 
 
 class EmotionRecordController @Inject()(cc: ControllerComponents,
@@ -25,6 +26,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   extends EmoBaseController(cc, authenticatedAction) {
 
   val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
+
 
   private def validateRequestUserId(bodyUserId: Option[Long], tokenUserId: Long): Boolean = {
     bodyUserId match {
@@ -43,7 +45,10 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def insert(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
-    logger.info(s"Inserting emotion record for user: ${token.user.userId}")
+
+    logger.info("Inserting emotion record for user {} {}",
+      value("userId", token.user.userId), value("record", token.body))
+
     token.body.validate[EmotionRecord].fold(
       errors => {
         logger.info(s"Failed to parse emotion record when inserting, user: ${token.user.userId}," +
