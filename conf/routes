@@ -8,6 +8,7 @@ GET            /                                                                
 
 # Login
 POST           /api/login                                                                       controllers.LoginController.login
+POST           /api/logout                                                                       controllers.LoginController.logout
 
 # EmotionRecordWithRelations routes
 POST           /api/emotionRecord                                                               controllers.EmotionRecordController.insert()

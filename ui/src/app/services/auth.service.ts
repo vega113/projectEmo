@@ -55,7 +55,23 @@ export class AuthService {
       );
   }
 
-  logout() {
+  logout(username: string = "") {
+    if (username != "") {
+      this.http
+        .post<{ token: string }>(`${environment.baseUrl}/logout`, { username })
+        .pipe(
+          tap((response) => {
+            console.log('User logged out successfully on server', this.jwtHelper.decodeToken(response.token));
+            this.currentUsername = username;
+          }),
+          catchError((error: HttpErrorResponse) =>
+            {
+              console.log('User failed to logout on server', error);
+              return throwError(() => new Error('User failed to logout on server'));
+            }
+          )
+        );
+    }
     localStorage.removeItem('auth_token');
     this.isAuthenticatedSubject.next(false);
   }

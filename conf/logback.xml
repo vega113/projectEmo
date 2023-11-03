@@ -18,6 +18,7 @@
   <logger name="com.zaxxer.hikari" level="INFO" />
   <logger name="akka.serialization.jackson.JacksonObjectMapperProvider" level="INFO" />
   <logger name="akka.http.impl.util.StreamUtils" level="INFO" />
+  <logger name="akka.io.TcpListener" level="INFO" />
 
   <root level="debug">
     <appender-ref ref="ASYNCSTDOUT" />

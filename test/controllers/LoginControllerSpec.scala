@@ -7,6 +7,7 @@ import dao.model.User
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -23,6 +24,8 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
 
   private val mockUserService = mock[UserService]
   private val mockJwtService = mock[JwtService]
+  private val authenticatedAction = new MockAuthenticatedAction(mockUserService, mockJwtService)
+  val config: Configuration = Configuration("emo.config.loginTokenExpirationTime" -> "1 hour")
 
   "LoginController" should {
     "return a token for a valid user" in {
@@ -33,7 +36,7 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(Some(user)))
       when(mockJwtService.createToken(user, 1.hour)).thenReturn(token)
 
-      val controller = new LoginController(stubControllerComponents(), mockUserService, mockJwtService)
+      val controller = new LoginController(stubControllerComponents(), mockUserService, mockJwtService, authenticatedAction, config)
       val fakeRequest = FakeRequest(GET, "/login").withBody(loginData)
       val login = controller.login().apply(fakeRequest)
 
@@ -47,7 +50,8 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
 
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(None))
 
-      val controller = new controllers.LoginController(stubControllerComponents(), mockUserService, mockJwtService)
+      val controller = new controllers.LoginController(stubControllerComponents(), mockUserService, mockJwtService,
+        authenticatedAction, config)
       val fakeRequest = FakeRequest(GET, "/login").withBody(loginData)
       val login = controller.login().apply(fakeRequest)
 
@@ -62,7 +66,7 @@ class LoginControllerSpec extends PlaySpec with MockitoSugar {
 
       when(mockUserService.findByUsername(loginData.username)).thenReturn(Future.successful(Some(user)))
 
-      val controller = new LoginController(stubControllerComponents(), mockUserService, mockJwtService)
+      val controller = new LoginController(stubControllerComponents(), mockUserService, mockJwtService, authenticatedAction, config)
       val fakeRequest = FakeRequest(GET, "/login").withBody(loginData)
       val login = controller.login().apply(fakeRequest)
 

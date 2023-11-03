@@ -2,9 +2,10 @@
 package controllers
 
 import auth.AuthenticatedAction
-import auth.model.TokenData
+import controllers.model.EmotionData._
 import controllers.model.TagData
-import dao.model.{EmotionRecord, EmotionRecordDay, LineChartTrendDataRow, Note}
+import dao.model.{EmotionRecord, Note}
+import net.logstash.logback.argument.StructuredArguments._
 import play.api.libs.json._
 import play.api.mvc._
 import service.{EmotionRecordService, NoteService, TagService}
@@ -14,8 +15,6 @@ import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util._
-import model.EmotionData._
-import net.logstash.logback.argument.StructuredArguments._
 
 
 class EmotionRecordController @Inject()(cc: ControllerComponents,
