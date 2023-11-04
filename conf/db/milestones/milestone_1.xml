@@ -37,11 +37,17 @@
             <column name="suggestion" type="varchar(255)" />
         </addColumn>
     </changeSet>
+
     <changeSet id="modify_suggestion_to_text" author="vega">
         <modifyDataType tableName="notes" columnName="suggestion" newDataType="TEXT" />
     </changeSet>
     <changeSet id="modify_description_to_text" author="vega">
         <modifyDataType tableName="notes" columnName="description" newDataType="TEXT" />
     </changeSet>
+
+    <changeSet id="modify_description_to_text" author="vega">
+        <modifyDataType tableName="text" columnName="description" newDataType="TEXT" />
+    </changeSet>
+
 
 </databaseChangeLog>
