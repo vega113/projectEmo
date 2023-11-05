@@ -45,8 +45,8 @@
         <modifyDataType tableName="notes" columnName="description" newDataType="TEXT" />
     </changeSet>
 
-    <changeSet id="modify_description_to_text" author="vega">
-        <modifyDataType tableName="text" columnName="description" newDataType="TEXT" />
+    <changeSet id="modify_text_to_text" author="vega">
+        <modifyDataType tableName="notes" columnName="text" newDataType="TEXT" />
     </changeSet>
 
 
