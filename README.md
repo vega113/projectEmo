@@ -48,6 +48,10 @@ npm install --save
 ## Dev notes:
   Run docker container with `colima start`
 
+## Performance Testing
+1. Run the local server with `sbt run`
+2. Run the performance test with `sbt gatling:test`
+
 
 
 ## Contributing

@@ -28,7 +28,7 @@ class UserController @Inject()(cc: ControllerComponents,
           case Some(id) =>
             logger.info("user created: " + user.username)
             Created(Json.toJson(user.copy(userId = Some(id.toInt))))
-          case None => InternalServerError("Failed to create user, probably due to duplicate username or email")
+          case None => Conflict("Failed to create user, probably due to duplicate username or email")
         }
         case JsError(errors) =>
           logger.info("failed to create user: " + errors.mkString(","))
