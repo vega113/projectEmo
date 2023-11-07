@@ -16,7 +16,7 @@ PUT            /api/emotionRecord/:id                                           
 POST           /api/emotionRecord/:id/note                                                      controllers.EmotionRecordController.insertNote(id: Long)
 GET            /api/emotionRecord/user                                                          controllers.EmotionRecordController.findAllByUserId()
 GET            /api/emotionRecord/user/days                                                     controllers.EmotionRecordController.findAllDaysByUserId()
-GET            /api/emotionRecord/user/month/:monthStart/:monthEnd                              controllers.EmotionRecordController.findRecordsByUserIdForMonth(monthStart: String, monthEnd)
+GET            /api/emotionRecord/user/month/:monthStart/:monthEnd                              controllers.EmotionRecordController.findRecordsByUserIdForMonth(monthStart: String, monthEnd: String)
 GET            /api/emotionRecord/day/user/month/:monthStart/:monthEnd                          controllers.EmotionRecordController.findRecordsByDayByUserIdForMonth(monthStart: String, monthEnd)
 GET            /api/charts/user/month/:monthStart/:monthEnd                                     controllers.EmotionRecordController.findAllByUserIdAndDateRangeForSunburstChart(monthStart: String, monthEnd)
 GET            /api/charts/user/doughnut/emotionTypesTrigger/month/:monthStart/:monthEnd        controllers.EmotionRecordController.findAllByUserIdAndDateRangeForDoughnutEmotionTypeTriggersChart(monthStart: String, monthEnd)

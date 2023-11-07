@@ -10,18 +10,22 @@ javaOptions ++= Seq(
   "-Xss1M",
   "-XX:+CMSClassUnloadingEnabled"
 )
+Gatling / scalaSource := sourceDirectory.value / "gatling" / "scala"
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala)
+  .enablePlugins(PlayScala, GatlingPlugin)
   .settings(
-    name := """projectEmo""",
+    name := "projectEmo",
     libraryDependencies ++= Seq(
       guice,
-      "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test,
+      "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
     ),
     watchSources ++= (baseDirectory.value / "ui/emo-app/src" ** "*").get,
+    inConfig(Gatling)(Defaults.testSettings),
   )
 
+Gatling / resourceDirectory := baseDirectory.value / "gatling/resources"
+Gatling / scalaSource := baseDirectory.value / "gatling"
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
 resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/"
@@ -51,7 +55,7 @@ libraryDependencies += "com.pauldijou" %% "jwt-play-json" % "5.0.0"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8"
 libraryDependencies += "org.fusesource.jansi" % "jansi" % "2.4.0"
-libraryDependencies += "com.google.inject" % "guice" % "5.0.0"
+libraryDependencies += "com.google.inject" % "guice" % "5.1.0"
 
 libraryDependencies += ws
 
@@ -59,6 +63,11 @@ libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.
 
 
 
+libraryDependencies ++= Seq(
+  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.9.5" % "test",
+  "io.gatling"            % "gatling-test-framework"    % "3.9.5" % "test"
+)
+Gatling / javaOptions := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
 
 libraryDependencies += "org.mockito" % "mockito-core" % "5.2.0" % "test"
 libraryDependencies += "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test"

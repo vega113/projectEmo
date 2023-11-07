@@ -1,0 +1,31 @@
+<configuration>
+
+    <!-- Define the root logger with the level -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+    </root>
+
+    <!-- Define the console appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%-5level] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Define the file appender -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>gatling.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%-5level] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set the logger level for io.gatling to TRACE for detailed logging -->
+    <logger name="io.gatling" level="TRACE"/>
+
+    <!-- Change the logger level for noisy loggers -->
+    <logger name="io.netty" level="WARN"/>
+    <logger name="io.gatling.http.engine.response" level="WARN"/>
+
+</configuration>

@@ -10,7 +10,8 @@ import play.api.libs.json._
 import play.api.mvc._
 import service.{EmotionRecordService, NoteService, TagService}
 
-import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, YearMonth, ZonedDateTime}
 import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -125,13 +126,28 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   def findRecordsByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
     authenticatedActionWithUser { implicit token =>
       logger.info("findRecordsByUserIdForMonth")
-      Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
+      parseMonthRange(Option(monthStart), Option(monthEnd)) match {
         case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
           from.toInstant, to.toInstant).map(
           emotionRecords => Ok(Json.toJson(emotionRecords)))
         case Failure(_) => Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
       }
     }
+
+  private def parseMonthRange(monthStartOpt: Option[String], monthEndOpt: Option[String]): Try[(ZonedDateTime, ZonedDateTime)] = {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    val now = ZonedDateTime.now()
+    val zoneId = now.getZone
+    val firstDayOfMonth: ZonedDateTime = YearMonth.from(now).atDay(1).atStartOfDay(now.getZone)
+    val lastDayOfMonth: ZonedDateTime = YearMonth.from(now).atEndOfMonth().atTime(23, 59, 59).atZone(zoneId)
+
+    Try(
+      (
+        monthStartOpt.flatMap(s => Try(ZonedDateTime.parse(s, formatter)).toOption).getOrElse(firstDayOfMonth),
+        monthEndOpt.flatMap(s => Try(ZonedDateTime.parse(s, formatter)).toOption).getOrElse(lastDayOfMonth)
+      )
+    )
+  }
 
   def findRecordsByDayByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
     authenticatedActionWithUser { implicit token =>
