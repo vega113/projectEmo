@@ -42,33 +42,27 @@ class UserSimulation extends Simulation {
       val userId = extractUserId(payload)
       session.set("userId", userId)
     }
-    .pause(1)
     .exec(http("Create Emotion Record")
       .post("/api/emotionRecord")
       .body(StringBody(Requests.createEmoBodyStr("${userId}"))) // Ensure Requests.createEmoBodyStr is defined elsewhere in your code
       .header("Authorization", "Bearer ${authToken}")
       .check(status.is(200)))
-    .pause(1)
     .exec(http("Fetch Timeline")
       .get("/api/emotionRecord/user")
       .header("Authorization", "Bearer ${authToken}")
       .check(status.is(200)))
-    .pause(1)
     .exec(http("View Calendar")
       .get("/api/emotionRecord/user/month/2023-11-01T00:00:00+02:00/2023-11-30T23:59:59+02:00")
       .header("Authorization", "Bearer ${authToken}")
       .check(status.is(200)))
-    .pause(1)
     .exec(http("View Charts Doughnut")
       .get("/api/charts/user/doughnut/emotionTypesTrigger/month/2023-08-07T07:08:41Z/2023-11-07T07:08:41Z")
       .header("Authorization", "Bearer ${authToken}")
       .check(status.is(200)))
-    .pause(1)
     .exec(http("View Charts Line")
       .get("/api/emotionRecord/day/user/month/2023-08-07T07:08:41Z/2023-11-07T07:08:41Z")
       .header("Authorization", "Bearer ${authToken}")
       .check(status.is(200)))
-    .pause(1)
     .exec(http("Logout")
       .post("/api/logout") // Assuming this is the endpoint to logout
       .header("Authorization", "Bearer ${authToken}") // If logout requires a token
@@ -76,7 +70,6 @@ class UserSimulation extends Simulation {
 
   setUp(
     scn.inject(
-      nothingFor(1.seconds),
       atOnceUsers(10),
       rampUsers(50).during(1.minutes) // Ramp up to 50 additional users over the period of 5 minutes
     ).protocols(httpProtocol)

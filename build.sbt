@@ -64,8 +64,8 @@ libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.
 
 
 libraryDependencies ++= Seq(
-  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.9.5" % "test",
-  "io.gatling"            % "gatling-test-framework"    % "3.9.5" % "test"
+  "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.9.5",
+  "io.gatling"            % "gatling-test-framework"    % "3.9.5"
 )
 Gatling / javaOptions := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
 
