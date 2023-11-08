@@ -61,6 +61,7 @@ libraryDependencies += ws
 
 libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.4"
 
+dependencyOverrides += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0"
 
 
 libraryDependencies ++= Seq(
