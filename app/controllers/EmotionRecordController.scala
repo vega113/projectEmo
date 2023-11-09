@@ -8,7 +8,7 @@ import dao.model.{EmotionRecord, Note}
 import net.logstash.logback.argument.StructuredArguments._
 import play.api.libs.json._
 import play.api.mvc._
-import service.{EmotionRecordService, NoteService, TagService}
+import service.{DateTimeService, EmotionRecordService, NoteService, TagService}
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, YearMonth, ZonedDateTime}
@@ -22,6 +22,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
                                         emotionRecordService: EmotionRecordService,
                                         noteService: NoteService,
                                         tagService: TagService,
+                                        dateTimeService: DateTimeService,
                                         authenticatedAction: AuthenticatedAction)
   extends EmoBaseController(cc, authenticatedAction) {
 
@@ -126,7 +127,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   def findRecordsByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
     authenticatedActionWithUser { implicit token =>
       logger.info("findRecordsByUserIdForMonth")
-      parseMonthRange(Option(monthStart), Option(monthEnd)) match {
+      dateTimeService.parseMonthRange(Option(monthStart), Option(monthEnd)) match {
         case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
           from.toInstant, to.toInstant).map(
           emotionRecords => Ok(Json.toJson(emotionRecords)))
@@ -134,31 +135,17 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       }
     }
 
-  private def parseMonthRange(monthStartOpt: Option[String], monthEndOpt: Option[String]): Try[(ZonedDateTime, ZonedDateTime)] = {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    val now = ZonedDateTime.now()
-    val zoneId = now.getZone
-    val firstDayOfMonth: ZonedDateTime = YearMonth.from(now).atDay(1).atStartOfDay(now.getZone)
-    val lastDayOfMonth: ZonedDateTime = YearMonth.from(now).atEndOfMonth().atTime(23, 59, 59).atZone(zoneId)
-
-    Try(
-      (
-        monthStartOpt.flatMap(s => Try(ZonedDateTime.parse(s, formatter)).toOption).getOrElse(firstDayOfMonth),
-        monthEndOpt.flatMap(s => Try(ZonedDateTime.parse(s, formatter)).toOption).getOrElse(lastDayOfMonth)
-      )
-    )
-  }
 
   def findRecordsByDayByUserIdForMonth(monthStart: String, monthEnd: String): Action[AnyContent] =
     authenticatedActionWithUser { implicit token =>
-      logger.info(s"entering findRecordsByDayByUserIdForMonth monthStart: ${monthStart}, monthEnd: ${monthEnd}")
+      logger.info(s"entering findRecordsByDayByUserIdForMonth monthStart: $monthStart, monthEnd: $monthEnd")
       Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
         case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
           from.toInstant, to.toInstant).map(emotionRecordService.groupRecordsByDate).
           map(emotionRecordService.generateLineChartTrendDataSetForEmotionTypesTriggers).
           map(emotionRecords => Ok(Json.toJson(emotionRecords)))
         case Failure(_) =>
-          logger.info(s"failed to parse date for findRecordsByDayByUserIdForMonth monthStart: ${monthStart}, monthEnd: ${monthEnd}")
+          logger.info(s"failed to parse date for findRecordsByDayByUserIdForMonth monthStart: ${monthStart}, monthEnd: $monthEnd")
           Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
       }
     }
