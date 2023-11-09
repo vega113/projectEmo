@@ -6,7 +6,8 @@ maintainer := "vega113@gmail.com"
 
 javaOptions ++= Seq(
   "-Dgraal.CompilationFailureAction=Silent",
-  "-Xmx300M",
+  "-Xms150m",
+  "-Xmx300m",
   "-Xss1M",
   "-XX:+CMSClassUnloadingEnabled"
 )
@@ -26,6 +27,7 @@ lazy val root = (project in file("."))
 
 Gatling / resourceDirectory := baseDirectory.value / "gatling/resources"
 Gatling / scalaSource := baseDirectory.value / "gatling"
+Gatling / javaOptions := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
 resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/"
@@ -68,7 +70,6 @@ libraryDependencies ++= Seq(
   "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.9.5",
   "io.gatling"            % "gatling-test-framework"    % "3.9.5"
 )
-Gatling / javaOptions := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
 
 libraryDependencies += "org.mockito" % "mockito-core" % "5.2.0" % "test"
 libraryDependencies += "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test"
