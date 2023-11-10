@@ -112,7 +112,9 @@ export class MainLayoutComponent implements AfterViewInit {
   }
 
   logout() {
-    this.authService.logout();
-    this.router.navigate(['landing']);
+    this.authService.logout().subscribe(() => {
+      console.log('User logged out successfully');
+      this.router.navigate(['login']).then(r => console.log(r));
+    });
   }
 }

@@ -65,6 +65,8 @@ libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.
 
 dependencyOverrides += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0"
 
+libraryDependencies += "io.honeybadger" % "honeybadger-java" % "2.1.2"
+
 
 libraryDependencies ++= Seq(
   "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.9.5",

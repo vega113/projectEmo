@@ -2,9 +2,9 @@ package service
 
 import com.google.inject.ImplementedBy
 import dao.model.EmotionDetectionResult
-import play.api.{Configuration, Logger}
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
 import service.serviceModel.ChatGptApiResponse
 
 import javax.inject.Inject

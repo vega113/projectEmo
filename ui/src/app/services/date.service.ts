@@ -11,32 +11,6 @@ export class DateService {
   constructor() {
   }
 
-  // formatDateToIsoString(date: Date): string {
-  //   return this.formatDateTimeToIsoString(date)
-  // }
-
-  // formatDateToIsoString(date: Date): string {
-  //   const year = date.getFullYear();
-  //   const month = date.getMonth() + 1;
-  //   const day = date.getDate();
-  //   return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-  // }
-
-  // formatDateTimeToIsoString(date: Date): string {
-  //   const year = date.getFullYear();
-  //   const month = date.getMonth() + 1;
-  //   const day = date.getDate();
-  //   const hours = date.getHours();
-  //   const minutes = date.getMinutes();
-  //   const seconds = date.getSeconds();
-  //   const timezoneOffset = -date.getTimezoneOffset(); // Note: The getTimezoneOffset method returns the difference, in minutes, from local time to UTC. The sign is reversed to align with the ISO format.
-  //   const timezoneOffsetHours = Math.floor(Math.abs(timezoneOffset) / 60);
-  //   const timezoneOffsetMinutes = Math.abs(timezoneOffset) % 60;
-  //   const timezoneOffsetSign = timezoneOffset >= 0 ? '+' : '-';
-  //
-  //   return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}${timezoneOffsetSign}${timezoneOffsetHours.toString().padStart(2, '0')}:${timezoneOffsetMinutes.toString().padStart(2, '0')}`;
-  // }
-
   formatDateToIsoString(date: Date): string {
     // Get the user's time zone
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;

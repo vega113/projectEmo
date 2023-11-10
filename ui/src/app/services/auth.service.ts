@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpErrorResponse} from '@angular/common/http';
 import { User } from '../models/emotion.model';
 import { tap, catchError } from 'rxjs/operators';
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {environment} from "../../environments/environment";
@@ -55,26 +55,30 @@ export class AuthService {
       );
   }
 
-  logout(username: string = "") {
+  logout(): Observable<any> {
+    const username = this.fetchDecodedToken().username;
     if (username != "") {
-      this.http
-        .post<{ token: string }>(`${environment.baseUrl}/logout`, { username })
+      const headers = this.getAuthorizationHeader();
+      return this.http
+        .post<{ token: string }>(`${environment.baseUrl}/logout`, { username }, {headers})
         .pipe(
           tap((response) => {
             console.log('User logged out successfully on server', this.jwtHelper.decodeToken(response.token));
             this.currentUsername = username;
+            localStorage.removeItem('auth_token');
+            this.isAuthenticatedSubject.next(false);
           }),
-          catchError((error: HttpErrorResponse) =>
-            {
-              console.log('User failed to logout on server', error);
-              return throwError(() => new Error('User failed to logout on server'));
-            }
-          )
+          catchError((error: HttpErrorResponse) => {
+            console.log('User failed to logout on server', error);
+            return throwError(() => new Error('User failed to logout on server'));
+          })
         );
+    } else {
+      // If username is empty, return an Observable that immediately completes
+      return of(null);
     }
-    localStorage.removeItem('auth_token');
-    this.isAuthenticatedSubject.next(false);
   }
+
 
   getAuthorizationHeader(): HttpHeaders {
     const token = localStorage.getItem('auth_token');
