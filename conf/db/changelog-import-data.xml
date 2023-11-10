@@ -10,17 +10,9 @@
     <changeSet id="load-sub_emotions-data" author="Yuri Zelikov">
         <loadData file="conf/db/data/sub_emotions.csv" tableName="sub_emotions" separator=","/>
     </changeSet>
-    <changeSet id="load-triggers-data" author="Yuri Zelikov">
+    <changeSet id="load-triggers-data" author="Yuri Zelikov" >
+        <validCheckSum>8:a48e762e8b357bcac2af5e5a9588822c</validCheckSum>
         <loadData file="conf/db/data/triggers.csv" tableName="triggers" separator=","/>
-    </changeSet>
-    <changeSet id="load-sub_emotion_suggested_action-data" author="Yuri Zelikov">
-        <loadData file="conf/db/data/sub_emotion_suggested_actions.csv" tableName="sub_emotion_suggested_actions" separator=","/>
-    </changeSet>
-    <changeSet id="load-suggested_actions-data" author="Yuri Zelikov">
-        <loadData file="conf/db/data/suggested_actions.csv" tableName="suggested_actions" separator=","/>
-    </changeSet>
-    <changeSet id="load-note_template-data" author="Yuri Zelikov">
-        <loadData file="conf/db/data/note_template.csv" tableName="note_template" separator=","/>
     </changeSet>
 
 </databaseChangeLog>

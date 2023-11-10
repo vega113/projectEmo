@@ -49,5 +49,14 @@
         <modifyDataType tableName="notes" columnName="text" newDataType="TEXT" />
     </changeSet>
 
+    <changeSet id="milestone_1_delete_sub_emotion_suggested_actions" author="yuri.zelikov">
+        <dropTable tableName="sub_emotion_suggested_actions"/>
+    </changeSet>
+
+    <changeSet id="milestone_1_delete_suggested_actions" author="yuri.zelikov">
+        <dropTable tableName="suggested_actions"/>
+    </changeSet>
+
+
 
 </databaseChangeLog>

@@ -79,11 +79,6 @@ export class DisplayEmotionComponent {
             this.isLoading = false;
           }
         });
-
-    this.noteService.getNoteTemplates().subscribe((noteTemplates) => {
-      this.noteTemplates = noteTemplates;
-      console.log('note templates received');
-    });
   }
 
 
