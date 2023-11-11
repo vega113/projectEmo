@@ -41,7 +41,6 @@ class LoginController @Inject()(
 
   def logout: Action[AnyContent] = authenticatedActionWithUser { implicit token =>
     logger.info("logging out user: {}" + value("username", token.username))
-    throw new RuntimeException("Testing honeybadger")
     Future.successful(Ok(Json.obj("message" -> "Logged out")))
   }
 }
