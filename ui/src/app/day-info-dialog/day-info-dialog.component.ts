@@ -1,6 +1,7 @@
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import { Component, Inject } from "@angular/core";
 import { MatTableDataSource } from "@angular/material/table";
+import {ColorService} from "../services/color.service";
 
 @Component({
   selector: 'app-day-info-dialog',
@@ -13,7 +14,9 @@ export class DayInfoDialogComponent {
   records: MatTableDataSource<any>;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-              private dialogRef: MatDialogRef<DayInfoDialogComponent>) {
+              private dialogRef: MatDialogRef<DayInfoDialogComponent>,
+              private colorService: ColorService
+              ) {
     const dataArr: any[] = [];  // This will hold our record data
 
     if (this.data.day) {
@@ -27,7 +30,9 @@ export class DayInfoDialogComponent {
           emotion: record.emotion?.emotionName,
           intensity: record.intensity,
           trigger: record.triggers.length > 0 ? record.triggers[0].triggerName : null,
-          note: record.notes.length > 0 ? record.notes[0]?.title : null
+          note: record.notes.length > 0 ? record.notes[0]?.title : null,
+          color: this.colorService.getColorForEmotionType(record.emotionType,
+            true)
         };
         console.log("day recordInfo: ", recordInfo);
         dataArr.push(recordInfo);

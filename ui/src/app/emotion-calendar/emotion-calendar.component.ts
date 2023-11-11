@@ -6,6 +6,7 @@ import {DayOfWeek, EmotionRecord, Week} from "../models/emotion.model";
 import {EmotionService} from "../services/emotion.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {DateService} from "../services/date.service";
+import {ColorService} from "../services/color.service";
 
 
 
@@ -20,8 +21,11 @@ export class EmotionCalendarComponent implements OnInit {
   isLoadingRecords = false;
   calendarWeeks: Week[] = [];
 
-  constructor(private emotionRecordService: EmotionService, private snackBar: MatSnackBar,
-              private dateService: DateService ) { }
+  constructor(private emotionRecordService: EmotionService,
+              private snackBar: MatSnackBar,
+              private dateService: DateService,
+              private colorService: ColorService
+              ) { }
 
   ngOnInit() {
     this.fetchRecords(this.date);
@@ -109,12 +113,19 @@ export class EmotionCalendarComponent implements OnInit {
         const averageIntensitiesPerType:{emotionType: string, averageIntensity: number}[] = this.calculateIntensityPerEmotion(dayRecords);
         const averageIntensity = averageIntensitiesPerType.length > 0 ?
             averageIntensitiesPerType.reduce((sum, {averageIntensity}) => sum + averageIntensity, 0) / averageIntensitiesPerType.length : 0;
+
+        let emotionType = averageIntensitiesPerType[0].emotionType;
+        if (averageIntensitiesPerType.length > 0) {
+          const sortedIntensities = averageIntensitiesPerType.sort((a, b) => b.averageIntensity - a.averageIntensity);
+          emotionType = sortedIntensities[0].emotionType;
+        }
+
         return {
           date: day,
           dateTime: date,
           records: dayRecords,
           averageIntensity: averageIntensity,
-          dayColor: this.getColorForDay(averageIntensitiesPerType, dayRecords.length > 0)
+          dayColor: this.colorService.getColorForEmotionType(emotionType, dayRecords.length > 0)
         };
       }
     }
@@ -123,41 +134,9 @@ export class EmotionCalendarComponent implements OnInit {
       date: day,
       records: [],
       averageIntensity: 0,
-      dayColor: '#D3D3D3'
+      dayColor: this.colorService.getColorForEmotionType('', false)
     };
   }
-
-
-  getColorForDay(intensitiesPerType:{emotionType: string, averageIntensity: number}[], hasRecords: boolean) {
-    // find the emotion with the highest intensity
-    let color = 'grey';
-    let emotionType = '';
-
-    // Define the colors corresponding to the Angular Material theme colors
-    const primaryColor = '#3f51b5'; // blue
-    const accentColor = '#ffb74d'; // pink
-    const warnColor = '#e57373'; // red
-    const greyColor = '#D3D3D3'; // grey
-
-    if (intensitiesPerType.length > 0) {
-      const sortedIntensities = intensitiesPerType.sort((a, b) => b.averageIntensity - a.averageIntensity);
-      emotionType = sortedIntensities[0].emotionType;
-    }
-
-    if(emotionType === 'Negative') {
-      color = warnColor;
-    } else if (emotionType === 'Positive') {
-      color = primaryColor;
-    } else if (emotionType === 'Neutral') {
-      color = accentColor;
-    }
-    else if (!hasRecords) {
-      color = greyColor;
-    }
-    return color;
-  }
-
-
 
   calculateIntensityPerEmotion(records: EmotionRecord[]): {emotionType: string, averageIntensity: number}[] {
     let emotionSums: {[key: string]: {sum: number, count: number}} = {};
