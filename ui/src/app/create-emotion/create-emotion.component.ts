@@ -16,7 +16,7 @@ import {
     EmotionTypesWithEmotions,
     EmotionWithSubEmotions, Note,
     SubEmotion,
-    SubEmotionWithActions, Tag,
+    SubEmotionWrapper, Tag,
     Trigger
 } from "../models/emotion.model";
 import {AuthService} from "../services/auth.service";
@@ -275,7 +275,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  makeSubEmotionsList(): SubEmotionWithActions[] {
+  makeSubEmotionsList(): SubEmotionWrapper[] {
     if (this.emotionCache) {
       const selectedEmotionObject = this.emotionForm.get('emotion')?.value as EmotionWithSubEmotions;
       if (selectedEmotionObject) {

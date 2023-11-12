@@ -4,6 +4,8 @@ ThisBuild / version := "1.0.3.8"
 
 maintainer := "vega113@gmail.com"
 
+enablePlugins(JavaAppPackaging)
+
 javaOptions ++= Seq(
   "-Dgraal.CompilationFailureAction=Silent",
   "-Xms150m",

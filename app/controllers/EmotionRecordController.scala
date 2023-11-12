@@ -89,14 +89,6 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     )
   }
 
-  def fetchSuggestions(emotionRecordId: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
-    fetchRecord(emotionRecordId, token.user.userId).flatMap { record =>
-      emotionRecordService.findSuggestionsByEmotionRecord(record).
-        map(suggestions => Ok(Json.toJson(suggestions)))
-    }
-  }
-
-
   def update(id: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     token.body.validate[EmotionRecord].fold(
       errors => {

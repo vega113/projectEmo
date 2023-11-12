@@ -28,7 +28,8 @@ class EmotionDataServiceImpl @Inject()(emotionDao: EmotionDao,
         val subEmotions: List[SubEmotion] = subEmotionDao.findAll()
 
         val emotionSubEmotions: List[EmotionWithSubEmotions] = emotions.map(emotion =>
-          controllers.model.EmotionWithSubEmotions(emotion, subEmotions.filter(_.parentEmotionId == emotion.id)))
+          controllers.model.EmotionWithSubEmotions(emotion, subEmotions.map(subEmotion =>
+            controllers.model.SubEmotionWrapper(subEmotion, List.empty))))
         val emotionTypes = emotionSubEmotions.groupBy(_.emotion.emotionType).map {
           case (Some(emotionType), emotionWithSubEmotions) => EmotionTypesWithEmotions(emotionType,
             emotionWithSubEmotions)

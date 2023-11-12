@@ -3,7 +3,7 @@ package service
 import scala.concurrent.{Await, Future}
 import org.scalatestplus.play._
 import org.scalatestplus.mockito.MockitoSugar
-import controllers.model.{EmotionData, EmotionTypesWithEmotions, EmotionWithSubEmotions, SubEmotionWithActions}
+import controllers.model.{EmotionData, EmotionTypesWithEmotions, EmotionWithSubEmotions, SubEmotionWrapper}
 import dao.model.{Emotion, SubEmotion, SuggestedAction, Trigger}
 import dao.{DatabaseExecutionContext, EmotionDao, SubEmotionDao, SuggestedActionDao, TriggerDao}
 import org.mockito.Mockito.when
@@ -24,8 +24,8 @@ class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
         }
       }
 
-      val emotionServiceImpl = new EmotionDataServiceImpl(mockEmotionDao, mockSubEmotionDao, mockTriggerDao,
-        mockSuggestedActionDao, fakeDatabaseExecutionContext)
+      val emotionServiceImpl = new EmotionDataServiceImpl(mockEmotionDao, mockTriggerDao,
+         fakeDatabaseExecutionContext, mockSubEmotionDao)
 
       val emotions = List(Emotion(Some("Joy"), Option("Joy"), Some("Positive")), Emotion(Some("Sadness"), Option("Sadness"), Some("Negative")))
       val subEmotions = List(SubEmotion(Some("Content"), Some("Content"), Some("description"), Some("Joy")))
@@ -37,7 +37,7 @@ class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
       when(mockSuggestedActionDao.findAllBySubEmotionId("Content")(connection)).thenReturn(suggestedActions)
       when(mockTriggerDao.findAll()(connection)).thenReturn(triggers)
 
-      val subEmotionWithActions: SubEmotionWithActions = SubEmotionWithActions(
+      val subEmotionWithActions: SubEmotionWrapper = SubEmotionWrapper(
         subEmotions.head, suggestedActions)
       val emotionWithSubEmotions1: EmotionWithSubEmotions = EmotionWithSubEmotions(
         emotions.head,List(subEmotionWithActions)

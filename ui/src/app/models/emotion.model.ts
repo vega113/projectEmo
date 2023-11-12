@@ -18,12 +18,11 @@ export interface EmotionTypesWithEmotions {
 
 export interface EmotionWithSubEmotions {
   emotion: Emotion;
-  subEmotions: SubEmotionWithActions[];
+  subEmotions: SubEmotionWrapper[];
 }
 
-export interface SubEmotionWithActions {
+export interface SubEmotionWrapper {
   subEmotion: SubEmotion;
-  suggestedActions?: SuggestedAction[];
 }
 
 export interface User {

@@ -41,7 +41,7 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
             EmotionWithSubEmotions(
               Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description")),
               List(
-                SubEmotionWithActions(
+                SubEmotionWrapper(
                   SubEmotion(Some("Amusement"), Some("Amusement"), Some("description"), Some("Joy")),
                   suggestions
                 )
@@ -128,29 +128,6 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
       )
     )
   }
-
-  "EmotionRecordServiceImpl" should {
-    "parse emotion data cache into map successfully" in new TestData {
-      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService, mockEmotionDataService, fakeDatabaseExecutionContext)
-      val actual: List[SuggestedAction] = emotionRecordServiceImpl.parseEmotionCacheIntoSuggestions(emotionData).values.flatten.toList
-      actual mustEqual suggestions
-    }
-
-    "find suggestions by EmotionRecord successfully" in new TestData {
-
-      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService, mockEmotionDataService, fakeDatabaseExecutionContext)
-
-
-      when(mockEmotionDataService.fetchEmotionData()).thenReturn(Future.successful(emotionData))
-
-      val expectedResult: Seq[SuggestedAction] = suggestions
-
-      val actual: Seq[SuggestedAction] = Await.result(emotionRecordServiceImpl.findSuggestionsByEmotionRecord(emotionRecord), 10000.seconds)
-
-      actual mustEqual expectedResult
-    }
-  }
-
 
   "EmotionRecordServiceImpl" should {
     "convert emotion records to Sunburst chart data" in new TestData {

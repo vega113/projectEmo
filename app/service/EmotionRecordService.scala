@@ -1,13 +1,10 @@
 package service
 
 import com.google.inject.{ImplementedBy, Inject}
-import controllers.model
 import dao.model._
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
 
 import java.time.{Instant, LocalDate}
-import scala.collection.immutable.ListMap
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.math.Ordered.orderingToOrdered
 
@@ -26,8 +23,6 @@ trait EmotionRecordService {
   def update(emotionRecord: EmotionRecord): Future[Int]
 
   def delete(id: Long): Future[Int]
-
-  def findSuggestionsByEmotionRecord(record: EmotionRecord): Future[List[SuggestedAction]]
 
   def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long): Future[Option[Long]]
 
@@ -145,26 +140,6 @@ class EmotionRecordServiceImpl @Inject()(
         getOrElse("Empty"))
       LineChartTrendDataRow(day.date, emotionTypes, triggers)
     }
-  }
-
-
-  def findSuggestionsByEmotionRecord(record: EmotionRecord): Future[List[SuggestedAction]] = {
-    emotionDataService.fetchEmotionData().map(emotionData => {
-      val subEmotionIdToSuggestedActionMap: ListMap[String, List[SuggestedAction]] = parseEmotionCacheIntoSuggestions(emotionData)
-      val out: List[SuggestedAction] = record.subEmotions.flatMap(subEmotion => {
-        subEmotionIdToSuggestedActionMap.get(subEmotion.subEmotionId.getOrElse("no name")).toList.flatten
-      })
-      out
-    })
-  }
-
-  private[service] def parseEmotionCacheIntoSuggestions(emotionData: model.EmotionData) = {
-    val listOfPairs: List[(String, List[SuggestedAction])] = for {
-      emotionType <- emotionData.emotionTypes
-      emotion <- emotionType.emotions
-      subEmotion <- emotion.subEmotions
-    } yield(subEmotion.subEmotion.subEmotionId.getOrElse("no name"), subEmotion.suggestedActions)
-    ListMap(listOfPairs: _*)
   }
 
   private def preProcessEmotionRecord(emotionRecord: EmotionRecord): EmotionRecord = {
