@@ -35,6 +35,7 @@ class UserSimulation extends Simulation {
       .check(status.is(200)))
     .exec(http("Emotion Cache")
       .get("/api/emotionCache")
+      .header("Authorization", "Bearer ${authToken}")
       .check(status.is(200)))
     .exec { session =>
       val authToken = session("authToken").as[String]
@@ -70,8 +71,8 @@ class UserSimulation extends Simulation {
 
   setUp(
     scn.inject(
-      atOnceUsers(10),
-      rampUsers(50).during(1.minutes) // Ramp up to 50 additional users over the period of 5 minutes
+      atOnceUsers(50),
+      rampUsers(1500).during(2.minutes) // Ramp up to 50 additional users over the period of 5 minutes
     ).protocols(httpProtocol)
   )
 

@@ -34,14 +34,18 @@ object FrontendRunHook {
       }
 
       /**
-        * Executed after play run start.
-        * Run npm start
-        */
+       * Executed after play run start.
+       * Run npm start if not in production mode
+       */
       override def afterStarted(): Unit = {
-        process = Option(
-          Process(run, base / "ui").run
-        )
+        if (!"PROD".equals(System.getProperty("PLAY_MODE"))) {
+          println("Starting UI process")
+          process = Option(
+            Process(run, base / "ui").run
+          )
+        }
       }
+
 
       /**
         * Executed after play run stop.
