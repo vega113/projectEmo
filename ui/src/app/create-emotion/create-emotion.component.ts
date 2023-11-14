@@ -139,6 +139,10 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
     this.setStep(1); // Move to manual entry without detecting
   }
 
+  backToNoteEntry() {
+    this.setStep(0);
+  }
+
   ngAfterViewInit() {
 
   }

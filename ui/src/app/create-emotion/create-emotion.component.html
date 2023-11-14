@@ -41,7 +41,7 @@
             Analyze Emotion with AI
             <mat-spinner *ngIf="isLoadingNotes" diameter="24" [style.marginRight.px]="4"></mat-spinner>
           </button>
-          <button mat-button color="primary"  type="button" (click)="skipToManualEntry()">Next</button>
+          <button mat-button color="primary"  type="button" (click)="skipToManualEntry()">Next (Or skip to manual)</button>
         </mat-action-row>
       </mat-expansion-panel>
 
@@ -101,6 +101,7 @@
             </mat-select>
           </mat-form-field>
           <mat-action-row>
+            <button mat-button color="primary"  type="button" (click)="backToNoteEntry()">Back to Note</button>
             <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid">
               Save
               <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24" [style.marginRight.px]="4"></mat-spinner>

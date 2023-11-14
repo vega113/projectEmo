@@ -110,15 +110,15 @@ export class EmotionCalendarComponent implements OnInit {
       });
 
       if (dayRecords.length > 0) {
-        const averageIntensitiesPerType:{emotionType: string, averageIntensity: number}[] = this.calculateIntensityPerEmotion(dayRecords);
+        const emotionSums = this.calculateIntensityPerEmotion(dayRecords);
+        const averageIntensitiesPerType:{emotionType: string, averageIntensity: number}[] =
+          this.calculateAverageIntensityPerEmotion(emotionSums);
         const averageIntensity = averageIntensitiesPerType.length > 0 ?
             averageIntensitiesPerType.reduce((sum, {averageIntensity}) => sum + averageIntensity, 0) / averageIntensitiesPerType.length : 0;
 
-        let emotionType = averageIntensitiesPerType[0].emotionType;
-        if (averageIntensitiesPerType.length > 0) {
-          const sortedIntensities = averageIntensitiesPerType.sort((a, b) => b.averageIntensity - a.averageIntensity);
-          emotionType = sortedIntensities[0].emotionType;
-        }
+        const sortedEmotionSums = this.sortEmotionsSums(emotionSums);
+        console.log("sortedEmotionSums for: " + dayRecords[0].created, sortedEmotionSums);
+        let emotionType = sortedEmotionSums.length > 0 ? sortedEmotionSums[0].emotionType : 'Empty';
 
         return {
           date: day,
@@ -138,7 +138,7 @@ export class EmotionCalendarComponent implements OnInit {
     };
   }
 
-  calculateIntensityPerEmotion(records: EmotionRecord[]): {emotionType: string, averageIntensity: number}[] {
+  calculateIntensityPerEmotion(records: EmotionRecord[]): {[key: string]: {sum: number, count: number}} {
     let emotionSums: {[key: string]: {sum: number, count: number}} = {};
 
     records.forEach(record => {
@@ -149,12 +149,24 @@ export class EmotionCalendarComponent implements OnInit {
       emotionSums[record.emotionType].count++;
     });
 
+    return emotionSums;
+  }
+
+
+  calculateAverageIntensityPerEmotion(emotionSums: {[key: string]: {sum: number, count: number}}): {emotionType: string, averageIntensity: number}[] {
     return Object.entries(emotionSums).map(([emotionType, {sum, count}]) => ({
       emotionType,
       averageIntensity: sum / count
     }));
   }
 
+  sortEmotionsSums(emotionSums: {[key: string]: {sum: number, count: number}}): {emotionType: string, sum: number, count: number}[] {
+  return Object.entries(emotionSums).map(([emotionType, {sum, count}]) => ({
+    emotionType,
+    sum,
+    count
+  })).sort((a, b) => b.sum - a.sum || b.count - a.count);
+}
 
 
   chosenYearHandler(normalizedYear: Date) {
