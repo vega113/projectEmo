@@ -1,21 +1,16 @@
 package service
 
 import controllers.model._
-import org.scalatestplus.play._
-import org.scalatestplus.mockito.MockitoSugar
-import dao.model.{Tag, _}
+import dao.model._
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
-import org.mockito.Mockito._
-import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
-
-import scala.concurrent.{Await, Future}
+import org.scalatestplus.mockito.MockitoSugar
+import org.scalatestplus.play._
 import uitil.TestObjectsFactory.createEmotionRecord
 
 import java.sql.Connection
-import java.time.LocalDateTime
-import java.time.LocalDate
+import java.time.{LocalDate, LocalDateTime}
 
-class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
+class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
   trait TestData {
     val mockEmotionRecordDao: EmotionRecordDao = mock[EmotionRecordDao]
     val mockEmotionDataService: EmotionDataService = mock[EmotionDataService]
@@ -131,8 +126,11 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
 
   "EmotionRecordServiceImpl" should {
     "convert emotion records to Sunburst chart data" in new TestData {
-
-      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService, mockEmotionDataService, fakeDatabaseExecutionContext)
+      val mockTagService: TagService = mock[TagService]
+      val mockTriggerService: TriggerService = mock[TriggerService]
+      val mockTitleService: TitleService = mock[TitleService]
+      val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService,
+         mockTagService, mockTriggerService, mockTitleService, fakeDatabaseExecutionContext)
       // Execute the method
       private val result = emotionRecordServiceImpl.emotionRecordsToSunburstChartData(records).sortWith(_.name < _.name)
 
@@ -148,8 +146,11 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
   }
 
   "convert emotion records to doughnut emotions type chart data" in new TestData {
+    val mockTagService: TagService = mock[TagService]
+    val mockTriggerService: TriggerService = mock[TriggerService]
+    val mockTitleService: TitleService = mock[TitleService]
     val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService,
-      mockEmotionDataService, fakeDatabaseExecutionContext)
+      mockTagService, mockTriggerService, mockTitleService, fakeDatabaseExecutionContext)
     // Execute the method
     private val result = emotionRecordServiceImpl.emotionRecordsToDoughnutEmotionTypeChartData(records)
 
@@ -160,11 +161,14 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
   }
 
   "convert emotion records to doughnut triggers chart data" in new TestData {
+    val mockTagService: TagService = mock[TagService]
+    val mockTriggerService: TriggerService = mock[TriggerService]
+    val mockTitleService: TitleService = mock[TitleService]
     val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService,
-      mockEmotionDataService, fakeDatabaseExecutionContext)
+      mockTagService, mockTriggerService, mockTitleService, fakeDatabaseExecutionContext)
 
     // add more emotion records to the list one for each trigger type
-    val recordsWithMoreTriggers = records ++ List(EmotionRecord(
+    val recordsWithMoreTriggers: List[EmotionRecord] = records ++ List(EmotionRecord(
       id = Some(1),
       emotionType = "Positive",
       userId = Some(1),
@@ -190,11 +194,14 @@ class EmotionRecordServiceImplSpec extends PlaySpec with MockitoSugar {
   }
 
   "convert emotion records to trend line chart data" in new TestData {
+    val mockTagService: TagService = mock[TagService]
+    val mockTriggerService: TriggerService = mock[TriggerService]
+    val mockTitleService: TitleService = mock[TitleService]
     val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService,
-      mockEmotionDataService, fakeDatabaseExecutionContext)
+      mockTagService, mockTriggerService, mockTitleService, fakeDatabaseExecutionContext)
 
     // add more emotion records to the list one for each trigger type
-    val recordsWithMoreTriggers = records ++ List(EmotionRecord(
+    val recordsWithMoreTriggers: List[EmotionRecord] = records ++ List(EmotionRecord(
       id = Some(1),
       emotionType = "Positive",
       userId = Some(1),

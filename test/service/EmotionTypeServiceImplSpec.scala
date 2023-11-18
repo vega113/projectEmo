@@ -10,7 +10,7 @@ import org.mockito.Mockito.when
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
 import play.api.libs.json.Json
 
-class EmotionServiceImplSpec extends PlaySpec with MockitoSugar {
+class EmotionTypeServiceImplSpec extends PlaySpec with MockitoSugar {
   "EmotionServiceImpl" should {
     "fetch EmotionData successfully" in {
       val mockEmotionDao = mock[EmotionDao]

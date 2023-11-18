@@ -7,7 +7,7 @@ import java.sql.Connection
 
 class TagDao {
 
-  def add(emotionRecordId: Long, tagName: String)(implicit connection: Connection): Int = {
+  def insert(emotionRecordId: Long, tagName: String)(implicit connection: Connection): Int = {
     if (!checkTagExistsForEmotionRecordByTagName(emotionRecordId, tagName)) {
       val tagId = SQL(
         """
@@ -38,7 +38,7 @@ class TagDao {
     SQL("SELECT * FROM tags inner join emotion_record_tags on  tag_id = id WHERE emotion_record_id = {id}").on("id" -> id).as(Tag.parser.*)
   }
 
-  def insert(emotionRecordId: Long, tags: List[Tag])(implicit connection: Connection): List[Long] = {
+  def insert(emotionRecordId: Long, tags: Set[Tag])(implicit connection: Connection): Set[Long] = {
     tags.map { tag =>
       val tagId: Long = SQL(
         """

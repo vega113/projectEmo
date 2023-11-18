@@ -32,6 +32,12 @@ GET            /api/noteTemplate                                                
 PUT            /api/note/delete/:id                                                             controllers.NoteController.deleteNote(id: Long)
 PUT            /api/note/undelete/:id                                                           controllers.NoteController.undeleteNote(id: Long)
 POST           /api/note/emotion/detect                                                         controllers.NoteController.detectEmotion
+PUT            /api/note/todo/accept/:noteTodoId                                                controllers.NoteController.acceptTodo(noteTodoId: Long)
+
+# User Todo routes
+GET            /api/user/todo/:page/:size                                                       controllers.UserTodoController.fetchUserTodos(page: Int, size: Int)
+PUT            /api/user/todo/complete/:userTodoId/:isDone                                      controllers.UserTodoController.complete(userTodoId: Long, isDone: Boolean)
+PUT            /api/user/todo/archive/:userTodoId/:isArchived                                   controllers.UserTodoController.archive(userTodoId: Long, isArchived: Boolean)
 
 
 # User routes

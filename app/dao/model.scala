@@ -69,11 +69,44 @@ object model {
                    text: String,
                    description: Option[String] = None,
                    suggestion: Option[String] = None,
+                   todos: Option[List[NoteTodo]] = None,
                    isDeleted: Option[Boolean] = None,
                    lastUpdated: Option[LocalDateTime] = None,
                    lastDeleted: Option[LocalDateTime] = None,
                    created: Option[LocalDateTime] = None
                  )
+
+  case class NoteTodoUpdate(
+                             id: Long,
+                             isAccepted: Boolean
+                           )
+
+
+  import java.time.LocalDateTime
+
+  case class UserTodo(
+                   id: Option[Long],
+                   userId: Option[Long],
+                   title: String,
+                   description: Option[String],
+                   color: Option[String],
+                   isDone: Boolean,
+                   isArchived: Boolean,
+                   isDeleted: Boolean,
+                   isAi: Boolean,
+                   isRead: Boolean,
+                   lastUpdated: Option[LocalDateTime] = None,
+                   created: Option[LocalDateTime]
+                 )
+
+  case class NoteTodo(
+                       id: Option[Long],
+                       title: String,
+                       description: String,
+                       isAccepted: Boolean,
+                       isAi: Boolean,
+                       created: Option[LocalDateTime] = None
+                     )
 
   case class Tag(
                   tagId: Option[Int],
@@ -185,24 +218,23 @@ object model {
     }
   }
 
-  object EmotionRecord {
-    implicit val emotionRecordFormat: Format[EmotionRecord] = Json.format[EmotionRecord]
+object EmotionRecord {
+  implicit val emotionRecordFormat: Format[EmotionRecord] = Json.format[EmotionRecord]
 
-    implicit val parser: RowParser[EmotionRecord] = {
-      get[Option[Long]]("id") ~
-        str("emotion_type") ~
-      get[Option[Long]]("user_id") ~
-        get[Option[String]]("emotion_id") ~
-        int("intensity") ~
-        get[Option[LocalDateTime]]("created") map {
-        case id ~ emotionType ~ userId ~ emotionIdOpt  ~ intensity ~ created =>
-          EmotionRecord(id, emotionType, userId,
-            emotionIdOpt.map(emotionId => Emotion(Some(emotionId), None, None, None)),
-            intensity, List(), List(), List(), List(),
-            created)
-      }
-    }
+implicit val parser: RowParser[EmotionRecord] = {
+  get[Option[Long]]("id") ~
+    str("emotion_type") ~
+    get[Option[Long]]("user_id") ~
+    get[Option[String]]("emotion_id") ~
+    int("intensity") ~
+    get[Option[LocalDateTime]]("created") map {
+    case id ~ emotionType ~ userId ~ emotionIdOpt  ~ intensity  ~ created =>
+      EmotionRecord(id, emotionType, userId,
+        emotionIdOpt.map(emotionId => Emotion(Some(emotionId), None, None, None)),
+        intensity, List.empty[SubEmotion], List.empty[Trigger], List.empty[Note], List.empty[Tag], created)
   }
+}
+}
 
   object Trigger {
     implicit val triggerFormat: Format[Trigger] = Json.format[Trigger]
@@ -246,7 +278,47 @@ object Note {
         get[Option[Boolean]]("is_deleted") ~
         get[Option[LocalDateTime]]("created") map {
         case id ~ title ~ noteText ~ description ~ suggestion ~ isDeleted ~ created =>
-          Note(id, title, noteText, description, suggestion, isDeleted, created)
+          Note(id, title, noteText, description, suggestion, None, isDeleted, created)
+      }
+    }
+  }
+
+  object UserTodo {
+    implicit val todoFormat: Format[UserTodo] = Json.format[UserTodo]
+
+    implicit val parser: RowParser[UserTodo] = {
+      get[Option[Long]]("id") ~
+      get[Option[Long]]("user_id") ~
+        str("title") ~
+        get[Option[String]]("description") ~
+        get[Option[String]]("color") ~
+        bool("is_done") ~
+        bool("is_archived") ~
+        bool("is_deleted") ~
+        bool("is_ai") ~
+        bool("is_read") ~
+        get[Option[LocalDateTime]]("created") ~
+        get[Option[LocalDateTime]]("last_updated") map {
+        case id ~ userId ~ title ~ description ~ color ~ isDone ~ isArchived ~ isDeleted ~ isAi ~ isRead ~ created
+          ~ lastUpdated =>
+          UserTodo(id, userId, title, description, color, isDone, isArchived, isDeleted, isAi, isRead, lastUpdated,
+            created)
+      }
+    }
+  }
+
+  object NoteTodo {
+    implicit val todoFormat: Format[NoteTodo] = Json.format[NoteTodo]
+
+    implicit val parser: RowParser[NoteTodo] = {
+      get[Option[Long]]("id") ~
+        str("title") ~
+        str("description") ~
+        bool("is_accepted") ~
+        bool("is_ai") ~
+        get[Option[LocalDateTime]]("created") map {
+        case id ~ title ~ description ~ isAccepted ~ isAi ~ created =>
+          NoteTodo(id, title, description, isAccepted, isAi, created)
       }
     }
   }
@@ -311,5 +383,9 @@ object Note {
 
   object LineChartTrendDataSet {
     implicit val lineChartTrendDataSetFormat: Format[LineChartTrendDataSet] = Json.format[LineChartTrendDataSet]
+  }
+
+  object NoteTodoUpdate {
+    implicit val noteTodoUpdateFormat: Format[NoteTodoUpdate] = Json.format[NoteTodoUpdate]
   }
 }

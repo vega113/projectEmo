@@ -1,0 +1,13 @@
+<mat-card class="note-todo-card">
+  <div *ngIf="noteTodo">
+    <p><strong>Title:</strong> {{ noteTodo.title }}</p>
+    <p><strong>Description:</strong> {{ noteTodo.description }}</p>
+    <p *ngIf="noteTodo.isAccepted; else notAcceptedBlock"><strong>Status:</strong> Accepted</p>
+    <ng-template #notAcceptedBlock>
+      <button mat-raised-button type="button" color="primary" (click)="acceptTodo()">
+        Accept
+        <mat-spinner *ngIf="isSavingStatus" diameter="24" [style.marginRight.px]="4"></mat-spinner>
+      </button>
+    </ng-template>
+  </div>
+</mat-card>

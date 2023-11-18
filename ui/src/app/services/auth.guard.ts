@@ -19,7 +19,7 @@ export class AuthGuard  {
       map(isAuthenticated => {
         // Check if the URL is the landing page
         if (state.url === '/' || state.url === '') {
-          this.router.navigate(['/landing']);
+          this.router.navigate(['/charts']);
           if (!isAuthenticated) {
             return true;  // Allow access to the landing page
           }

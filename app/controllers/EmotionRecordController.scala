@@ -137,7 +137,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
           map(emotionRecordService.generateLineChartTrendDataSetForEmotionTypesTriggers).
           map(emotionRecords => Ok(Json.toJson(emotionRecords)))
         case Failure(_) =>
-          logger.info(s"failed to parse date for findRecordsByDayByUserIdForMonth monthStart: ${monthStart}, monthEnd: $monthEnd")
+          logger.info(s"failed to parse date for findRecordsByDayByUserIdForMonth monthStart: $monthStart, monthEnd: $monthEnd")
           Future.successful(BadRequest(Json.obj("message" -> "Invalid date format")))
       }
     }
@@ -189,7 +189,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       tagData => {
         logger.info("adding tag: " + tagData.tagName)
         emotionRecordService.findByIdForUser(tagData.emotionRecordId, token.user.userId).flatMap {
-          case Some(_) => tagService.add(tagData.emotionRecordId, tagData.tagName).map {
+          case Some(_) => tagService.insert(tagData.emotionRecordId, tagData.tagName).map {
             case true => Ok
             case false => BadRequest(Json.obj("message" -> s"Invalid tag name: ${tagData.tagName}"))
           }

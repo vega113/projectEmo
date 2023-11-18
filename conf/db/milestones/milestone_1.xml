@@ -5,7 +5,7 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+                      https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
     <changeSet id="milestone_1_add_deleted_column_to_notes" author="vega">
         <addColumn tableName="notes">
@@ -33,20 +33,20 @@
 
     <changeSet id="add_description_suggestion_to_notes" author="vega">
         <addColumn tableName="notes">
-            <column name="description" type="varchar(255)" />
-            <column name="suggestion" type="varchar(255)" />
+            <column name="description" type="varchar(255)"/>
+            <column name="suggestion" type="varchar(255)"/>
         </addColumn>
     </changeSet>
 
     <changeSet id="modify_suggestion_to_text" author="vega">
-        <modifyDataType tableName="notes" columnName="suggestion" newDataType="TEXT" />
+        <modifyDataType tableName="notes" columnName="suggestion" newDataType="TEXT"/>
     </changeSet>
     <changeSet id="modify_description_to_text" author="vega">
-        <modifyDataType tableName="notes" columnName="description" newDataType="TEXT" />
+        <modifyDataType tableName="notes" columnName="description" newDataType="TEXT"/>
     </changeSet>
 
     <changeSet id="modify_text_to_text" author="vega">
-        <modifyDataType tableName="notes" columnName="text" newDataType="TEXT" />
+        <modifyDataType tableName="notes" columnName="text" newDataType="TEXT"/>
     </changeSet>
 
     <changeSet id="milestone_1_delete_sub_emotion_suggested_actions" author="yuri.zelikov">
@@ -57,6 +57,275 @@
         <dropTable tableName="suggested_actions"/>
     </changeSet>
 
+    <changeSet id="create_todo_table" author="vega">
+        <createTable tableName="todos">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="color" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_done" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_archived" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_ai" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_read" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create_emotion_record_todos_table" author="vega">
+        <createTable tableName="emotion_record_todos">
+            <column name="emotion_record_id" type="int"/>
+            <column name="todo_id" type="int"/>
+        </createTable>
+        <createIndex indexName="fk_emotion_record_todos_emotion_record_id" tableName="emotion_record_todos">
+            <column name="emotion_record_id"/>
+        </createIndex>
+        <createIndex indexName="fk_emotion_record_todos_todo_id" tableName="emotion_record_todos">
+            <column name="todo_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create_note_todos_table" author="vega">
+        <createTable tableName="note_todos">
+            <column name="note_id" type="int"/>
+            <column name="todo_id" type="int"/>
+        </createTable>
+        <createIndex indexName="fk_note_todos_note_id" tableName="note_todos">
+            <column name="note_id"/>
+        </createIndex>
+        <createIndex indexName="fk_note_todos_todo_id" tableName="note_todos">
+            <column name="todo_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="milestone_1_delete_note_todos_table" author="vega">
+        <dropTable tableName="note_todos"/>
+    </changeSet>
+
+    <changeSet id="milestone_1_delete_emotion_record_todos_table" author="vega">
+        <dropTable tableName="emotion_record_todos"/>
+    </changeSet>
+
+    <changeSet id="milestone_1_delete_todo_table" author="vega">
+        <dropTable tableName="todos"/>
+    </changeSet>
+
+
+    <changeSet id="create_user_todo_table" author="vega">
+        <createTable tableName="user_todos">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="color" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_done" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_archived" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_ai" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_read" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create_emotion_record_user_todos_table" author="vega">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="emotion_record_user_todos"/>
+            </not>
+        </preConditions>
+        <createTable tableName="emotion_record_user_todos">
+            <column name="emotion_record_id" type="int"/>
+            <column name="user_todo_id" type="int"/>
+        </createTable>
+        <createIndex indexName="fk_emotion_record_todos_emotion_record_id" tableName="emotion_record_user_todos">
+            <column name="emotion_record_id"/>
+        </createIndex>
+        <createIndex indexName="fk_emotion_record_todos_user_todo_id" tableName="emotion_record_user_todos">
+            <column name="user_todo_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="milestone_1_delete_emotion_record_user_todos_table" author="vega">
+        <dropTable tableName="emotion_record_user_todos"/>
+    </changeSet>
+
+    <changeSet id="add_user_id_column_to_user_todos_table" author="vega">
+        <addColumn tableName="user_todos">
+            <column name="user_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="milestone_1_create_note_todos_table" author="vega">
+        <createTable tableName="note_todos">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_accepted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create_note_note_todos" author="vega">
+        <createTable tableName="note_note_todos">
+            <column name="note_id" type="int"/>
+            <column name="note_todo_id" type="int"/>
+        </createTable>
+        <createIndex indexName="fk_note_note_todos_note_id" tableName="note_note_todos">
+            <column name="note_id"/>
+        </createIndex>
+        <createIndex indexName="fk_note_note_todos_note_todo_id" tableName="note_note_todos">
+            <column name="note_todo_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="milestone_1_add_is_ai_column_to_note_todos" author="vega">
+        <addColumn tableName="note_todos">
+            <column name="is_ai" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_users" author="vega">
+        <sql>
+            ALTER TABLE users CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_emotion_records" author="vega">
+        <sql>
+            ALTER TABLE emotion_records CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_emotion_record_tags" author="vega">
+        <sql>
+            ALTER TABLE emotion_record_tags CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_emotion_record_sub_emotions" author="vega">
+        <sql>
+            ALTER TABLE emotion_record_sub_emotions CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_emotion_record_triggers" author="vega">
+        <sql>
+            ALTER TABLE emotion_record_triggers CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_emotion_record_user_todos" author="vega">
+        <sql>
+            ALTER TABLE emotion_record_user_todos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_note_todos" author="vega">
+        <sql>
+            ALTER TABLE note_todos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_note_note_todos" author="vega">
+        <sql>
+            ALTER TABLE note_note_todos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_notes" author="vega">
+        <sql>
+            ALTER TABLE notes CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_tags" author="vega">
+        <sql>
+            ALTER TABLE tags CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_triggers" author="vega">
+        <sql>
+            ALTER TABLE triggers CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_sub_emotions" author="vega">
+        <sql>
+            ALTER TABLE sub_emotions CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_emotions" author="vega">
+        <sql>
+            ALTER TABLE emotions CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
+
+    <changeSet id="milestone_1_update_charset_user_todos" author="vega">
+        <sql>
+            ALTER TABLE user_todos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        </sql>
+    </changeSet>
 
 
 </databaseChangeLog>

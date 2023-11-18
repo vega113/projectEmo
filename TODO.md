@@ -21,3 +21,4 @@
 - [X] Idea for a chart - evolution of emotions over time: negative/neutral/positive as there can be more than one emotion per day. this will provide more detailed view on what happened over time.
 - [ ] Allow emotions to be publicly shared
 - [ ] allow to create an emotion for another person
+- [ ] Fix the future handling of the database execution, need to wrap with Future instead of returning the result wrapped into immediate future

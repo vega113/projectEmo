@@ -49,7 +49,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
 
   step = 0;
 
-  maxNoteLength = 500;
+  maxNoteLength = 1000;
 
   isLoadingNotes: boolean = false;
   isSavingEmotionRecord: boolean = false;

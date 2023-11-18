@@ -49,7 +49,7 @@ class JwtServiceImpl @Inject()(dateTimeService: DateTimeService) extends JwtServ
         } match {
         case Success(user) => Some(user)
         case Failure(failure) =>
-          logger.warn(s"Error validating token: ${token}", failure.getMessage)
+          logger.warn(s"Error validating token: $token, message: {}", failure.getMessage)
           None
       }
     } match {
