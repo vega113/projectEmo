@@ -273,23 +273,12 @@
         </sql>
     </changeSet>
 
-    <changeSet id="milestone_1_update_charset_emotion_record_user_todos" author="vega">
-        <sql>
-            ALTER TABLE emotion_record_user_todos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-        </sql>
-    </changeSet>
-
     <changeSet id="milestone_1_update_charset_note_todos" author="vega">
         <sql>
             ALTER TABLE note_todos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         </sql>
     </changeSet>
 
-    <changeSet id="milestone_1_update_charset_note_note_todos" author="vega">
-        <sql>
-            ALTER TABLE note_note_todos CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-        </sql>
-    </changeSet>
 
     <changeSet id="milestone_1_update_charset_notes" author="vega">
         <sql>
