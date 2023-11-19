@@ -1,0 +1,36 @@
+.note-todo-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.note-todo-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.note-todo-description {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.note-todo-status {
+  font-size: 14px;
+  color: #888;
+}
+
+button {
+  margin-left: auto;
+  display: block;
+}
+
+.note-todo-card {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 20px;
+}

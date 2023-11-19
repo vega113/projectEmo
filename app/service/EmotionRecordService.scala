@@ -3,10 +3,14 @@ package service
 import com.google.inject.{ImplementedBy, Inject}
 import dao.model._
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
+import service.enums.{ColorType, EmotionType, TriggerType}
 
 import java.time.{Instant, LocalDate}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.Future.sequence
 import scala.math.Ordered.orderingToOrdered
+import scala.util.Success
 
 @ImplementedBy(classOf[EmotionRecordServiceImpl])
 trait EmotionRecordService {
@@ -43,9 +47,13 @@ trait EmotionRecordService {
 class EmotionRecordServiceImpl @Inject()(
                                           emotionRecordDao: EmotionRecordDao,
                                           noteService: NoteService,
-                                          emotionDataService: EmotionDataService,
+                                          tagService: TagService,
+                                          triggerService: TriggerService,
+                                          titleService: TitleService,
                                           databaseExecutionContext: DatabaseExecutionContext
                                         ) extends EmotionRecordService {
+
+  private val logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
   def emotionRecordsToDoughnutTriggerChartData(records: List[EmotionRecord]): List[DoughnutChartData] = {
     val recordsByTrigger: Map[String, List[EmotionRecord]] = records.groupBy(record => {
       record.triggers match {
@@ -55,7 +63,7 @@ class EmotionRecordServiceImpl @Inject()(
     })
     val triggersDoughnutChartData = recordsByTrigger.map { case (triggerName, recordsForTrigger) =>
       val intensitySum = recordsForTrigger.map(_.intensity).sum
-      DoughnutChartData(triggerName, recordsForTrigger.length, intensitySum, Color.fromName(triggerName).map(_.value))
+      DoughnutChartData(triggerName, recordsForTrigger.length, intensitySum, ColorType.fromName(triggerName).map(_.value))
     }.toList
     triggersDoughnutChartData.sortWith((d1, d2) => {
       val order = List("People", "Places", "Situations", "Other", "Empty")
@@ -67,7 +75,7 @@ class EmotionRecordServiceImpl @Inject()(
     val recordsByType: Map[String, List[EmotionRecord]] = records.groupBy(_.emotionType)
     val chartData = recordsByType.map { case (emotionType, recordsForType) =>
       val intensitySum = recordsForType.map(_.intensity).sum
-      DoughnutChartData(emotionType, recordsForType.length, intensitySum, Color.fromName(emotionType).map(_.value))
+      DoughnutChartData(emotionType, recordsForType.length, intensitySum, ColorType.fromName(emotionType).map(_.value))
     }.toList
     chartData.sortWith((d1, d2) => {
       val order = List("Positive", "Negative", "Neutral")
@@ -113,13 +121,13 @@ class EmotionRecordServiceImpl @Inject()(
   }
 
   def generateLineChartTrendDataSetForEmotionTypesTriggers(days: List[EmotionRecordDay]): LineChartTrendDataSet = {
-    val emotionTypes: List[String] = List("Positive", "Negative", "Neutral")
-    val triggerTypes:List[String] = List("People", "Places", "Situations", "Other", "Empty")
+    val emotionTypes: List[String] = EmotionType.toList
+    val triggerTypes:List[String] = TriggerType.toList
     LineChartTrendDataSet(
       rows = generateLineChartTrendDataRowsForEmotionTypesTriggers(days),
       emotionTypes = emotionTypes,
       triggerTypes = triggerTypes,
-      colors = Color.toMap,
+      colors = ColorType.toMap,
     )
 
   }
@@ -144,16 +152,33 @@ class EmotionRecordServiceImpl @Inject()(
 
   private def preProcessEmotionRecord(emotionRecord: EmotionRecord): EmotionRecord = {
     emotionRecord.copy(notes = emotionRecord.notes.map(note => {
-      note.copy(title = Option(noteService.makeTitle(note.text)))
+      note.copy(title = Option(titleService.makeTitle(note.text)))
     }), tags = (emotionRecord.tags.toSet ++ noteService.extractTags(emotionRecord.notes.map(_.text).mkString(" "))).
       toList)
   }
 
-  override def insert(emotionRecord: EmotionRecord): Future[Option[Long]] = {
+   def insert2(emotionRecord: EmotionRecord): Future[Option[Long]] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
       val processedEmotionRecord = preProcessEmotionRecord(emotionRecord)
       emotionRecordDao.insert(processedEmotionRecord)
     }))
+  }
+
+  override def insert(emotionRecord: EmotionRecord): Future[Option[Long]] = {
+    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
+      val emotionRecordsIdOpt = emotionRecordDao.insert2(emotionRecord)
+      emotionRecordsIdOpt
+    })).andThen({
+      case Success(Some(emotionRecordId)) =>
+        sequence(emotionRecord.notes.map(note => {
+          val title = note.title.getOrElse(titleService.makeTitle(note.text))
+          noteService.insert(emotionRecordId, note.copy(title = Some(title)))
+        }))
+
+        tagService.insert(emotionRecordId, emotionRecord.tags.toSet)
+
+        triggerService.insert(emotionRecordId, emotionRecord.triggers)
+    })
   }
 
   override def update(emotionRecord: EmotionRecord): Future[Int] = {
@@ -183,12 +208,7 @@ class EmotionRecordServiceImpl @Inject()(
   }
 
   private def computeColor(name: String): Option[String] = {
-    name match {
-      case "Positive" => Some("#3f51b5")
-      case "Negative" => Some("#ffb74d")
-      case "Neutral" => Some("#e57373")
-      case _ => Some("#D3D3D3")
-    }
+    ColorType.fromName(name).map(_.value)
   }
 
   def emotionRecordsToSunburstChartData(records: List[EmotionRecord]): List[SunburstData] = {

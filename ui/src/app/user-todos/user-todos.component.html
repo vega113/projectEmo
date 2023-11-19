@@ -1,0 +1,73 @@
+<mat-tab-group>
+    <mat-tab label="Active">
+        <mat-accordion>
+            <mat-expansion-panel *ngFor="let todo of activeTodos" >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mat-checkbox [checked]="todo.isDone"  (click)="$event.stopPropagation(); complete(todo)">
+                            {{ todo.title }}</mat-checkbox>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <button mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
+                                [innerText]="isArchivedToTitle(todo.isArchived)"></button>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>{{ todo.description }}</p>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-tab>
+    <mat-tab label="Completed">
+        <mat-accordion>
+            <mat-expansion-panel *ngFor="let todo of completedTodos" >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mat-checkbox [checked]="todo.isDone" (click)="$event.stopPropagation(); complete(todo)">
+                            {{ todo.title }}</mat-checkbox>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <button mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
+                                [innerText]="isArchivedToTitle(todo.isArchived)"></button>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>{{ todo.description }}</p>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-tab>
+    <mat-tab label="All">
+        <mat-accordion>
+            <mat-expansion-panel *ngFor="let todo of allTodos">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mat-checkbox [checked]="todo.isDone"  (click)="$event.stopPropagation(); complete(todo)">
+                            {{ todo.title }}</mat-checkbox>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <button mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
+                                [innerText]="isArchivedToTitle(todo.isArchived)"></button>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>{{ todo.description }}</p>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-tab>
+    <mat-tab label="Archived">
+        <mat-accordion>
+            <mat-expansion-panel *ngFor="let todo of archivedTodos">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        <mat-checkbox [checked]="todo.isDone"  (click)="$event.stopPropagation(); complete(todo)">
+                            {{ todo.title }}</mat-checkbox>
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        <button mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
+                                [innerText]="isArchivedToTitle(todo.isArchived)"></button>
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>{{ todo.description }}</p>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-tab>
+</mat-tab-group>
+<div *ngIf="todos.length === 0">
+    <p>No todos found.</p>
+</div>

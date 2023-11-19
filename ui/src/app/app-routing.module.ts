@@ -11,9 +11,10 @@ import { AuthGuard } from './services/auth.guard';
 import {DisplayEmotionComponent} from "./display-emotion/display-emotion.component";
 import { MatListModule } from '@angular/material/list';
 import {EmotionCalendarComponent} from "./emotion-calendar/emotion-calendar.component";
+import {UserTodosComponent} from "./user-todos/user-todos.component";
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'landing', pathMatch: 'full' },
+  { path: '', redirectTo: 'create-emotion', pathMatch: 'full' },
   {
     path: '',
     component: MainLayoutComponent,
@@ -23,6 +24,7 @@ export const routes: Routes = [
       { path: 'signup', component: SignupComponent },
       { path: 'create-emotion', component: CreateEmotionComponent , canActivate: [AuthGuard] },
       { path: 'emotions-timeline', component: EmotionsTimelineComponent , canActivate: [AuthGuard] },
+      { path: 'todos', component: UserTodosComponent , canActivate: [AuthGuard] },
       { path: 'charts', component: DashboardComponent, canActivate: [AuthGuard] },
       { path: 'display-emotion', component: DisplayEmotionComponent , canActivate: [AuthGuard]},
       { path: 'emotions-calendar', component: EmotionCalendarComponent, canActivate: [AuthGuard] },

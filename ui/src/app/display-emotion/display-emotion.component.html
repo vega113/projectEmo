@@ -93,10 +93,20 @@
             </mat-expansion-panel-header>
             {{noteElem.suggestion}}
           </mat-expansion-panel>
+
+          <mat-expansion-panel *ngIf="noteElem.todos && noteElem.todos.length > 0">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                Todos
+              </mat-panel-title>
+              <mat-panel-description>
+                Todos associated with the note
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <app-note-todo *ngFor="let todo of noteElem.todos" [noteTodo]="todo"></app-note-todo>
+          </mat-expansion-panel>
         </mat-accordion>
       </div>
     </div>
-
-
     </div>
 </ng-container>

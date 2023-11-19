@@ -18,8 +18,7 @@ export class NoteService {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.get<NoteTemplate[]>(environment.baseUrl + '/noteTemplate', { headers });
   }
-
-  // add method to delete and undelete a note
+  
   deleteNote(id: number): Observable<boolean> {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.put(environment.baseUrl + '/note/delete/' + id, {}, { headers, observe: 'response' })

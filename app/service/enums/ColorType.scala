@@ -1,46 +1,46 @@
-package service
+package service.enums
 
-sealed trait Color {
+sealed trait ColorType {
 
   def name: String
   def value: String
 }
 
-object Color {
-  case object PeopleColor extends Color {
+object ColorType {
+  case object PeopleColor extends ColorType {
     val name = "People"
     val value = "#FF6B6B"
   }
-  case object PlacesColor extends Color {
+  case object PlacesColor extends ColorType {
     val name = "Places"
     val value = "#4ECDC4"
   }
-  case object SituationsColor extends Color {
+  case object SituationsColor extends ColorType {
     val name = "Situations"
     val value = "#FFD166"
   }
-  case object OtherColor extends Color {
+  case object OtherColor extends ColorType {
     val name = "Other"
     val value = "#839788"
   }
-  case object EmptyColor extends Color {
+  case object EmptyColor extends ColorType {
     val name = "Empty"
     val value = "#D3D3D3"
   }
-  case object Positive extends Color {
+  case object Positive extends ColorType {
     val name = "Positive"
     val value = "#3f51b5"
   }
-  case object Negative extends Color {
+  case object Negative extends ColorType {
     val name = "Negative"
     val value = "#e57373"
   }
-  case object Neutral extends Color {
+  case object Neutral extends ColorType {
     val name = "Neutral"
     val value = "#ffb74d"
   }
 
-  def fromName(name: String): Option[Color] = name match {
+  def fromName(name: String): Option[ColorType] = name match {
     case "People" => Some(PeopleColor)
     case "Places" => Some(PlacesColor)
     case "Situations" => Some(SituationsColor)
@@ -62,12 +62,4 @@ object Color {
     "Negative" -> Negative.value,
     "Neutral" -> Neutral.value
   )
-
-  def triggerColors: List[Color] = List(PeopleColor, PlacesColor, SituationsColor, OtherColor, EmptyColor)
-  def emotionTypeColors: List[Color] = List(Positive, Negative, Neutral)
-}
-
-
-trait ColorsService {
-
 }

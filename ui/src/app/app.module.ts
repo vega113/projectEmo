@@ -54,6 +54,9 @@ import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
 import {MatRadioModule} from "@angular/material/radio";
 import { DayInfoDialogComponent } from './day-info-dialog/day-info-dialog.component';
 import {MatDialogModule} from "@angular/material/dialog";
+import { NoteTodoComponent } from './note-todo/note-todo.component';
+import { UserTodosComponent } from './user-todos/user-todos.component';
+import {MatCheckboxModule} from "@angular/material/checkbox";
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -84,6 +87,8 @@ export const MAT_DATE_FNS_FORMATS = {
     DayComponent,
     CustomDatePickerComponent,
     DayInfoDialogComponent,
+    NoteTodoComponent,
+    UserTodosComponent,
   ],
     imports: [
         BrowserModule,
@@ -119,7 +124,8 @@ export const MAT_DATE_FNS_FORMATS = {
         MatProgressBarModule,
         CanvasJSAngularChartsModule,
         MatRadioModule,
-        MatDialogModule
+        MatDialogModule,
+        MatCheckboxModule
 
     ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {

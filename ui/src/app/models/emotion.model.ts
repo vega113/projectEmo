@@ -59,6 +59,39 @@ export interface EmotionRecord {
   triggers: Trigger[];
   notes: Note[];
   tags: Tag[];
+  isAi?: boolean;
+  created?: string;
+}
+
+// export interface UserTodoPaginatedResp {
+//   todos: UserTodo[];
+//   length: number;
+//   hasMore: boolean;
+// }
+//
+// export interface UserTodoPaginatedReq {
+//   lastId?: number;
+//   pageSize: number;
+// }
+
+export interface UserTodo {
+  id?: number;
+  title: string;
+  description?: string;
+  color?: string;
+  isDone: boolean;
+  isArchived: boolean;
+  isDeleted: boolean;
+  isRead: boolean;
+  isAi: boolean;
+  created?: string;
+}
+
+export interface NoteTodo {
+  id?: number;
+  title: string;
+  description: string;
+  isAccepted: boolean;
   created?: string;
 }
 
@@ -77,6 +110,7 @@ export interface Note {
   text: string;
   description?: string;
   suggestion?: string;
+  todos?: NoteTodo[];
   created?: string;
 }
 
@@ -177,4 +211,9 @@ export interface EmotionDetectionResult {
 export interface EmotionFromNoteResult {
   emotionDetection?: EmotionDetectionResult;
   note: Note;
+}
+
+export interface NoteTodoUpdate {
+  id: number;
+  isAccepted: boolean;
 }

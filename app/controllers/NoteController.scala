@@ -1,22 +1,25 @@
 package controllers
 
 import auth.AuthenticatedAction
-import dao.model.{EmotionDetectionResult, EmotionFromNoteResult, EmotionRecord, Note, Trigger}
-import liquibase.LiquibaseRunner
+import dao.model.Note
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import service.{EmotionDetectionService, EmotionRecordService, NoteService, TagService}
+import service.{EmotionDetectionService, EmotionRecordService, NoteService, NoteTodoService}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import net.logstash.logback.argument.StructuredArguments._
+
+import scala.util.Success
+
 
 class NoteController @Inject()(cc: ControllerComponents,
                                noteService: NoteService,
-                               tagService: TagService,
                                emotionRecordService: EmotionRecordService,
                                emotionDetectionService: EmotionDetectionService,
+                               noteTodoService: NoteTodoService,
                                authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc){
 
@@ -50,6 +53,7 @@ class NoteController @Inject()(cc: ControllerComponents,
     }
 
   def detectEmotion(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+    logger.info("Detecting emotion")
     token.body.validate[Note].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
@@ -60,4 +64,16 @@ class NoteController @Inject()(cc: ControllerComponents,
         }
       })
     }
+
+  def acceptTodo(noteTodoId: Long):Action[AnyContent] =
+    Action andThen authenticatedAction async { implicit token =>
+      noteTodoService.acceptNoteTodo(token.user.userId, noteTodoId).flatMap {
+        case true =>
+          logger.info("Accepted note todo {}", value("noteTodoId", noteTodoId))
+          Future.successful(Ok)
+        case false =>
+          logger.error("Failed to accept note todo {}", value("noteTodoId", noteTodoId))
+          Future.successful(BadRequest(Json.obj("message" -> s"Invalid note todo id: $noteTodoId")))
+      }
+  }
 }

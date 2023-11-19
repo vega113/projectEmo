@@ -33,7 +33,8 @@ class LiquibaseRunner @Inject()(env: Environment, config: Configuration) {
       val database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection)
       val resourceAccessor = new  DirectoryResourceAccessor(new java.io.File(env.rootPath.getAbsolutePath))
       val liquibase = new Liquibase(changeLogFile, resourceAccessor, database)
-      liquibase.update(new Contexts())
+      liquibase.clearCheckSums()
+      liquibase.update(new Contexts(), new LabelExpression())
       logger.info("Liquibase migrations successfully applied.")
     } catch {
       case e: Exception =>

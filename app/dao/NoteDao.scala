@@ -7,13 +7,23 @@ import service.DateTimeService
 import java.sql.Connection
 import javax.inject.Inject
 
-class NoteDao @Inject()(dateTimeService: DateTimeService) {
+class NoteDao @Inject()(dateTimeService: DateTimeService, noteTodoDao: NoteTodoDao) {
   def findAllByEmotionRecordId(id: Long)(implicit connection: Connection): List[Note] = {
     SQL("SELECT * FROM notes inner join emotion_record_notes on id = note_id  WHERE emotion_record_id = {id}").on("id" -> id).as(Note.parser.*)
   }
 
   def findAllNotDeletedByEmotionRecordId(id: Long)(implicit connection: Connection): List[Note] = {
-    SQL("SELECT * FROM notes inner join emotion_record_notes on id = note_id  WHERE emotion_record_id = {id} and is_deleted = false").on("id" -> id).as(Note.parser.*)
+    val notes: List[Note] =
+      SQL("SELECT * FROM notes inner join emotion_record_notes on id = note_id" +
+        "  WHERE emotion_record_id = {id} and is_deleted = false").on("id" -> id).as(Note.parser.*)
+        for {
+          note <- notes
+          noteId <- note.id
+        } yield {
+          note.copy(
+            todos = noteTodoDao.findNoteTodosByNoteId(noteId)
+          )
+        }
   }
 
 

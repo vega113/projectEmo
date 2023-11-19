@@ -6,9 +6,6 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 
 import java.util.Base64
 import scala.concurrent.duration._
-
-
-
 class UserSimulation extends Simulation {
 
   val userFeeder: Feeder[String] = Iterator.continually(Map(
