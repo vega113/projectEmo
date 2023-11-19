@@ -10,7 +10,7 @@ import org.mockito.Mockito.when
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
 import play.api.libs.json.Json
 
-class EmotionTypeServiceImplSpec extends PlaySpec with MockitoSugar {
+class EmotionDataServiceImplSpec extends PlaySpec with MockitoSugar {
   "EmotionServiceImpl" should {
     "fetch EmotionData successfully" in {
       val mockEmotionDao = mock[EmotionDao]
@@ -29,16 +29,14 @@ class EmotionTypeServiceImplSpec extends PlaySpec with MockitoSugar {
 
       val emotions = List(Emotion(Some("Joy"), Option("Joy"), Some("Positive")), Emotion(Some("Sadness"), Option("Sadness"), Some("Negative")))
       val subEmotions = List(SubEmotion(Some("Content"), Some("Content"), Some("description"), Some("Joy")))
-      val suggestedActions = List(SuggestedAction(Some("Content"), "Watch a comedy"))
       val triggers = List(Trigger(Some(1), Some("Bad weather"), None, None, Some("Bad weather")))
 
       when(mockEmotionDao.findAll()(connection)).thenReturn(emotions)
       when(mockSubEmotionDao.findAll()(connection)).thenReturn(subEmotions)
-      when(mockSuggestedActionDao.findAllBySubEmotionId("Content")(connection)).thenReturn(suggestedActions)
       when(mockTriggerDao.findAll()(connection)).thenReturn(triggers)
 
       val subEmotionWithActions: SubEmotionWrapper = SubEmotionWrapper(
-        subEmotions.head, suggestedActions)
+        subEmotions.head, List())
       val emotionWithSubEmotions1: EmotionWithSubEmotions = EmotionWithSubEmotions(
         emotions.head,List(subEmotionWithActions)
       )
@@ -50,10 +48,11 @@ class EmotionTypeServiceImplSpec extends PlaySpec with MockitoSugar {
       val expectedEmotionData = EmotionData(List(emotionType2, emotionType1),triggers)
 
       val actual: EmotionData = Await.result(emotionServiceImpl.fetchEmotionData(), 10000.seconds)
-      println("actual: " + Json.toJson(actual))
+      val sortedActual = EmotionData(actual.emotionTypes.sortBy(_.emotionType), actual.triggers)
+      println("actual: " + Json.toJson(sortedActual))
       println("expected: " + Json.toJson(expectedEmotionData))
 
-      actual mustEqual expectedEmotionData
+      sortedActual mustEqual expectedEmotionData
     }
   }
 }

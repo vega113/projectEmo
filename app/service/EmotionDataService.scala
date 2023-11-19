@@ -20,22 +20,27 @@ class EmotionDataServiceImpl @Inject()(emotionDao: EmotionDao,
                                     subEmotionDao: SubEmotionDao,
                                   ) extends EmotionDataService {
   override def fetchEmotionData(): Future[EmotionData] = { // TODO: add caching
-    Future {
-      databaseExecutionContext.withConnection { implicit connection =>
-        val emotions: List[Emotion] = emotionDao.findAll()
-        val triggers = triggerDao.findAll()
-
-        val subEmotions: List[SubEmotion] = subEmotionDao.findAll()
-
-        val emotionSubEmotions: List[EmotionWithSubEmotions] = emotions.map(emotion =>
-          controllers.model.EmotionWithSubEmotions(emotion, subEmotions.map(subEmotion =>
-            controllers.model.SubEmotionWrapper(subEmotion, List.empty))))
-        val emotionTypes = emotionSubEmotions.groupBy(_.emotion.emotionType).map {
-          case (Some(emotionType), emotionWithSubEmotions) => EmotionTypesWithEmotions(emotionType,
-            emotionWithSubEmotions)
-        }.toList
-        EmotionData(emotionTypes, triggers)
-      }
+    for {
+      emotions <- Future(databaseExecutionContext.withConnection(implicit connection => emotionDao.findAll()))
+      triggers <- Future(databaseExecutionContext.withConnection(implicit connection => triggerDao.findAll()))
+      subEmotions <- Future(databaseExecutionContext.withConnection(implicit connection => subEmotionDao.findAll()))
+    } yield {
+      val emotionSubEmotions: List[EmotionWithSubEmotions] = emotions.map(emotion =>
+        EmotionWithSubEmotions(emotion,
+          subEmotions.filter(subEmotion => equals(subEmotion.parentEmotionId, emotion.id)).
+            map(subEmotion => SubEmotionWrapper(subEmotion, List.empty))
+        )
+      )
+      val emotionTypes = emotionSubEmotions.groupBy(_.emotion.emotionType).map {
+        case (Some(emotionType), emotionWithSubEmotions) => EmotionTypesWithEmotions(emotionType,
+          emotionWithSubEmotions)
+      }.toList
+      EmotionData(emotionTypes, triggers)
     }
+  }
+
+  private def equals[T](a: Option[T], b: Option[T]): Boolean = (a, b) match {
+    case (Some(a), Some(b)) => a == b
+    case _ => false
   }
 }

@@ -13,7 +13,6 @@ javaOptions ++= Seq(
   "-Xss1M",
   "-XX:+CMSClassUnloadingEnabled"
 )
-Gatling / scalaSource := sourceDirectory.value / "gatling" / "scala"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala, GatlingPlugin)
@@ -24,12 +23,13 @@ lazy val root = (project in file("."))
       "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % Test
     ),
     watchSources ++= (baseDirectory.value / "ui/emo-app/src" ** "*").get,
-    inConfig(Gatling)(Defaults.testSettings),
+    inConfig(GatlingIt)(Defaults.testSettings),
   )
 
-Gatling / resourceDirectory := baseDirectory.value / "gatling/resources"
-Gatling / scalaSource := baseDirectory.value / "gatling"
-Gatling / javaOptions := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
+GatlingIt / resourceDirectory := baseDirectory.value / "gatling/resources"
+GatlingIt / scalaSource := baseDirectory.value / "gatling"
+GatlingIt / javaOptions := overrideDefaultJavaOptions("-Xms1024m", "-Xmx2048m")
+
 
 resolvers += "Typesafe Releases" at "https://repo.typesafe.com/typesafe/releases/"
 resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe/simple/maven-releases/"
