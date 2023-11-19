@@ -14,7 +14,7 @@ import {EmotionCalendarComponent} from "./emotion-calendar/emotion-calendar.comp
 import {UserTodosComponent} from "./user-todos/user-todos.component";
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'landing', pathMatch: 'full' },
+  { path: '', redirectTo: 'create-emotion', pathMatch: 'full' },
   {
     path: '',
     component: MainLayoutComponent,
