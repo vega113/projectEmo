@@ -93,7 +93,7 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
 override def extractTodos(text: String): List[NoteTodo] = {
   val todoRegex = "(?s)(?<=\\[\\[).+?(?=]])".r
   todoRegex.findAllIn(text).toList.map(todo => NoteTodo(None, titleService.makeTitle(todo), todo, isAccepted = false,
-    isAi = false))
+    isAi = false)).filter(_.description.nonEmpty)
 }
 
   override def fetchById(id: Long): Future[Option[NoteTodo]] = {
