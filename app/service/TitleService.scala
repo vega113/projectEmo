@@ -10,7 +10,7 @@ trait TitleService {
 class TitleServiceImpl extends TitleService {
   def makeTitle(text: String): String = {
     val maxLength = 50
-    val firstSegment = text.split("[.,:;\\-\n]")(0)
+    val firstSegment = text.split("[.,:;\\-\n]").find(_.nonEmpty).getOrElse("")
     val firstLine = firstSegment.replaceAll("\\[\\[|]]|#", "")
     if (firstLine.length > maxLength) {
       firstLine.substring(0, maxLength) + "..."
