@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 class UserTodoDao @Inject()(dateTimeService: DateTimeService) {
   def fetchByUserId(userId: Long)(implicit connection: Connection): List[UserTodo] = {
-    SQL("SELECT * FROM user_todos WHERE user_id = {userId} and is_deleted = false")
+    SQL("SELECT * FROM user_todos WHERE user_id = {userId} and is_deleted = false order by created desc")
       .on("userId" -> userId)
       .as(UserTodo.parser.*)
   }
