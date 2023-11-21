@@ -1,5 +1,5 @@
 <mat-tab-group>
-    <mat-tab label="Active">
+    <mat-tab label="Active ({{activeTodos.length}})">
         <mat-accordion>
             <mat-expansion-panel *ngFor="let todo of activeTodos" >
                 <mat-expansion-panel-header>
@@ -16,7 +16,7 @@
             </mat-expansion-panel>
         </mat-accordion>
     </mat-tab>
-    <mat-tab label="Completed">
+    <mat-tab label="Completed ({{completedTodos.length}})">
         <mat-accordion>
             <mat-expansion-panel *ngFor="let todo of completedTodos" >
                 <mat-expansion-panel-header>
@@ -33,7 +33,7 @@
             </mat-expansion-panel>
         </mat-accordion>
     </mat-tab>
-    <mat-tab label="All">
+    <mat-tab label="All ({{allTodos.length}})">
         <mat-accordion>
             <mat-expansion-panel *ngFor="let todo of allTodos">
                 <mat-expansion-panel-header>
@@ -50,7 +50,7 @@
             </mat-expansion-panel>
         </mat-accordion>
     </mat-tab>
-    <mat-tab label="Archived">
+    <mat-tab label="Archived ({{archivedTodos.length}})">
         <mat-accordion>
             <mat-expansion-panel *ngFor="let todo of archivedTodos">
                 <mat-expansion-panel-header>
