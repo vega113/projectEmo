@@ -68,7 +68,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
   private triggerSubscription!: Subscription;
   private emotionDetected: EmotionDetectionResult | undefined;
 
-  placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note.";
+  placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note. To add a todo, simply enclose it in double square brackets like this: [[<your todo here>]].";
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
               private authService: AuthService,
