@@ -177,7 +177,13 @@ class EmotionRecordServiceImpl @Inject()(
 
         tagService.insert(emotionRecordId, emotionRecord.tags.toSet)
 
-        triggerService.insert(emotionRecordId, emotionRecord.triggers)
+        emotionRecord.triggers.foreach {
+          case Trigger(Some(triggerId), _, _, _, _, _) =>
+            triggerService.linkTriggerToEmotionRecord(triggerId, emotionRecordId)
+          case trigger =>
+            logger.error(s"Empty trigger id while inserting trigger: ${trigger.triggerId}")
+        }
+
     })
   }
 

@@ -15,23 +15,32 @@ class TriggerDao {
   }
 
   def insert(trigger: Trigger, emotionRecordId: Long)(implicit connection: Connection): Option[Long] = {
-    val triggerId: Option[Long] = SQL("INSERT INTO triggers (user_id, description) VALUES ({userId}, {description})")
-      .on("userId" -> trigger.createdByUser, "description" -> trigger.description)
-      .executeInsert()
-    triggerId match {
-      case Some(id) => linkTriggerToEmotionRecord(id, emotionRecordId)
-    }
+    val triggerId: Option[Long] = SQL(
+      """
+        |INSERT INTO triggers (trigger_id, trigger_name, created_by_user, description, trigger_parent_id)
+        |VALUES ({triggerId}, {triggerName},  {createdByUser}, {description}, {triggerParentId})
+        |""".stripMargin).on("triggerId" -> trigger.triggerId, "triggerName" -> trigger.triggerName,
+        "createdByUser" -> trigger.createdByUser, "description" -> trigger.description,
+      "triggerParentId" -> emotionRecordId
+      ).executeInsert()
     triggerId
   }
 
   def update(trigger: Trigger)(implicit connection: Connection): Int = {
-    SQL("UPDATE triggers SET user_id = {userId}, description = {description} WHERE id = {id}")
-      .on("id" -> trigger.triggerId, "userId" -> trigger.createdByUser, "description" -> trigger.description)
-      .executeUpdate()
+    SQL(
+      """
+        |UPDATE triggers
+        |SET  trigger_name = {triggerName}, created_by_user = {createdByUser},
+        |description = {description}, trigger_parent_id = {triggerParentId}
+        |WHERE trigger_id = {triggerId}
+        |""".stripMargin).on("triggerId" -> trigger.triggerId, "triggerName" -> trigger.triggerName,
+      "createdByUser" -> trigger.createdByUser, "description" -> trigger.description,
+      "triggerParentId" -> trigger.parentId
+    ).executeUpdate()
   }
 
   def delete(id: Int)(implicit connection: Connection): Int = {
-    SQL("DELETE FROM triggers WHERE id = {id}").on("id" -> id).executeUpdate()
+    SQL("DELETE FROM triggers WHERE trigger_id = {id}").on("id" -> id).executeUpdate()
   }
 
   def linkTriggerToEmotionRecord(triggerId: Long, emotionRecordId: Long)(implicit connection: Connection): Long = {
