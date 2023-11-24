@@ -26,7 +26,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
                                         authenticatedAction: AuthenticatedAction)
   extends EmoBaseController(cc, authenticatedAction) {
 
-  val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
+  private lazy val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
 
 
   private def validateRequestUserId(bodyUserId: Option[Long], tokenUserId: Long): Boolean = {
@@ -51,14 +51,10 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       value("userId", token.user.userId), value("record", token.body))
 
     token.body.validate[EmotionRecord].fold(
-      errors => {
-        logger.info(s"Failed to parse emotion record when inserting, user: ${token.user.userId}," +
-          s" errors: ${JsError.toJson(errors).toString()}")
-        Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
-      },
+      errors => handleError(errors, "emotionRecord", token),
       emotionRecord => {
         if (!validateRequestUserId(emotionRecord.userId, token.user.userId)) {
-          logger.warn(s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")
+          logger.warn(s"Invalid user id. body id: {} token id: {}", emotionRecord.userId, token.user.userId)
           Future.successful(BadRequest(Json.obj("message" -> s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
         } else {
           emotionRecordService.insert(emotionRecord).flatMap {
@@ -77,9 +73,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   def insertNote(emotionRecordId: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     logger.info(s"Inserting note for user: ${token.user.userId} recordId: $emotionRecordId")
     token.body.validate[Note].fold(
-      errors => {
-        Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
-      },
+      errors => handleError(errors, "noteTodo", token),
       note => {
         noteService.insert(emotionRecordId, note).flatMap {
           case Some(_) => fetchRecord(emotionRecordId, token.user.userId).map(record => Ok(Json.toJson(record)))

@@ -1,1 +1,17 @@
 /* Global styles */
+/* Custom styles for the dialog */
+.responsive-dialog .mat-dialog-container {
+  /* Styles to ensure the dialog is not too small on larger screens */
+  min-width: 300px;
+min-height: 300px;
+}
+
+/* Adjusting dialog size for very small screens */
+@media (max-width: 600px) {
+  .responsive-dialog .mat-dialog-container {
+    min-width: 90vw;
+  min-height: 50vh;
+  max-width: 90vw;
+  max-height: 80vh;
+  }
+}

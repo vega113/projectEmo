@@ -29,4 +29,10 @@ export class UserTodoService {
         return this.http.put<UserTodo[]>(`${environment.baseUrl}/user/todo/archive/${todo.id}/${todo.isArchived}`, {},
             {headers});
     }
+
+    add(todo: UserTodo) {
+        const headers = this.authService.getAuthorizationHeader();
+        return this.http.post<UserTodo[]>(`${environment.baseUrl}/user/todo/add`, todo,
+            {headers});
+    }
 }

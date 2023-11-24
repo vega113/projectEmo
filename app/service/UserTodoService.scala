@@ -13,7 +13,7 @@ import scala.concurrent.Future
 trait UserTodoService {
   def fetchByUserId(userId: Long):Future[List[UserTodo]]
 
-  def insert(emotionRecordId: Long, text: String, noteId: Option[Long], todo: UserTodo): Future[Option[Long]]
+  def insert(emotionRecordId: Option[Long], noteId: Option[Long], todo: UserTodo): Future[List[UserTodo]]
 
   def update(todo: UserTodo): Future[Boolean]
   def findEmotionRecordIdByTodoId(todoId: Long): Future[Option[Long]]
@@ -26,16 +26,13 @@ trait UserTodoService {
 class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionContext,
                                     todoDao: UserTodoDao) extends UserTodoService {
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[UserTodoServiceImpl])
-
-  override def insert(emotionRecordId: Long, text: String, noteId: Option[Long], todo: UserTodo): Future[Option[Long]] = {
+  override def insert(emotionRecordId: Option[Long], noteId: Option[Long], todo: UserTodo): Future[List[UserTodo]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
-      val todoId: Long = todoDao.insert(todo) match {
-        case Some(id) =>
-          id
-        case None => throw new Exception("Failed to insert todo")
+      if (todo.userId.isDefined &&  todoDao.insert(todo).isDefined) {
+        Future.successful(todoDao.fetchByUserId(todo.userId.get))
+      } else {
+        Future.failed(new Exception("Failed to insert todo"))
       }
-      Future.successful(Some(todoId))
     })
   }
 
@@ -44,7 +41,7 @@ class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
       if (todoDao.archive(userId, id) > 0) {
         Future.successful(todoDao.fetchByUserId(userId))
       } else {
-        Future.failed(new Exception("Failed to delete todo"))
+        Future.failed(new Exception("Failed to archive todo"))
       }
     })
   }
@@ -54,7 +51,7 @@ class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
       if (todoDao.unarchive(userId, id) > 0) {
         Future.successful(todoDao.fetchByUserId(userId))
       } else {
-        Future.failed(new Exception("Failed to archive todo"))
+        Future.failed(new Exception("Failed to unarchive todo"))
       }
     })
   }

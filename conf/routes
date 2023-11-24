@@ -38,6 +38,7 @@ PUT            /api/note/todo/accept/:noteTodoId                                
 GET            /api/user/todo/:page/:size                                                       controllers.UserTodoController.fetchUserTodos(page: Int, size: Int)
 PUT            /api/user/todo/complete/:userTodoId/:isDone                                      controllers.UserTodoController.complete(userTodoId: Long, isDone: Boolean)
 PUT            /api/user/todo/archive/:userTodoId/:isArchived                                   controllers.UserTodoController.archive(userTodoId: Long, isArchived: Boolean)
+POST           /api/user/todo/add                                                               controllers.UserTodoController.add()
 
 
 # User routes
