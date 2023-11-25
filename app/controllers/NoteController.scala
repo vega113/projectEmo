@@ -11,6 +11,7 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import net.logstash.logback.argument.StructuredArguments._
+import service.model.DetectEmotionRequest
 
 import scala.util.Success
 
@@ -59,7 +60,7 @@ class NoteController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       note => {
-        emotionDetectionService.detectEmotion(note.text).map { resp =>
+        emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId)).map { resp =>
           Ok(Json.toJson(resp))
         }
       })

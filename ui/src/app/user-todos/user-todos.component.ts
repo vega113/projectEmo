@@ -37,9 +37,9 @@ export class UserTodosComponent implements OnInit {
 
   private refresh() {
     this.allTodos = this.todos.filter(todo => !todo.isArchived);
-    this.archivedTodos = this.todos.filter(todo => todo.isArchived);
     this.activeTodos = this.allTodos.filter(todo => !todo.isDone);
-    this.completedTodos = this.allTodos.filter(todo => todo.isDone);
+    this.archivedTodos = this.todos.filter(todo => todo.isArchived && !todo.isDone);
+    this.completedTodos = this.todos.filter(todo => todo.isDone);
   }
 
   complete(todo: UserTodo): void {

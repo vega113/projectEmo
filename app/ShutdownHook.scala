@@ -1,4 +1,4 @@
-import org.slf4j.Logger
+import play.api
 import play.api.Configuration
 
 import scala.concurrent.Future
@@ -7,7 +7,7 @@ import play.api.inject.ApplicationLifecycle
 import javax.inject._
 
 class ShutdownHook @Inject()(lifecycle: ApplicationLifecycle, config: Configuration) {
-  val logger: Logger = org.slf4j.LoggerFactory.getLogger("ShutdownHook")
+  private lazy val logger = play.api.Logger(getClass)
 
   private def threadDump(): Unit = {
     val threadMXBean = java.lang.management.ManagementFactory.getThreadMXBean

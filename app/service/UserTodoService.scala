@@ -58,11 +58,13 @@ class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
 
   override def complete(userId: Long, id: Long): Future[List[UserTodo]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
-      if (todoDao.complete(userId, id) > 0) {
-        Future.successful(todoDao.fetchByUserId(userId))
-      } else {
-        Future.failed(new Exception("Failed to complete todo"))
-      }
+      Future(todoDao.fetchByUserIdTodoId(userId, id)).flatMap(todo => {
+        if (todo.isDefined && todoDao.complete(userId, id) > 0) {
+          Future.successful(todoDao.fetchByUserId(userId))
+        } else {
+          Future.failed(new Exception("Failed to complete todo"))
+        }
+      })
     })
   }
 

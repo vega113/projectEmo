@@ -172,6 +172,9 @@ object model {
                                   )
 
 
+  case class AiDbObj(id: Option[String], response: String, userId: Long, created: Option[LocalDateTime])
+
+
   object User {
     implicit val userFormat: Format[User] = Json.format[User]
 
@@ -387,5 +390,18 @@ object Note {
 
   object NoteTodoUpdate {
     implicit val noteTodoUpdateFormat: Format[NoteTodoUpdate] = Json.format[NoteTodoUpdate]
+  }
+
+  object ChatGptApiResponse {
+    implicit val chatGptApiResponseFormat: Format[AiDbObj] = Json.format[AiDbObj]
+    implicit val parser: RowParser[AiDbObj] = {
+      get[Option[String]]("id") ~
+        str("response") ~
+        get[Long]("user_id") ~
+        get[Option[LocalDateTime]]("created") map {
+        case id ~ response ~ userId ~ created =>
+          AiDbObj(id, response, userId, created)
+      }
+    }
   }
 }
