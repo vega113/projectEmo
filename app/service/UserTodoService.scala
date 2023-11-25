@@ -36,15 +36,21 @@ class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
     })
   }
 
-  override def archive(userId: Long, id: Long): Future[List[UserTodo]] = {
-    databaseExecutionContext.withConnection({ implicit connection =>
-      if (todoDao.archive(userId, id) > 0) {
-        Future.successful(todoDao.fetchByUserId(userId))
-      } else {
-        Future.failed(new Exception("Failed to archive todo"))
+  def archive(userId: Long, id: Long): Future[List[UserTodo]] = {
+    Future {
+      databaseExecutionContext.withConnection { implicit connection =>
+        todoDao.fetchByUserIdTodoId(userId, id) match {
+          case Some(todo) if !todo.isDone =>
+            if (todoDao.archive(userId, id) > 0)
+              todoDao.fetchByUserId(userId)
+            else
+              throw new Exception("Failed to archive todo")
+          case _ => throw new Exception("Todo not found or already completed")
+        }
       }
-    })
+    }
   }
+
 
   override def unarchive(userId: Long, id: Long): Future[List[UserTodo]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
@@ -58,13 +64,11 @@ class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
 
   override def complete(userId: Long, id: Long): Future[List[UserTodo]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
-      Future(todoDao.fetchByUserIdTodoId(userId, id)).flatMap(todo => {
-        if (todo.isDefined && todoDao.complete(userId, id) > 0) {
-          Future.successful(todoDao.fetchByUserId(userId))
-        } else {
-          Future.failed(new Exception("Failed to complete todo"))
-        }
-      })
+      if (todoDao.complete(userId, id) > 0) {
+        Future.successful(todoDao.fetchByUserId(userId))
+      } else {
+        Future.failed(new Exception("Failed to complete todo"))
+      }
     })
   }
 

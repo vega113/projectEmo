@@ -43,7 +43,7 @@
                             {{ todo.title }}</mat-checkbox>
                     </mat-panel-title>
                     <mat-panel-description>
-                        <button mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
+                        <button *ngIf="!todo.isDone" mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
                                 [innerText]="isArchivedToTitle(todo.isArchived)"></button>
                     </mat-panel-description>
                 </mat-expansion-panel-header>
