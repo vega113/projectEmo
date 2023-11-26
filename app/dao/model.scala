@@ -163,6 +163,7 @@ object model {
                                      triggers: Option[List[Trigger]],
                                      tags: Option[List[Tag]],
                                      todos: Option[List[NoteTodo]],
+                                     textTitle: Option[String],
                                      description: String,
                                      suggestion: String
                                    )

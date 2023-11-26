@@ -206,6 +206,7 @@ export interface EmotionDetectionResult {
   triggers: Trigger[];
   tags: Tag[];
   todos: NoteTodo[];
+  textTitle?: string;
   description: string;
   suggestion: string;
 }

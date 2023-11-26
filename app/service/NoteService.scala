@@ -70,7 +70,10 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
   }
 
   private def makeTitle(note: Note): Option[String] = {
-    Option(titleService.makeTitle(note.text))
+    note.title match {
+      case None => Option(titleService.makeTitle(note.text))
+      case Some(title) if title.nonEmpty  => Some(title)
+    }
   }
 
   private def addNewTagsFromNoteToRecord(emotionRecordId: Long, note: Note)(implicit connection: Connection): Set[Long] = {

@@ -89,6 +89,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
       emotionNote: [''],
       tags: [[]],
       todos: [[]],
+      textTitle: [''],
       description: [''],
       suggestion: [''],
     });
@@ -229,6 +230,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
     if (emotionFromData.emotionNote) {
       const note: Note = {
         text: emotionFromData.emotionNote,
+        title: emotionFromData.textTitle,
         description: emotionFromData.description,
         suggestion: emotionFromData.suggestion,
         todos: emotionFromData.todos
@@ -354,6 +356,10 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
 
       if(this.emotionDetected?.todos != null && this.emotionDetected?.todos.length > 0) {
         this.emotionForm.controls['todos'].setValue(this.emotionDetected?.todos);
+      }
+
+      if(this.emotionDetected?.textTitle != null) {
+        this.emotionForm.controls['textTitle'].setValue(this.emotionDetected?.textTitle);
       }
 
       this.snackBar.open(this.emotionDetected?.description + "\n" + this.emotionDetected?.suggestion, 'Close', {
