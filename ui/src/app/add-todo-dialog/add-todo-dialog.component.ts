@@ -1,24 +1,35 @@
-import { Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import {UserTodo} from "../models/emotion.model";
+// add-todo-dialog.component.ts
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import { UserTodo } from '../models/emotion.model';
 
 @Component({
   selector: 'app-add-todo-dialog',
   templateUrl: './add-todo-dialog.component.html',
   styleUrls: ['./add-todo-dialog.component.css']
 })
-
 export class AddTodoDialogComponent {
-  newTodo: UserTodo = {
+    isNewTodo = true;
+    todo: UserTodo = {
     isAi: false,
     isDeleted: false,
     isRead: false,
-    title: '', description: '', isDone: false, isArchived: false };
+    title: '', description: '', isDone: false, isArchived: false
+  };
 
-  constructor(public dialogRef: MatDialogRef<AddTodoDialogComponent>) {}
+  constructor(public dialogRef: MatDialogRef<AddTodoDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 
-  onAdd() {
-    this.dialogRef.close(this.newTodo);
+  ngOnInit() {
+    if (this.data.todo) {
+      // If a todo is provided, we're in "edit mode".
+      // Pre-fill the form fields with the todo data.
+      this.todo = this.data.todo;
+      this.isNewTodo = false;
+    }
+  }
+
+  onSave() {
+    this.dialogRef.close(this.todo);
   }
 
   onCancel() {

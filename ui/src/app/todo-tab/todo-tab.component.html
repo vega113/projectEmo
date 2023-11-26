@@ -6,8 +6,23 @@
                     {{ todo.title }}</mat-checkbox>
             </mat-panel-title>
             <mat-panel-description>
-                <button mat-button color="primary" (click)="$event.stopPropagation(); archive.emit(todo)"
-                        [innerText]="postponeActionTitle(todo.isArchived)"></button>
+                <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="archive.emit(todo)">
+                        <mat-icon>schedule</mat-icon>
+                        <span>{{postponeActionTitle(todo.isArchived)}}</span>
+                    </button>
+                    <button mat-menu-item (click)="delete.emit(todo)">
+                        <mat-icon>delete</mat-icon>
+                        <span>Delete</span>
+                    </button>
+                    <button mat-menu-item (click)="openEditTodoDialog(todo)">
+                        <mat-icon>edit</mat-icon>
+                        <span>Edit</span>
+                    </button>
+                </mat-menu>
             </mat-panel-description>
         </mat-expansion-panel-header>
         <p>{{ todo.description }}</p>

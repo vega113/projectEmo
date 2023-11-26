@@ -61,7 +61,6 @@ export class UserTodosComponent implements OnInit {
   }
 
   archive(todo: UserTodo): void {
-    this.editingTodoId = todo.id!;
     todo.isArchived = !todo.isArchived;
     this.userTodoService.archive(todo).subscribe({
       next: todos => {
@@ -74,6 +73,34 @@ export class UserTodosComponent implements OnInit {
         });
       },
       error: err => this.handleError(err, "Failed to archive todo")
+    });
+  }
+
+  delete(todo: UserTodo): void {
+    this.userTodoService.delete(todo).subscribe({
+      next: todos => {
+        this.todos = todos;
+        this.editingTodoId = null;
+        this.refresh();
+        this.snackBar.open(`Todo deleted`, 'Close', {
+          duration: 5000,
+        });
+      },
+      error: err => this.handleError(err, "Failed to delete todo")
+    });
+  }
+
+  edit(todo: UserTodo): void {
+    this.userTodoService.edit(todo).subscribe({
+      next: todos => {
+        this.todos = todos;
+        this.editingTodoId = null;
+        this.refresh();
+        this.snackBar.open(`Todo updated`, 'Close', {
+          duration: 5000,
+        });
+      },
+      error: err => this.handleError(err, "Failed to update todo")
     });
   }
 

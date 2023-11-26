@@ -8,6 +8,18 @@ import java.sql.Connection
 import javax.inject.Inject
 
 class UserTodoDao @Inject()(dateTimeService: DateTimeService) {
+  def delete(userId: Long, userTodoId: Long)(implicit connection: Connection): Int = {
+    SQL(
+      """
+      UPDATE user_todos
+      SET is_deleted = true, last_updated = {lastUpdated}
+      WHERE id = {id} and user_id = {userId}
+      """).on("id" -> userTodoId,
+        "userId" -> userId,
+        "lastUpdated" -> dateTimeService.now())
+      .executeUpdate()
+  }
+
   def fetchByUserIdTodoId(userId: Long, id: Long)(implicit connection: Connection): Option[UserTodo] = {
     SQL("SELECT * FROM user_todos WHERE user_id = {userId} and id = {id} and is_deleted = false")
       .on("userId" -> userId, "id" -> id)
@@ -24,22 +36,13 @@ class UserTodoDao @Inject()(dateTimeService: DateTimeService) {
     SQL(
       """
       UPDATE user_todos
-      SET title = {title}, description = {description}, color = {color}, is_done = {isDone}, is_archived = {isArchived},
-      is_deleted = {isDeleted}, is_ai = {isAi}, is_read = {isRead},
-      last_updated = {lastUpdated}
-      WHERE id = {id}
-      """).on(
-      "id" -> todo.id,
-      "title" -> todo.title,
-      "description" -> todo.description,
-      "color" -> todo.color,
-      "isDone" -> todo.isDone,
-      "isArchived" -> todo.isArchived,
-      "isDeleted" -> todo.isDeleted,
-      "isAi" -> todo.isAi,
-      "isRead" -> todo.isRead,
-      "lastUpdated" -> dateTimeService.now()
-    ).executeUpdate()
+      SET title = {title}, description = {description}, last_updated = {lastUpdated}
+      WHERE id = {id} and user_id = {userId}
+      """).on("id" -> todo.id,
+        "userId" -> todo.userId,
+        "title" -> todo.title,
+        "description" -> todo.description,
+        "lastUpdated" -> dateTimeService.now()).executeUpdate()
   }
 
   def findAllNotDeletedByEmotionRecordId(id: Long)(implicit connection: Connection): List[UserTodo] = {

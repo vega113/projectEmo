@@ -32,7 +32,19 @@ export class UserTodoService {
 
     add(todo: UserTodo) {
         const headers = this.authService.getAuthorizationHeader();
-        return this.http.post<UserTodo[]>(`${environment.baseUrl}/user/todo/add`, todo,
+        return this.http.post<UserTodo[]>(`${environment.baseUrl}/user/todo`, todo,
+            {headers});
+    }
+
+    delete(todo: UserTodo) {
+        const headers = this.authService.getAuthorizationHeader();
+        return this.http.delete<UserTodo[]>(`${environment.baseUrl}/user/todo/${todo.id}`,
+            {headers});
+    }
+
+    edit(todo: UserTodo) {
+        const headers = this.authService.getAuthorizationHeader();
+        return this.http.put<UserTodo[]>(`${environment.baseUrl}/user/todo`, todo,
             {headers});
     }
 }

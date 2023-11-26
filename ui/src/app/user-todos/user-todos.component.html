@@ -5,12 +5,18 @@
 <button mat-button class="add-todo-button" color="primary" type="button" (click)="openAddTodoDialog()">Add New Todo</button>
 <mat-tab-group>
     <mat-tab label="Active ({{activeTodos.length}})">
-        <app-todo-tab [label]="'Active'" [todos]="activeTodos" (complete)="complete($event)" (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
+        <app-todo-tab [label]="'Active'" [todos]="activeTodos" (complete)="complete($event)" (archive)="archive($event)"
+                      (delete)="delete($event)" (edit)="edit($event)"
+                      [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
     </mat-tab>
     <mat-tab label="Completed ({{completedTodos.length}})">
-        <app-todo-tab [label]="'Completed'" [todos]="completedTodos" (complete)="complete($event)" (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
+        <app-todo-tab [label]="'Completed'" [todos]="completedTodos" (complete)="complete($event)"
+                      (archive)="archive($event)" (delete)="delete($event)" (edit)="edit($event)"
+                      [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
     </mat-tab>
     <mat-tab label="Postponed ({{archivedTodos.length}})">
-        <app-todo-tab [label]="'Postponed'" [todos]="archivedTodos" (complete)="complete($event)" (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
+        <app-todo-tab [label]="'Postponed'" [todos]="archivedTodos" (complete)="complete($event)"
+                      (delete)="delete($event)" (edit)="edit($event)"
+                      (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
     </mat-tab>
 </mat-tab-group>

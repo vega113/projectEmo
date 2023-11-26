@@ -1,17 +1,15 @@
 package controllers
 
 import auth.AuthenticatedAction
-import net.logstash.logback.argument.StructuredArguments
+import dao.model.UserTodo
+import net.logstash.logback.argument.StructuredArguments._
 import org.slf4j.{Logger, LoggerFactory}
-import play.api.libs.json.{JsError, JsValue, Json}
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import service.UserTodoService
-import StructuredArguments._
-import dao.model.UserTodo
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class UserTodoController @Inject()(cc: ControllerComponents, userTodoService: UserTodoService,
                                    authenticatedAction: AuthenticatedAction)
@@ -64,4 +62,22 @@ class UserTodoController @Inject()(cc: ControllerComponents, userTodoService: Us
       }
     )
   }
+
+  def delete(userTodoId: Long): Action[AnyContent] = authenticatedActionWithUser { implicit token =>
+    logger.info("Deleting user todo {}", Map("userTodoId" -> userTodoId))
+    userTodoService.delete(token.userId, userTodoId).map(userTodos => Ok(Json.toJson(userTodos)))
+  }
+
+    def edit(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+      logger.info("Updating user todo for user {} {}",
+        value("userId", token.user.userId), value("userTodo", token.body))
+
+      token.body.validate[UserTodo].fold(
+        errors => handleError(errors, "userTodo", token),
+        userTodo => {
+          userTodoService.update(userTodo.copy(userId = Some(token.user.userId))).
+            map(isUpdated => Ok(Json.toJson(isUpdated)))
+        }
+      )
+    }
 }

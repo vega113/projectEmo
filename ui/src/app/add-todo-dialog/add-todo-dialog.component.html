@@ -1,15 +1,15 @@
 <div class="add-todo-dialog-content">
-  <h2 class="add-todo-dialog-title">Add New Todo</h2>
+  <h1 mat-dialog-title>{{ isNewTodo ? 'Add New Todo' : 'Edit Todo' }}</h1>
   <mat-form-field class="add-todo-dialog-input">
     <mat-label>Title</mat-label>
-    <input matInput [(ngModel)]="newTodo.title" required>
+    <input matInput [(ngModel)]="todo.title" required>
   </mat-form-field>
   <mat-form-field class="add-todo-dialog-input">
     <mat-label>Description</mat-label>
-    <textarea matInput [(ngModel)]="newTodo.description"></textarea>
+    <textarea matInput [(ngModel)]="todo.description"></textarea>
   </mat-form-field>
-  <div class="add-todo-dialog-actions">
+  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="10px" class="add-todo-dialog-actions">
     <button mat-button class="add-todo-dialog-button cancel" (click)="onCancel()">Cancel</button>
-    <button mat-button class="add-todo-dialog-button add" (click)="onAdd()" [disabled]="!newTodo.title">Add</button>
+    <button mat-button (click)="onSave()">{{ isNewTodo ? 'Add' : 'Update' }}</button>
   </div>
 </div>

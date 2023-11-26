@@ -11,11 +11,13 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[UserTodoServiceImpl])
 trait UserTodoService {
+  def delete(userId: Long, userTodoId: Long): Future[List[UserTodo]]
+
   def fetchByUserId(userId: Long):Future[List[UserTodo]]
 
   def insert(emotionRecordId: Option[Long], noteId: Option[Long], todo: UserTodo): Future[List[UserTodo]]
 
-  def update(todo: UserTodo): Future[Boolean]
+  def update(todo: UserTodo): Future[List[UserTodo]]
   def findEmotionRecordIdByTodoId(todoId: Long): Future[Option[Long]]
   def archive(userId: Long, id: Long): Future[List[UserTodo]]
   def unarchive(userId: Long, id: Long): Future[List[UserTodo]]
@@ -82,9 +84,16 @@ class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
     })
   }
 
-  override def update(todo: UserTodo): Future[Boolean] = {
+  override def update(todo: UserTodo): Future[List[UserTodo]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
-      Future.successful(todoDao.update(todo) > 0)
+      if (todoDao.update(todo) > 0) {
+        todo.userId match {
+          case Some(userId) => Future.successful(todoDao.fetchByUserId(userId))
+          case None => Future.failed(new Exception("Failed to update todo"))
+        }
+      } else {
+        Future.failed(new Exception("Failed to update todo"))
+      }
     })
   }
 
@@ -99,4 +108,13 @@ class UserTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
       Future.successful(todoDao.findEmotionRecordIdByTodoId(todoId))
     })
   }
+
+  override def delete(userId: Long, userTodoId: Long): Future[List[UserTodo]] =
+    databaseExecutionContext.withConnection({ implicit connection =>
+      if (todoDao.delete(userId, userTodoId) > 0) {
+        Future.successful(todoDao.fetchByUserId(userId))
+      } else {
+        Future.failed(new Exception("Failed to delete todo"))
+      }
+    })
 }
