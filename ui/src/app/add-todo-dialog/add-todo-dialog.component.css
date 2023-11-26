@@ -1,3 +1,7 @@
+textarea {
+  min-height: 6em;
+}
+
 /* Global Styles Override */
 .mat-dialog-container {
   max-width: 80vw; /* Limit the maximum width to 80% of the view width */
