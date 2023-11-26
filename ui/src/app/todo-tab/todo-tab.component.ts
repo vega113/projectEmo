@@ -28,7 +28,7 @@ export class TodoTabComponent {
     openEditTodoDialog(todoToBeUpdated: UserTodo): void {
         console.log("openEditTodoDialog", todoToBeUpdated);
         const dialogRef = this.dialog.open(AddTodoDialogComponent, {
-            width: '40%', height: '30%',
+            width: '35%', height: '40%',
             data: {todo: todoToBeUpdated}
         });
 
