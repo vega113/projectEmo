@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { EmotionStateService } from '../services/emotion-state.service';
 import {MatSort} from "@angular/material/sort";
 import {EmotionRecord} from "../models/emotion.model";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 
 @Component({
@@ -18,7 +19,8 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
     'date',
     'intensity',
     'subEmotion',
-    'noteTitle'
+    'noteTitle',
+    'actions'
   ];
   dataSource: MatTableDataSource<EmotionRecord>;
 
@@ -30,7 +32,8 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
       private emotionService: EmotionService,
       private router: Router,
       private emotionStateService: EmotionStateService,
-      private changeDetector: ChangeDetectorRef
+      private changeDetector: ChangeDetectorRef,
+      private snackbar: MatSnackBar
   ) {
     this.dataSource = new MatTableDataSource();
   }
@@ -72,5 +75,22 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
 
   getDateForSorting(data: any): number {
     return new Date(data.created).getTime();
+  }
+
+  onDelete(record: EmotionRecord): void {
+    this.emotionService.deleteEmotionRecord(record.id!).subscribe({
+        next: () => {
+            this.snackbar.open(`Emotion record deleted successfully: ${record.notes[0].title}` , 'Close', {
+            duration: 3000,
+            });
+            this.ngOnInit();
+        },
+        error: (err) => {
+            console.error(err);
+            this.snackbar.open('Error deleting emotion record', 'Close', {
+            duration: 3000,
+            });
+        },
+    });
   }
 }

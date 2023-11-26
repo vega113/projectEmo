@@ -192,4 +192,16 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       }
     )
   }
+
+  def delete(id: Long): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
+    logger.info("deleting emotion record: " + id)
+    emotionRecordService.delete(id, token.user.userId).map {
+      case true =>
+        logger.info("deleted emotion record: " + id)
+        Ok
+      case false =>
+        logger.info("failed to delete emotion record: " + id)
+        BadRequest(Json.obj("message" -> s"Invalid emotion record id: $id"))
+    }
+  }
 }

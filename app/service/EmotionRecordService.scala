@@ -26,7 +26,7 @@ trait EmotionRecordService {
 
   def update(emotionRecord: EmotionRecord): Future[Int]
 
-  def delete(id: Long): Future[Int]
+  def delete(id: Long, userId: Long): Future[Boolean]
 
   def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long): Future[Option[Long]]
 
@@ -193,9 +193,9 @@ class EmotionRecordServiceImpl @Inject()(
     }))
   }
 
-  override def delete(id: Long): Future[Int] = {
-    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.delete(id)
+  override def delete(id: Long, userId: Long): Future[Boolean] = {
+    Future(databaseExecutionContext.withConnection({ implicit connection =>
+      emotionRecordDao.deleteByIdAndUserId(id, userId)
     }))
   }
 

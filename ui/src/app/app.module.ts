@@ -58,6 +58,7 @@ import { NoteTodoComponent } from './note-todo/note-todo.component';
 import { UserTodosComponent } from './user-todos/user-todos.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import { AddTodoDialogComponent } from './add-todo-dialog/add-todo-dialog.component';
+import {MatMenuModule} from "@angular/material/menu";
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -127,7 +128,8 @@ export const MAT_DATE_FNS_FORMATS = {
         CanvasJSAngularChartsModule,
         MatRadioModule,
         MatDialogModule,
-        MatCheckboxModule
+        MatCheckboxModule,
+        MatMenuModule
 
     ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {

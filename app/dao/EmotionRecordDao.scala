@@ -145,7 +145,10 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
     insertedCount
   }
 
-  def delete(id: Long)(implicit connection: Connection): Int = {
-    SQL("DELETE FROM emotion_records WHERE id = {id}").on("id" -> id).executeUpdate()
+  def deleteByIdAndUserId(id: Long, userId: Long)(implicit connection: Connection): Boolean = {
+    val deleted = SQL("DELETE FROM emotion_records WHERE id = {id} AND user_id = {userId}").
+      on("id" -> id, "userId" -> userId).
+      executeUpdate()
+    deleted > 0
   }
 }

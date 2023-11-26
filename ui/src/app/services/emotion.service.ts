@@ -142,4 +142,13 @@ export class EmotionService {
       map(response => response.status === 200)
     )
   }
+
+  deleteEmotionRecord(id: number) {
+    const headers = this.authService.getAuthorizationHeader();
+    return this.http.delete(`${environment.baseUrl}/emotionRecord/${id}`, {headers, observe: 'response' }).
+    pipe(catchError(resp => this.errorService.handleError(resp))).
+    pipe(
+        map(response => response.status === 200)
+    );
+  }
 }
