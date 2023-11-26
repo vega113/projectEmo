@@ -28,6 +28,8 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatSort) sort!: MatSort;
 
+  isLoading: boolean = true;
+
   constructor(
       private emotionService: EmotionService,
       private router: Router,
@@ -42,7 +44,7 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
     this.emotionService.fetchEmotionRecordsForCurrentUser().subscribe((data) => {
       this.dataSource.data = data;
       this.dataSource.paginator = this.paginator;
-
+      this.isLoading = false;
     });
   }
 

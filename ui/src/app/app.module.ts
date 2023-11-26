@@ -59,6 +59,7 @@ import { UserTodosComponent } from './user-todos/user-todos.component';
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import { AddTodoDialogComponent } from './add-todo-dialog/add-todo-dialog.component';
 import {MatMenuModule} from "@angular/material/menu";
+import { TodoTabComponent } from './todo-tab/todo-tab.component';
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -92,6 +93,7 @@ export const MAT_DATE_FNS_FORMATS = {
     NoteTodoComponent,
     UserTodosComponent,
     AddTodoDialogComponent,
+    TodoTabComponent,
   ],
     imports: [
         BrowserModule,

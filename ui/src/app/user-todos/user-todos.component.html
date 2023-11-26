@@ -1,74 +1,16 @@
-<button mat-button class="add-todo-button" color="primary"  type="button" (click)="openAddTodoDialog()">Add New Todo</button>
-
-
+<div *ngIf="isLoading" class="page-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <h2>Loading...</h2>
+</div>
+<button mat-button class="add-todo-button" color="primary" type="button" (click)="openAddTodoDialog()">Add New Todo</button>
 <mat-tab-group>
-    <mat-tab label="Active ({{activeTodos.length}})">
-        <mat-accordion>
-            <mat-expansion-panel *ngFor="let todo of activeTodos" >
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <mat-checkbox [checked]="todo.isDone"  (click)="$event.stopPropagation(); complete(todo)">
-                            {{ todo.title }}</mat-checkbox>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        <button mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
-                                [innerText]="isArchivedToTitle(todo.isArchived)"></button>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <p>{{ todo.description }}</p>
-            </mat-expansion-panel>
-        </mat-accordion>
+    <mat-tab label="Active ({{todos.length}})">
+        <app-todo-tab [label]="'Active'" [todos]="activeTodos" (complete)="complete($event)" (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
     </mat-tab>
-    <mat-tab label="Completed ({{completedTodos.length}})">
-        <mat-accordion>
-            <mat-expansion-panel *ngFor="let todo of completedTodos" >
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <mat-checkbox [checked]="todo.isDone" (click)="$event.stopPropagation(); complete(todo)">
-                            {{ todo.title }}</mat-checkbox>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <p>{{ todo.description }}</p>
-            </mat-expansion-panel>
-        </mat-accordion>
+    <mat-tab label="Completed ({{todos.length}})">
+        <app-todo-tab [label]="'Completed'" [todos]="completedTodos" (complete)="complete($event)" (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
     </mat-tab>
-    <mat-tab label="All ({{allTodos.length}})">
-        <mat-accordion>
-            <mat-expansion-panel *ngFor="let todo of allTodos">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <mat-checkbox [checked]="todo.isDone"  (click)="$event.stopPropagation(); complete(todo)">
-                            {{ todo.title }}</mat-checkbox>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        <button *ngIf="!todo.isDone" mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
-                                [innerText]="isArchivedToTitle(todo.isArchived)"></button>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <p>{{ todo.description }}</p>
-            </mat-expansion-panel>
-        </mat-accordion>
-    </mat-tab>
-    <mat-tab label="Archived ({{archivedTodos.length}})">
-        <mat-accordion>
-            <mat-expansion-panel *ngFor="let todo of archivedTodos">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        <mat-checkbox [checked]="todo.isDone"  (click)="$event.stopPropagation(); complete(todo)">
-                            {{ todo.title }}</mat-checkbox>
-                    </mat-panel-title>
-                    <mat-panel-description>
-                        <button mat-button color="primary" (click)="$event.stopPropagation(); archive(todo)"
-                                [innerText]="isArchivedToTitle(todo.isArchived)"></button>
-                    </mat-panel-description>
-                </mat-expansion-panel-header>
-                <p>{{ todo.description }}</p>
-            </mat-expansion-panel>
-        </mat-accordion>
+    <mat-tab label="Postponed ({{todos.length}})">
+        <app-todo-tab [label]="'Postponed'" [todos]="archivedTodos" (complete)="complete($event)" (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"></app-todo-tab>
     </mat-tab>
 </mat-tab-group>
-<div *ngIf="todos.length === 0">
-    <p>No todos found.</p>
-</div>

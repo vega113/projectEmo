@@ -1,3 +1,7 @@
+<div *ngIf="isLoading" class="page-loading">
+  <mat-spinner diameter="48"></mat-spinner>
+  <h2>Loading...</h2>
+</div>
 <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
   <ng-container matColumnDef="date">
     <th mat-header-cell *matHeaderCellDef mat-sort-header > Date </th>

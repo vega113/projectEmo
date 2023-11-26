@@ -2,43 +2,6 @@ h2 {
     margin-bottom: 20px;
 }
 
-mat-accordion {
-    margin-bottom: 20px;
-}
-
-mat-expansion-panel-header {
-    align-items: center;
-}
-
-mat-checkbox {
-    margin-right: 20px;
-}
-
-button {
-    margin-left: auto;
-}
-
-
-/* Global Styles Override */
-.mat-dialog-container {
-  max-width: 80vw; /* Limit the maximum width to 80% of the view width */
-  width: auto; /* This will make the width to be as per content up to max-width */
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  padding: 0; /* Ensure padding does not cause overflow */
-  margin: 0 auto; /* Center the dialog in the viewport */
-  box-sizing: border-box; /* Include padding and border in the width calculation */
-}
-
-/* Specific Dialog Content Styles */
-.add-todo-dialog-content {
-  display: flex;
-  flex-direction: column;
-  width: auto; /* Allow content to define the width */
-  max-width: 100%; /* Prevent the content from exceeding the dialog container */
-  padding: 20px; /* Adequate padding within the dialog */
-  box-sizing: border-box; /* Include padding in the width calculation */
-}
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .mat-dialog-container {

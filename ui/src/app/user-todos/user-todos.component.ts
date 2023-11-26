@@ -19,6 +19,7 @@ export class UserTodosComponent implements OnInit {
   completedTodos: UserTodo[] = [];
   allTodos: UserTodo[] = [];
   archivedTodos: UserTodo[] = [];
+  isLoading = true;
 
 
   constructor(private userTodoService: UserTodoService, public dialog: MatDialog,
@@ -32,6 +33,7 @@ export class UserTodosComponent implements OnInit {
     this.userTodoService.fetchUserTodos(this.page, this.size).subscribe(todos => {
       this.todos = todos;
       this.refresh();
+      this.isLoading = false;
     });
   }
 
@@ -66,7 +68,8 @@ export class UserTodosComponent implements OnInit {
         this.todos = todos;
         this.editingTodoId = null;
         this.refresh();
-        this.snackBar.open('Todo Archived', 'Close', {
+        const action = todo.isArchived ? 'postponed' : 'activated';
+        this.snackBar.open(`Todo ${action}`, 'Close', {
           duration: 5000,
         });
       },
@@ -80,8 +83,8 @@ export class UserTodosComponent implements OnInit {
     this.fetchTodos();
   }
 
-  isArchivedToTitle(isArchived: boolean): string {
-    return isArchived ? 'Unarchive' : 'Archive';
+  postponeActionTitle(isArchived: boolean): string {
+    return isArchived ? 'Activate' : 'Postpone';
   }
 
   openAddTodoDialog(): void {

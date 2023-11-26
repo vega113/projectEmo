@@ -1,0 +1,18 @@
+<mat-accordion>
+    <mat-expansion-panel *ngFor="let todo of todos">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <mat-checkbox [checked]="todo.isDone" (click)="$event.stopPropagation(); complete.emit(todo)">
+                    {{ todo.title }}</mat-checkbox>
+            </mat-panel-title>
+            <mat-panel-description>
+                <button mat-button color="primary" (click)="$event.stopPropagation(); archive.emit(todo)"
+                        [innerText]="postponeActionTitle(todo.isArchived)"></button>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>{{ todo.description }}</p>
+    </mat-expansion-panel>
+</mat-accordion>
+<div *ngIf="todos.length === 0">
+    <p>No todos found.</p>
+</div>

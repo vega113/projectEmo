@@ -1,0 +1,25 @@
+h2 {
+    margin-bottom: 20px;
+}
+
+mat-accordion {
+    margin-bottom: 20px;
+}
+
+mat-expansion-panel-header {
+    align-items: center;
+}
+
+mat-checkbox {
+    margin-right: 20px;
+}
+
+button {
+    margin-left: auto;
+}
+
+mat-panel-title {
+    white-space: nowrap;
+    width: 100%;
+    text-overflow: ellipsis;
+}
