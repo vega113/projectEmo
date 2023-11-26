@@ -1,7 +1,7 @@
 package service
 
 import com.google.inject.ImplementedBy
-import dao.{DatabaseExecutionContext, NoteDao, TagDao}
+import dao.{DatabaseExecutionContext, NoteDao, TagDao, model}
 import dao.model.{Note, NoteTemplate, Tag}
 import net.logstash.logback.argument.StructuredArguments._
 
@@ -61,6 +61,7 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
       case x@Some(id) =>
         addNewTagsFromNoteToRecord(emotionRecordId, note)
         addTodosFromNoteToNote(note.text, id)
+        addTodosFromAi(note.todos, id)
         logger.info("Inserted note emotion record id {}, note id {}", value("noteId", emotionRecordId),
           value("noteId", id))
         x
@@ -84,9 +85,19 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
     tagId
   }
 
+
+
   private def addTodosFromNoteToNote(text: String, noteId: Long): Future[List[Option[Long]]] = {
-    val todos = todoService.extractTodos(text)
-    sequence(todos.map(todo => todoService.insert(text, noteId, todo)))
+    val extractedTodos = todoService.extractTodos(text)
+    sequence(extractedTodos.map(todo => todoService.insert(noteId, todo)))
+  }
+
+  private def addTodosFromAi(todosOpt: Option[List[model.NoteTodo]], id: Long): Future[List[Option[Long]]] = {
+    todosOpt match {
+      case Some(todos) =>
+        sequence(todos.map(todo => todoService.insert(id, todo.copy(isAi = Some(true), isAccepted = Some(false)))))
+      case None => Future.successful(List())
+    }
   }
 
   override def findAllNoteTemplates(): Future[List[NoteTemplate]] = {

@@ -103,8 +103,8 @@ object model {
                        id: Option[Long],
                        title: String,
                        description: String,
-                       isAccepted: Boolean,
-                       isAi: Boolean,
+                       isAccepted: Option[Boolean] = Some(false),
+                       isAi: Option[Boolean] = Some(true),
                        created: Option[LocalDateTime] = None
                      )
 
@@ -162,6 +162,7 @@ object model {
                                      subEmotionId: Option[String],
                                      triggers: Option[List[Trigger]],
                                      tags: Option[List[Tag]],
+                                     todos: Option[List[NoteTodo]],
                                      description: String,
                                      suggestion: String
                                    )
@@ -317,11 +318,18 @@ object Note {
       get[Option[Long]]("id") ~
         str("title") ~
         str("description") ~
-        bool("is_accepted") ~
-        bool("is_ai") ~
+        get[Option[Boolean]]("is_accepted") ~
+        get[Option[Boolean]]("is_ai") ~
         get[Option[LocalDateTime]]("created") map {
         case id ~ title ~ description ~ isAccepted ~ isAi ~ created =>
-          NoteTodo(id, title, description, isAccepted, isAi, created)
+          NoteTodo(
+            id,
+            title,
+            description,
+            isAccepted,
+            isAi,
+            created
+          )
       }
     }
   }

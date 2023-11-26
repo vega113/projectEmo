@@ -92,6 +92,7 @@ export interface NoteTodo {
   title: string;
   description: string;
   isAccepted: boolean;
+  isAi: boolean;
   created?: string;
 }
 
@@ -204,6 +205,7 @@ export interface EmotionDetectionResult {
   subEmotionId?: string;
   triggers: Trigger[];
   tags: Tag[];
+  todos: NoteTodo[];
   description: string;
   suggestion: string;
 }

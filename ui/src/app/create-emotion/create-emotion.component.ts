@@ -88,6 +88,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
       isPublic: [false],
       emotionNote: [''],
       tags: [[]],
+      todos: [[]],
       description: [''],
       suggestion: [''],
     });
@@ -119,7 +120,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
     this.isLoadingNotes = true;
     console.log('Detecting emotion for text: ', this.emotionForm.get("emotionNote")?.value);
     this.noteService.detectEmotion(this.emotionForm.get("emotionNote")?.value).subscribe({
-      next: (response) => {
+      next: (response: EmotionFromNoteResult) => {
         console.log('Emotion detected successfully', response);
         this.handleNoteSubmission(response);
         this.isLoadingNotes = false;
@@ -229,7 +230,8 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
       const note: Note = {
         text: emotionFromData.emotionNote,
         description: emotionFromData.description,
-        suggestion: emotionFromData.suggestion
+        suggestion: emotionFromData.suggestion,
+        todos: emotionFromData.todos
       }
       notes.push(note);
     }
@@ -348,6 +350,10 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
 
       if(this.emotionDetected?.tags != null && this.emotionDetected?.tags.length > 0) {
         this.emotionForm.controls['tags'].setValue(this.emotionDetected?.tags);
+      }
+
+      if(this.emotionDetected?.todos != null && this.emotionDetected?.todos.length > 0) {
+        this.emotionForm.controls['todos'].setValue(this.emotionDetected?.todos);
       }
 
       this.snackBar.open(this.emotionDetected?.description + "\n" + this.emotionDetected?.suggestion, 'Close', {

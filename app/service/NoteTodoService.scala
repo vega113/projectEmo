@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[NoteTodoServiceImpl])
 trait NoteTodoService {
-  def insert(text: String, noteId: Long, todo: NoteTodo): Future[Option[Long]]
+  def insert(noteId: Long, todo: NoteTodo): Future[Option[Long]]
 
   def extractTodos(text: String): List[NoteTodo]
 
@@ -28,7 +28,7 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
                                     titleService: TitleService) extends NoteTodoService {
   private val logger: Logger = LoggerFactory.getLogger(classOf[NoteTodoServiceImpl])
 
-  override def insert(text: String, noteId: Long, todo: NoteTodo): Future[Option[Long]] = {
+  override def insert(noteId: Long, todo: NoteTodo): Future[Option[Long]] = {
     logger.info("Inserting note todo, noteId: {}", value("noteId", noteId))
     databaseExecutionContext.withConnection({ implicit connection =>
       val todoId: Long = noteTodoDao.insert(noteId, todo) match {
@@ -59,7 +59,7 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
         case Some(todo) =>
           val userNoteTodo = UserTodo(None, Option(userId), todo.title, Option(todo.description), None,
             isDone = false,
-            isArchived = false, isDeleted = false, isAi = todo.isAi, isRead = false, None, None)
+            isArchived = false, isDeleted = false, isAi = todo.isAi.getOrElse(true), isRead = false, None, None)
           userTodoDao.insert(userNoteTodo.copy(userId = Option(userId))) match {
             case Some(id) =>
               logger.info(s"Inserted user todo: {}", value("userTodo", userNoteTodo.copy(id = Some(id))))
@@ -92,8 +92,8 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
   }
 override def extractTodos(text: String): List[NoteTodo] = {
   val todoRegex = "(?s)(?<=\\[\\[).+?(?=]])".r
-  todoRegex.findAllIn(text).toList.map(todo => NoteTodo(None, titleService.makeTitle(todo), todo, isAccepted = false,
-    isAi = false)).filter(_.description.nonEmpty)
+  todoRegex.findAllIn(text).toList.map(todo => NoteTodo(None, titleService.makeTitle(todo), todo, isAccepted = Some(false),
+    isAi = Some(false))).filter(_.description.nonEmpty)
 }
 
   override def fetchById(id: Long): Future[Option[NoteTodo]] = {
