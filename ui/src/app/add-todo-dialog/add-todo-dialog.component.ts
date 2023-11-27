@@ -1,4 +1,3 @@
-// add-todo-dialog.component.ts
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import { UserTodo } from '../models/emotion.model';
@@ -20,9 +19,7 @@ export class AddTodoDialogComponent {
   constructor(public dialogRef: MatDialogRef<AddTodoDialogComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   ngOnInit() {
-    if (this.data.todo) {
-      // If a todo is provided, we're in "edit mode".
-      // Pre-fill the form fields with the todo data.
+    if (this.data?.todo) {
       this.todo = this.data.todo;
       this.isNewTodo = false;
     }

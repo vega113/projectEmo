@@ -2,7 +2,9 @@
     <mat-spinner diameter="48"></mat-spinner>
     <h2>Loading...</h2>
 </div>
-<button mat-button class="add-todo-button" color="primary" type="button" (click)="openAddTodoDialog()">Add New Todo</button>
+<button mat-raised-button type="button" color="primary" (click)="openAddTodoDialog()">
+    Add New Todo
+</button>
 <mat-tab-group>
     <mat-tab label="Active ({{activeTodos.length}})">
         <app-todo-tab [label]="'Active'" [todos]="activeTodos" (complete)="complete($event)" (archive)="archive($event)"

@@ -2,6 +2,12 @@ h2 {
     margin-bottom: 20px;
 }
 
+button {
+  margin-top: 10px;
+  margin-left: 10px;
+  display: block;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
   .mat-dialog-container {
