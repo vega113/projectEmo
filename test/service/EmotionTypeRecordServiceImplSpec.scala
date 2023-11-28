@@ -3,12 +3,15 @@ package service
 import controllers.model._
 import dao.model._
 import dao.{DatabaseExecutionContext, EmotionRecordDao}
+import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play._
 import uitil.TestObjectsFactory.createEmotionRecord
 
 import java.sql.Connection
 import java.time.{LocalDate, LocalDateTime}
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
   trait TestData {
@@ -137,11 +140,11 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
       // Verify the result
       result mustEqual
         List(SunburstData("Negative", None, List(SunburstData("undefined", None, List(), None),
-          SunburstData("Anger", None, List(SunburstData("Annoyance", Some(1), List(), None)), None)), Some("red")),
-          SunburstData("Neutral", None, List(SunburstData("Other", None, List(SunburstData("Indifference", Some(1), List(), None)), None)), Some("blue")),
+          SunburstData("Anger", None, List(SunburstData("Annoyance", Some(1), List(), None)), None)), Some("#e57373")),
+          SunburstData("Neutral", None, List(SunburstData("Other", None, List(SunburstData("Indifference", Some(1), List(), None)), None)), Some("#ffb74d")),
           SunburstData("Positive", None, List(SunburstData("Joy", None,
             List(SunburstData("Amusement", Some(2), List(), None),
-              SunburstData("Excitement", Some(1), List(), None)), None)), Some("green")))
+              SunburstData("Excitement", Some(1), List(), None)), None)), Some("#3f51b5")))
     }
   }
 
@@ -156,8 +159,8 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
 
     // Verify the result
     result mustEqual
-      List(DoughnutChartData("Neutral", 1, 3, Some("blue")), DoughnutChartData("Negative", 2, 6, Some("red")),
-        DoughnutChartData("Positive", 3, 12, Some("green")))
+      List(DoughnutChartData("Neutral", 1, 3, Some("#ffb74d")), DoughnutChartData("Negative", 2, 6, Some("#e57373")),
+        DoughnutChartData("Positive", 3, 9, Some("#3f51b5")))
   }
 
   "convert emotion records to doughnut triggers chart data" in new TestData {
@@ -227,6 +230,19 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
         Map("Positive" -> LineChartData(2, 6)),
         Map("Empty" -> LineChartData(1, 2), "Situations" -> LineChartData(1, 4)))
     )
+  }
+
+  "check fetch data" in new TestData {
+    val mockTagService: TagService = mock[TagService]
+    val mockTriggerService: TriggerService = mock[TriggerService]
+    val mockTitleService: TitleService = mock[TitleService]
+    val emotionRecordServiceImpl = new EmotionRecordServiceImpl(mockEmotionRecordDao, mockNoteService,
+      mockTagService, mockTriggerService, mockTitleService, fakeDatabaseExecutionContext)
+    when(mockEmotionRecordDao.findAllByUserId(1)(connection)).thenReturn(records)
+
+
+    private val actual: List[EmotionRecord] = Await.result(emotionRecordServiceImpl.findAllByUserId(1) , Duration("5s"))
+    actual mustEqual List(EmotionRecord(Some(3), "Positive", Some(1), Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))), 3, List(SubEmotion(Some("Excitement"), Some("Excitement"), Some("description"), Some("Joy"))), List(Trigger(Some(1), Some("People"), Some(1), Some(1), Some("description"), None)), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))), EmotionRecord(Some(4), "Neutral", Some(1), Some(Emotion(Some("Other"), Some("Other"), Some("Neutral"), Some("description"))), 3, List(SubEmotion(Some("Indifference"), Some("Indifference"), Some("description"), Some("Other"))), List(Trigger(Some(1), Some("Other"), Some(1), Some(1), Some("description"), None)), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))), EmotionRecord(Some(4), "Negative", Some(1), Some(Emotion(Some("Anger"), Some("Anger"), Some("Negative"), Some("description"))), 3, List(SubEmotion(Some("Annoyance"), Some("Annoyance"), Some("description"), Some("Anger"))), List(Trigger(Some(1), Some("Other"), Some(1), Some(1), Some("description"), None)), List(Note(None, Some("Note title"), "Note text", Some("description"), None, None, None, None, None, None)), List(Tag(Some(1), "Tag name", None)), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))), EmotionRecord(Some(4), "Negative", Some(1), None, 3, List(), List(Trigger(Some(1), Some("People"), Some(1), Some(1), Some("description"), None)), List(Note(None, Some("Note title"), "Note text", Some("description"), None, None, None, None, None, None)), List(Tag(Some(1), "Tag name", None)), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))), EmotionRecord(Some(1), "Positive", Some(1), Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))), 2, List(SubEmotion(Some("Amusement"), Some("Amusement"), Some("description"), Some("Joy"))), List(), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-01T00:00"))), EmotionRecord(Some(2), "Positive", Some(1), Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))), 4, List(SubEmotion(Some("Amusement"), Some("Amusement"), Some("description"), Some("Joy"))), List(Trigger(Some(1), Some("Situations"), Some(1), Some(1), Some("description"), None)), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-01T00:00"))))
   }
 
   def createMockDate1(): Option[LocalDateTime] = {

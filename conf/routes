@@ -12,8 +12,8 @@ POST           /api/logout                                                      
 
 # EmotionRecordWithRelations routes
 POST           /api/emotionRecord                                                               controllers.EmotionRecordController.insert()
-DELETE         /api/emotionRecord/:id                                                              controllers.EmotionRecordController.delete(id: Long)
-PUT            /api/emotionRecord/:id                                                           controllers.EmotionRecordController.update(id: Long)
+DELETE         /api/emotionRecord/:id                                                           controllers.EmotionRecordController.delete(id: Long)
+PUT            /api/emotionRecord                                                               controllers.EmotionRecordController.update()
 POST           /api/emotionRecord/:id/note                                                      controllers.EmotionRecordController.insertNote(id: Long)
 GET            /api/emotionRecord/user                                                          controllers.EmotionRecordController.findAllByUserId()
 GET            /api/emotionRecord/user/days                                                     controllers.EmotionRecordController.findAllDaysByUserId()
@@ -31,7 +31,6 @@ GET            /api/noteTemplate                                                
 
 # Note routes
 PUT            /api/note/delete/:id                                                             controllers.NoteController.deleteNote(id: Long)
-PUT            /api/note/undelete/:id                                                           controllers.NoteController.undeleteNote(id: Long)
 POST           /api/note/emotion/detect                                                         controllers.NoteController.detectEmotion
 PUT            /api/note/todo/accept/:noteTodoId                                                controllers.NoteController.acceptTodo(noteTodoId: Long)
 

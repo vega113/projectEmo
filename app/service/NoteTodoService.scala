@@ -59,7 +59,7 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
         case Some(todo) =>
           val userNoteTodo = UserTodo(None, Option(userId), todo.title, Option(todo.description), None,
             isDone = false,
-            isArchived = false, isDeleted = false, isAi = todo.isAi.getOrElse(true), isRead = false, None, None)
+            isArchived = false, isDeleted = false, isAi = todo.isAi, isRead = Some(false), None, None)
           userTodoDao.insert(userNoteTodo.copy(userId = Option(userId))) match {
             case Some(id) =>
               logger.info(s"Inserted user todo: {}", value("userTodo", userNoteTodo.copy(id = Some(id))))

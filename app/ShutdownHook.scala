@@ -23,7 +23,7 @@ class ShutdownHook @Inject()(lifecycle: ApplicationLifecycle, config: Configurat
 
   lifecycle.addStopHook { () =>
     logger.info("ShutdownHook is running")
-    if (config.get[Boolean]("emo.threadDumpOnShutdown")) {
+    if (config.get[Boolean]("emo.config.threadDumpOnShutdown")) {
       logger.info("Thread dump on shutdown is enabled")
       threadDump()
     } else {

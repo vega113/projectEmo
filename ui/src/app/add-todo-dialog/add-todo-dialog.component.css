@@ -2,24 +2,14 @@ textarea {
   min-height: 6em;
 }
 
-/* Global Styles Override */
-.mat-dialog-container {
-  max-width: 80vw; /* Limit the maximum width to 80% of the view width */
-  width: auto; /* Adjusts width according to content, respecting max-width */
-  overflow-x: hidden; /* Prevent horizontal scroll */
-  padding: 0; /* Ensure padding does not cause overflow */
-  margin: 0 auto; /* Center the dialog in the viewport */
-  box-sizing: border-box; /* Include padding and border in the width calculation */
-}
-
-/* Specific Dialog Content Styles */
-.add-todo-dialog-content {
-  display: flex;
-  flex-direction: column;
-  width: auto; /* Allow content to define the width */
-  max-width: 100%; /* Prevent the content from exceeding the dialog container */
-  padding: 20px;
-  box-sizing: border-box; /* Include padding in the width calculation */
+mat-form-field {
+  width: 95%;
+  margin-bottom: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  border-radius: 1px;
+  padding: 1px;
 }
 
 /* Mobile Responsiveness */

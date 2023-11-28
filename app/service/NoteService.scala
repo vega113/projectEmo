@@ -13,6 +13,8 @@ import scala.concurrent.Future.sequence
 
 @ImplementedBy(classOf[NoteServiceImpl])
 trait NoteService {
+  def deleteByEmotionRecordId(id: Long, userId: Long): Boolean
+
   def insert(emotionRecordId: Long, note: Note): Future[Option[Long]]
 
   def insert(emotionRecordId: Long, notes: List[Note]): Future[Option[Long]]
@@ -20,8 +22,6 @@ trait NoteService {
   def findAllNoteTemplates(): Future[List[NoteTemplate]]
 
   def delete(userId: Long, id: Long): Future[Boolean]
-
-  def undelete(userId: Long, id: Long): Future[Boolean]
 
   def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]]
 
@@ -71,7 +71,7 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
 
   private def makeTitle(note: Note): Option[String] = {
     note.title match {
-      case None => Option(titleService.makeTitle(note.text))
+      case None | Some("") => Option(titleService.makeTitle(note.text))
       case Some(title) if title.nonEmpty  => Some(title)
     }
   }
@@ -111,19 +111,22 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
 
   override def delete(emotionRecordId: Long, noteId: Long): Future[Boolean] = {
     databaseExecutionContext.withConnection({ implicit connection =>
-      Future.successful(noteDao.delete(emotionRecordId, noteId) > 0)
+      Future.successful(noteDao.deleteByEmotionRecordId(noteId, emotionRecordId) > 0)
     })
   }
 
-  override def undelete(emotionRecordId: Long, id: Long): Future[Boolean] = {
-    databaseExecutionContext.withConnection({ implicit connection =>
-      Future.successful(noteDao.undelete(emotionRecordId, id) > 0)
-    })
-  }
 
   override def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful(noteDao.findEmotionRecordIdByNoteId(noteId))
+    })
+  }
+
+  override def deleteByEmotionRecordId(id: Long, userId: Long): Boolean = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      val count = noteDao.deleteByEmotionRecordId(id, userId) > 0
+      logger.info("Deleted notes for emotion record {}", value("emotionRecordId", id))
+      count
     })
   }
 }

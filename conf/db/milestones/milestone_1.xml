@@ -337,5 +337,49 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="add_is_deleted_to_emotion_records_table" author="vega">
+        <addColumn tableName="emotion_records">
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="add_last_updated_to_emotion_records_table" author="vega">
+        <addColumn tableName="emotion_records">
+            <column name="last_updated" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_user_id_to_notes_table" author="vega">
+        <addColumn tableName="notes">
+            <column name="user_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="update_user_id_in_notes_table" author="vega">
+        <update tableName="notes">
+            <column name="user_id" valueComputed="(SELECT emotion_records.user_id FROM emotion_records JOIN emotion_record_notes ON emotion_records.id = emotion_record_notes.emotion_record_id WHERE emotion_record_notes.note_id = notes.id)"/>
+            <where>id IN (SELECT note_id FROM emotion_record_notes)</where>
+        </update>
+    </changeSet>
+    <changeSet id="add_emotion_record_id_to_notes_table" author="vega">
+        <addColumn tableName="notes">
+            <column name="emotion_record_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="update_emotion_record_id_in_notes_table" author="vega">
+        <update tableName="notes">
+            <column name="emotion_record_id" valueComputed="(SELECT emotion_record_id FROM emotion_record_notes WHERE emotion_record_notes.note_id = notes.id)"/>
+            <where>id IN (SELECT note_id FROM emotion_record_notes)</where>
+        </update>
+    </changeSet>
+    <changeSet id="drop_last_deleted_from_notes_table" author="vega">
+        <dropColumn tableName="notes" columnName="last_deleted"/>
+    </changeSet>
 
 </databaseChangeLog>

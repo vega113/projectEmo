@@ -28,12 +28,13 @@ export class TodoTabComponent {
     openEditTodoDialog(todoToBeUpdated: UserTodo): void {
         console.log("openEditTodoDialog", todoToBeUpdated);
         const dialogRef = this.dialog.open(AddTodoDialogComponent, {
-            width: '35%', height: '40%',
+            width: '45%', height: '45%',
             data: {todo: todoToBeUpdated}
         });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
+                console.log("openEditTodoDialog result", result);
                 this.editTodo(result);
             }
         });

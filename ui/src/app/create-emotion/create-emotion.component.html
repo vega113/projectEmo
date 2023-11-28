@@ -34,6 +34,7 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Note</mat-label>
             <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength" [placeholder]="placeHolderText"></textarea>
+            <mat-hint align="end">{{emotionForm.get('emotionNote')?.value.length || 0}}/{{maxNoteLength}}</mat-hint>
           </mat-form-field>
         </div>
         <mat-action-row>

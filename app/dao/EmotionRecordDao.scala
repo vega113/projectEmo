@@ -2,6 +2,7 @@ package dao
 
 import anorm._
 import dao.model._
+import service.DateTimeService
 
 import java.sql.Connection
 import javax.inject.Inject
@@ -10,8 +11,19 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
                                  emotionRecordTriggerDao: EmotionRecordTriggerDao,
                                  emotionDao: EmotionDao,
                                  noteDao: NoteDao,
-                                 tagDao: TagDao
+                                 tagDao: TagDao,
+                                  dateTimeService: DateTimeService
                                 ) {
+  def linkSubEmotionToEmotionRecord(subEmotionId: String, emotionRecordId: Long)(implicit connection: Connection): Option[Long] = {
+    SQL(
+      """
+      INSERT INTO emotion_record_sub_emotions(parent_emotion_record_id, parent_sub_emotion_id)
+      VALUES ({emotionRecordId}, {subEmotionId})
+      """).on("subEmotionId" -> subEmotionId,
+      "emotionRecordId" -> emotionRecordId)
+      .executeInsert()
+  }
+
   def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long)(implicit connection: Connection): Option[Long] = {
     SQL("SELECT emotion_record_id FROM emotion_record_notes inner join emotion_records on id=emotion_record_id" +
       " WHERE note_id = {noteId} and user_id = {userId}").
@@ -53,34 +65,23 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
   }
 
   def findByIdForUser(recordId: Long, userId: Long)(implicit connection: Connection): Option[EmotionRecord] = {
-    val emotionRecordOpt = SQL("SELECT * FROM emotion_records WHERE id = {recordId} and user_id = {userId}" ).
+    val emotionRecordOpt = SQL(
+      """
+     SELECT * FROM emotion_records WHERE id = {recordId} and user_id = {userId}
+      """).
       on("recordId" -> recordId, "userId" -> userId).
       as(EmotionRecord.parser.singleOpt)
     populateListsByEmotionRecord(emotionRecordOpt.toList).headOption
   }
 
   def findAllByUserId(userId: Long)(implicit connection: Connection): List[EmotionRecord] = {
-    val emotionRecords = SQL("SELECT * FROM emotion_records WHERE user_id = {userId}").on("userId" -> userId).
+    val emotionRecords = SQL("SELECT * FROM emotion_records WHERE user_id = {userId} and is_deleted <> true").
+      on("userId" -> userId).
       as(EmotionRecord.parser.*)
     populateListsByEmotionRecord(emotionRecords)
   }
 
   def insert(emotionRecord: EmotionRecord)(implicit connection: Connection): Option[Long] = {
-    val idOpt: Option[Long] = SQL(
-      """
-      INSERT INTO emotion_records (emotion_type, emotion_id, user_id, intensity, created)
-      VALUES ({emotionType}, {emotionId}, {userId}, {intensity}, {created})
-    """).on("userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
-      "emotionType" -> emotionRecord.emotionType,
-      "emotionId" -> emotionRecord.emotion.flatMap(_.id),
-      "intensity" -> emotionRecord.intensity,
-      "created" -> emotionRecord.created)
-      .executeInsert()
-    idOpt.foreach(id => insertSubLists(emotionRecord, id))
-    idOpt
-  }
-
-  def insert2(emotionRecord: EmotionRecord)(implicit connection: Connection): Option[Long] = {
     val idOpt: Option[Long] = SQL(
       """
       INSERT INTO emotion_records (emotion_type, emotion_id, user_id, intensity, created)
@@ -94,55 +95,23 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
     idOpt
   }
 
-  private def insertSubLists(emotionRecord: EmotionRecord, id: Long)(implicit connection: Connection) = {
-    for {
-      subEmotion <- emotionRecord.subEmotions
-    } yield {
-      SQL(
-        """
-      INSERT INTO emotion_record_sub_emotions(parent_emotion_record_id, parent_sub_emotion_id)
-      VALUES ({id}, {subEmotionId})
-      """).on("subEmotionId" -> subEmotion.subEmotionId,
-        "id" -> id)
-        .executeInsert()
-    }
-    for {
-      trigger <- emotionRecord.triggers
-    } yield {
-      SQL(
-        """
-      INSERT INTO emotion_record_triggers(parent_emotion_record_id, parent_trigger_id)
-      VALUES ({id}, {triggerId})
-      """).on("triggerId" -> trigger.triggerId,
-        "id" -> id)
-        .executeInsert()
-    }
-    for {
-      note <- emotionRecord.notes
-    } yield {
-      noteDao.insert(id, note)
-    }
-    tagDao.insert(id, emotionRecord.tags.toSet)
-  }
-
   def update(emotionRecord: EmotionRecord)(implicit connection: Connection): Int = {
-    val insertedCount = SQL(
+    val updatedCount = SQL(
       """
-      UPDATE emotion_records
-      SET emotion_id = {emotionId}, intensity = {intensity}
-      WHERE id = {id}
-    """).on("id" -> emotionRecord.id,
-      "userId" -> emotionRecord.userId,
-      "emotionId" -> emotionRecord.emotion.flatMap(_.id),
-      "intensity" -> emotionRecord.intensity)
+    UPDATE emotion_records
+    SET emotion_type = {emotionType}, emotion_id = {emotionId}, user_id = {userId}, intensity = {intensity},
+    is_deleted = {isDeleted}, last_updated = {lastUpdated}
+    WHERE id = {id}
+  """).on("id" -> emotionRecord.id.getOrElse(throw new RuntimeException("Id is required.")),
+        "userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
+        "emotionType" -> emotionRecord.emotionType,
+        "emotionId" -> emotionRecord.emotion.flatMap(_.id),
+        "intensity" -> emotionRecord.intensity,
+        "isDeleted" -> emotionRecord.isDeleted,
+        "lastUpdated" -> dateTimeService.now(),
+        "created" -> emotionRecord.created)
       .executeUpdate()
-
-    emotionRecord.id.foreach(id => {
-      emotionRecordSubEmotionDao.deleteByEmotionRecordId(id)
-      emotionRecordTriggerDao.deleteByEmotionRecordId(id)
-      insertSubLists(emotionRecord, id)
-    })
-    insertedCount
+    updatedCount
   }
 
   def deleteByIdAndUserId(id: Long, userId: Long)(implicit connection: Connection): Boolean = {

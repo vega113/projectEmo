@@ -42,16 +42,6 @@ class NoteController @Inject()(cc: ControllerComponents,
       }
   }
 
-  def undeleteNote(id: Long): Action[AnyContent] =
-    Action andThen authenticatedAction async { implicit token =>
-      emotionRecordService.findEmotionRecordIdByUserIdNoteId(token.user.userId, id).flatMap {
-        case Some(emotionRecordId) => noteService.undelete(emotionRecordId, id).map {
-          case true => Ok
-          case false => BadRequest(Json.obj("message" -> s"Invalid note id: $id"))
-        }
-        case None => Future.successful(BadRequest(Json.obj("message" -> s"Invalid note id: $id")))
-      }
-    }
 
   def detectEmotion(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     logger.info("Detecting emotion")

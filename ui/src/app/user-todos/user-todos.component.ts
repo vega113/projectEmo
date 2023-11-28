@@ -3,7 +3,7 @@ import {UserTodo} from '../models/emotion.model';
 import {UserTodoService} from "../services/user-todo.service";
 import {MatDialog} from "@angular/material/dialog";
 import {AddTodoDialogComponent} from "../add-todo-dialog/add-todo-dialog.component";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-user-todos',
@@ -20,6 +20,9 @@ export class UserTodosComponent implements OnInit {
   allTodos: UserTodo[] = [];
   archivedTodos: UserTodo[] = [];
   isLoading = true;
+  snackBarDuration = 10000;
+
+  snackBarRef: MatSnackBarRef<SimpleSnackBar> | null = null;
 
 
   constructor(private userTodoService: UserTodoService, public dialog: MatDialog,
@@ -52,11 +55,16 @@ export class UserTodosComponent implements OnInit {
         this.todos = todos;
         this.editingTodoId = null;
         this.refresh();
-        this.snackBar.open('Todo Completed', 'Close', {
-          duration: 5000,
+        const action = todo.isDone ? 'completed' : 'activated';
+        this.snackBar.open(`Todo ${action}: : ${todo.title}`, 'Close', {
+          duration: this.snackBarDuration,
         });
       },
-      error: err => this.handleError(err, "Failed to complete todo")
+      error: err => {
+        const action = todo.isDone ? 'complete' : 'activate';
+        this.handleError(err, `Failed to ${action} todo: ${todo.title}`)
+      }
+
     });
   }
 
@@ -68,39 +76,63 @@ export class UserTodosComponent implements OnInit {
         this.editingTodoId = null;
         this.refresh();
         const action = todo.isArchived ? 'postponed' : 'activated';
-        this.snackBar.open(`Todo ${action}`, 'Close', {
-          duration: 5000,
+        this.snackBar.open(`Todo ${action}: ${todo.title}`, 'Close', {
+          duration: this.snackBarDuration,
         });
       },
-      error: err => this.handleError(err, "Failed to archive todo")
+      error: err => this.handleError(err, `Failed to archive todo ${todo.title}`)
     });
   }
 
   delete(todo: UserTodo): void {
-    this.userTodoService.delete(todo).subscribe({
+    this.snackBar.open(`Deleting todo: ${todo.title}`, 'Close', {
+      duration: this.snackBarDuration,
+    });
+    todo.isDeleted = true;
+    this.userTodoService.update(todo).subscribe({
       next: todos => {
         this.todos = todos;
-        this.editingTodoId = null;
         this.refresh();
-        this.snackBar.open(`Todo deleted`, 'Close', {
-          duration: 5000,
+        this.snackBarRef = this.snackBar.open(`Todo deleted: ${todo.title}`, 'Undo', {
+          duration: this.snackBarDuration,
+        });
+        this.snackBarRef.onAction().subscribe(() => {
+          todo.isDeleted = false;
+          this.userTodoService.update(todo).subscribe({
+            next: todos => {
+              this.todos = todos;
+              this.refresh();
+            },
+            error: err => this.handleError(err, `Failed to undo delete for todo: ${todo.title}`)
+          });
+        });
+        this.snackBarRef.afterDismissed().subscribe(info => {
+          if (!info.dismissedByAction) {
+            this.userTodoService.delete(todo).subscribe({
+              next: todos => {
+                this.todos = todos;
+                this.refresh();
+              },
+              error: err => this.handleError(err, `Failed to delete todo: ${todo.title}`)
+            });
+          }
         });
       },
-      error: err => this.handleError(err, "Failed to delete todo")
+      error: err => this.handleError(err, `Failed to delete todo: ${todo.title}`)
     });
   }
 
-  edit(todo: UserTodo): void {
-    this.userTodoService.edit(todo).subscribe({
+  update(todo: UserTodo): void {
+    this.userTodoService.update(todo).subscribe({
       next: todos => {
         this.todos = todos;
         this.editingTodoId = null;
         this.refresh();
-        this.snackBar.open(`Todo updated`, 'Close', {
-          duration: 5000,
+        this.snackBar.open(`Todo updated 111: ${todo.title}`, 'Close', {
+          duration: this.snackBarDuration,
         });
       },
-      error: err => this.handleError(err, "Failed to update todo")
+      error: err => this.handleError(err, `Failed to update todo: ${todo.title}`)
     });
   }
 
@@ -116,7 +148,7 @@ export class UserTodosComponent implements OnInit {
 
   openAddTodoDialog(): void {
     const dialogRef = this.dialog.open(AddTodoDialogComponent, {
-      width: '35%', height: '40%'
+      width: '45%', height: '45%'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -132,18 +164,18 @@ export class UserTodosComponent implements OnInit {
       next: todos => {
         this.todos = todos;
         this.refresh();
-        this.snackBar.open('Todo Added', 'Close', {
-          duration: 5000,
+        this.snackBar.open(`Todo Added: ${newTodo.title}`, 'Close', {
+          duration: this.snackBarDuration,
         });
       },
-      error: err => this.handleError(err, "Failed to add todo")
+      error: err => this.handleError(err, `Failed to add todo: ${newTodo.title}`)
     })
   }
 
   private handleError(err: any, errorMsg = "Failed to complete action") {
     console.error(err);
     this.snackBar.open(errorMsg, 'Close', {
-      duration: 5000,
+      duration: this.snackBarDuration,
     });
   }
 }

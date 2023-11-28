@@ -83,14 +83,14 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     )
   }
 
-  def update(id: Long): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
+  def update(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     token.body.validate[EmotionRecord].fold(
       errors => {
         logger.info("errors when updating emotion record: " + JsError.toJson(errors).toString)
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
-        emotionRecordService.update(emotionRecord.copy(id = Option(token.user.userId))).map {
+        emotionRecordService.update(emotionRecord.copy(userId = Option(token.user.userId))).map {
           case 1 => Ok(Json.toJson(emotionRecord))
           case _ => NotFound
         }
@@ -99,7 +99,6 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def findAllByUserId(): Action[AnyContent] = Action andThen authenticatedAction async { implicit token =>
-    logger.info("findAllByUserId")
     emotionRecordService.findAllByUserId(token.user.userId).map(emotionRecords => Ok(Json.toJson(emotionRecords)))
   }
 

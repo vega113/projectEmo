@@ -51,13 +51,13 @@ class UserTodoController @Inject()(cc: ControllerComponents, userTodoService: Us
 
   def add(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
 
-    logger.info("Inserting emotion record for user {} {}",
+    logger.info("Inserting user todoxa for user {} {}",
       value("userId", token.user.userId), value("userTodo", token.body))
 
     token.body.validate[UserTodo].fold(
       errors => handleError(errors, "userTodo", token),
       userTodo => {
-        userTodoService.insert(None, None, userTodo.copy(isAi = false, userId = Option(token.user.userId))).
+        userTodoService.insert(None, None, userTodo.copy(isAi = Option(false), userId = Option(token.user.userId))).
           map(userTodos => Ok(Json.toJson(userTodos)))
       }
     )

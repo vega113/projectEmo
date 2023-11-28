@@ -42,7 +42,7 @@ export class UserTodoService {
             {headers});
     }
 
-    edit(todo: UserTodo) {
+    update(todo: UserTodo) {
         const headers = this.authService.getAuthorizationHeader();
         return this.http.put<UserTodo[]>(`${environment.baseUrl}/user/todo`, todo,
             {headers});

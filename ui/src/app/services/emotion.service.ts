@@ -26,7 +26,7 @@ export class EmotionService {
   getEmotionRecordsByUserId(userId: number) {
     const headers = this.authService.getAuthorizationHeader();
     return this.http
-      .get<EmotionRecord[]>(`${environment.baseUrl}/emotionRecord/user/${userId}`, {headers})
+      .get<EmotionRecord[]>(`${environment.baseUrl}/emotionRecord/user`, {headers})
       .pipe(catchError(resp => this.errorService.handleError(resp)));
   }
 
@@ -143,12 +143,19 @@ export class EmotionService {
     )
   }
 
-  deleteEmotionRecord(id: number) {
+  deleteEmotionRecord(record: EmotionRecord) {
     const headers = this.authService.getAuthorizationHeader();
-    return this.http.delete(`${environment.baseUrl}/emotionRecord/${id}`, {headers, observe: 'response' }).
+    return this.http.delete(`${environment.baseUrl}/emotionRecord/${record.id}`,
+        {headers, observe: 'response' }).
     pipe(catchError(resp => this.errorService.handleError(resp))).
     pipe(
         map(response => response.status === 200)
     );
   }
+
+    updateEmotionRecord(emotionRecord: EmotionRecord): Observable<EmotionRecord> {
+      const headers = this.authService.getAuthorizationHeader();
+      return this.http.put<EmotionRecord>(`${environment.baseUrl}/emotionRecord`, emotionRecord, {headers}).
+      pipe(catchError(resp => this.errorService.handleError(resp)))
+    }
 }

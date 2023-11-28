@@ -10,7 +10,7 @@
                     <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
-                    <button mat-menu-item (click)="archive.emit(todo)">
+                    <button mat-menu-item *ngIf="!todo.isDone" (click)="archive.emit(todo)">
                         <mat-icon>schedule</mat-icon>
                         <span>{{postponeActionTitle(todo.isArchived)}}</span>
                     </button>

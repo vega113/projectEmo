@@ -60,6 +60,7 @@ export interface EmotionRecord {
   notes: Note[];
   tags: Tag[];
   isAi?: boolean;
+  isDeleted?: boolean;
   created?: string;
 }
 

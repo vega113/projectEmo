@@ -36,12 +36,13 @@ class UserTodoDao @Inject()(dateTimeService: DateTimeService) {
     SQL(
       """
       UPDATE user_todos
-      SET title = {title}, description = {description}, last_updated = {lastUpdated}
+      SET title = {title}, description = {description}, is_deleted = {isDeleted}, last_updated = {lastUpdated}
       WHERE id = {id} and user_id = {userId}
       """).on("id" -> todo.id,
         "userId" -> todo.userId,
         "title" -> todo.title,
         "description" -> todo.description,
+        "isDeleted" -> todo.isDeleted,
         "lastUpdated" -> dateTimeService.now()).executeUpdate()
   }
 

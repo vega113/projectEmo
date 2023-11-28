@@ -1,3 +1,7 @@
+<div *ngIf="isLoadingRecords" class="loading-screen">
+  <mat-spinner diameter="48"></mat-spinner>
+  <h2>Loading...</h2>
+</div>
 <mat-form-field appearance="fill">
   <mat-label>Choose a month</mat-label>
   <input matInput [matDatepicker]="picker" (dateChange)="monthSelected($event)" [value]="date">

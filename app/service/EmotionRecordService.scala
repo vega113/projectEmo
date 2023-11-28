@@ -98,6 +98,7 @@ class EmotionRecordServiceImpl @Inject()(
 
 
   override def findAllByUserId(userId: Long): Future[List[EmotionRecord]] = {
+    logger.info(s"Fetching all emotion records for user: $userId")
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
       emotionRecordDao.findAllByUserId(userId).sortWith((d1, d2) => {
         val earliestTime = LocalDate.of(2022, 1, 1).atStartOfDay()
@@ -150,52 +151,58 @@ class EmotionRecordServiceImpl @Inject()(
     }
   }
 
-  private def preProcessEmotionRecord(emotionRecord: EmotionRecord): EmotionRecord = {
-    emotionRecord.copy(notes = emotionRecord.notes.map(note => {
-      note.copy(title = Option(titleService.makeTitle(note.text)))
-    }), tags = (emotionRecord.tags.toSet ++ noteService.extractTags(emotionRecord.notes.map(_.text).mkString(" "))).
-      toList)
-  }
-
-   def insert2(emotionRecord: EmotionRecord): Future[Option[Long]] = {
-    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      val processedEmotionRecord = preProcessEmotionRecord(emotionRecord)
-      emotionRecordDao.insert(processedEmotionRecord)
-    }))
-  }
-
   override def insert(emotionRecord: EmotionRecord): Future[Option[Long]] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      val emotionRecordsIdOpt = emotionRecordDao.insert2(emotionRecord)
+      val emotionRecordsIdOpt = emotionRecordDao.insert(emotionRecord)
+
+
+      emotionRecordsIdOpt match {
+        case Some(emotionRecordId) =>
+          sequence(emotionRecord.notes.map(note => {
+            val title = note.title.getOrElse(titleService.makeTitle(note.text))
+            noteService.insert(emotionRecordId, note.copy(title = Some(title)))
+          }))
+
+          tagService.insert(emotionRecordId, emotionRecord.tags.toSet)
+
+          for {
+            subEmotion <- emotionRecord.subEmotions
+            subEmotionId <- subEmotion.subEmotionId
+          } yield {
+            logger.info(s"Linking sub emotion to emotion record: $subEmotionId, $emotionRecordId")
+            emotionRecordDao.linkSubEmotionToEmotionRecord(subEmotionId, emotionRecordId)
+          }
+
+          emotionRecord.triggers.foreach {
+            case Trigger(Some(triggerId), _, _, _, _, _) =>
+              triggerService.linkTriggerToEmotionRecord(triggerId, emotionRecordId)
+            case trigger =>
+              logger.error(s"Empty trigger id while inserting trigger: ${trigger.triggerId}")
+          }
+        case None =>
+          logger.error(s"Failed to insert emotion record: $emotionRecord")
+      }
       emotionRecordsIdOpt
-    })).andThen({
-      case Success(Some(emotionRecordId)) =>
-        sequence(emotionRecord.notes.map(note => {
-          val title = note.title.getOrElse(titleService.makeTitle(note.text))
-          noteService.insert(emotionRecordId, note.copy(title = Some(title)))
-        }))
-
-        tagService.insert(emotionRecordId, emotionRecord.tags.toSet)
-
-        emotionRecord.triggers.foreach {
-          case Trigger(Some(triggerId), _, _, _, _, _) =>
-            triggerService.linkTriggerToEmotionRecord(triggerId, emotionRecordId)
-          case trigger =>
-            logger.error(s"Empty trigger id while inserting trigger: ${trigger.triggerId}")
-        }
-
-    })
+    }))
   }
 
   override def update(emotionRecord: EmotionRecord): Future[Int] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.update(emotionRecord)
+      val count = emotionRecordDao.update(emotionRecord)
+      logger.info(s"Updated emotion record: ${emotionRecord.id}, userId ${emotionRecord.userId}, count: $count")
+      count
     }))
   }
 
   override def delete(id: Long, userId: Long): Future[Boolean] = {
     Future(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.deleteByIdAndUserId(id, userId)
+      val isEmotionRecordDeleted = emotionRecordDao.deleteByIdAndUserId(id, userId)
+      if (isEmotionRecordDeleted) {
+        noteService.deleteByEmotionRecordId(id, userId)
+//        tagService.deleteByEmotionRecordId(id, userId) //TODO: add deletion for tags and triggers
+//        triggerService.deleteByEmotionRecordId(id, userId)
+      }
+      isEmotionRecordDeleted
     }))
   }
 

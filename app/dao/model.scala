@@ -45,6 +45,8 @@ object model {
                             triggers: List[Trigger],
                             notes: List[Note],
                             tags: List[Tag],
+                            isDeleted: Option[Boolean] = None,
+                            lastUpdated: Option[LocalDateTime] = None,
                             created: Option[LocalDateTime] = None
                           )
 
@@ -72,7 +74,7 @@ object model {
                    todos: Option[List[NoteTodo]] = None,
                    isDeleted: Option[Boolean] = None,
                    lastUpdated: Option[LocalDateTime] = None,
-                   lastDeleted: Option[LocalDateTime] = None,
+                   emotionRecordId: Option[Long] = None,
                    created: Option[LocalDateTime] = None
                  )
 
@@ -93,8 +95,8 @@ object model {
                    isDone: Boolean,
                    isArchived: Boolean,
                    isDeleted: Boolean,
-                   isAi: Boolean,
-                   isRead: Boolean,
+                   isAi: Option[Boolean],
+                   isRead: Option[Boolean] = None,
                    lastUpdated: Option[LocalDateTime] = None,
                    created: Option[LocalDateTime]
                  )
@@ -231,12 +233,12 @@ implicit val parser: RowParser[EmotionRecord] = {
     str("emotion_type") ~
     get[Option[Long]]("user_id") ~
     get[Option[String]]("emotion_id") ~
-    int("intensity") ~
-    get[Option[LocalDateTime]]("created") map {
-    case id ~ emotionType ~ userId ~ emotionIdOpt  ~ intensity  ~ created =>
-      EmotionRecord(id, emotionType, userId,
-        emotionIdOpt.map(emotionId => Emotion(Some(emotionId), None, None, None)),
-        intensity, List.empty[SubEmotion], List.empty[Trigger], List.empty[Note], List.empty[Tag], created)
+    get[Option[Int]]("intensity") ~
+    get[Option[LocalDateTime]]("created") ~
+    get[Option[LocalDateTime]]("last_updated") map {
+    case id ~ emotionType ~ userId ~ emotionId ~ intensity ~ created ~ lastUpdated =>
+      EmotionRecord(id, emotionType, userId, Some(Emotion(emotionId, None, None, None)), intensity.getOrElse(0), List.empty, List.empty, List.empty,
+        List.empty, None, lastUpdated, created)
   }
 }
 }
@@ -281,9 +283,22 @@ object Note {
         get[Option[String]]("description") ~
         get[Option[String]]("suggestion") ~
         get[Option[Boolean]]("is_deleted") ~
+        get[Option[LocalDateTime]]("last_updated") ~
+        get[Option[Long]]("emotion_record_id") ~
         get[Option[LocalDateTime]]("created") map {
-        case id ~ title ~ noteText ~ description ~ suggestion ~ isDeleted ~ created =>
-          Note(id, title, noteText, description, suggestion, None, isDeleted, created)
+        case id ~ title ~ noteText ~ description ~ suggestion ~ isDeleted ~ lastUpdated ~ emotionRecordId ~ created =>
+          Note(
+            id,
+            title,
+            noteText,
+            description,
+            suggestion,
+            None,
+            isDeleted,
+            lastUpdated,
+            emotionRecordId,
+            created
+          )
       }
     }
   }
@@ -300,8 +315,8 @@ object Note {
         bool("is_done") ~
         bool("is_archived") ~
         bool("is_deleted") ~
-        bool("is_ai") ~
-        bool("is_read") ~
+        get[Option[Boolean]]("is_ai") ~
+        get[Option[Boolean]]("is_read") ~
         get[Option[LocalDateTime]]("created") ~
         get[Option[LocalDateTime]]("last_updated") map {
         case id ~ userId ~ title ~ description ~ color ~ isDone ~ isArchived ~ isDeleted ~ isAi ~ isRead ~ created
