@@ -34,7 +34,6 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
     isLoading: boolean = true;
 
     snackBarDuration = 10000;
-    private record: EmotionRecord | undefined;
 
     constructor(
         private emotionService: EmotionService,

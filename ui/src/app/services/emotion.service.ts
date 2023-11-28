@@ -23,13 +23,6 @@ export class EmotionService {
               private dateService: DateService) {
   }
 
-  getEmotionRecordsByUserId(userId: number) {
-    const headers = this.authService.getAuthorizationHeader();
-    return this.http
-      .get<EmotionRecord[]>(`${environment.baseUrl}/emotionRecord/user`, {headers})
-      .pipe(catchError(resp => this.errorService.handleError(resp)));
-  }
-
   insertEmotionRecord(emotionRecord: Omit<EmotionRecord, 'id'>) {
     const headers: HttpHeaders = this.authService.getAuthorizationHeader();
     headers.set('Content-Type', 'application/json');
