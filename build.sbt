@@ -27,14 +27,6 @@ lazy val root = (project in file("."))
     buildInfoKeys := Seq[BuildInfoKey](
       version,
       "buildTimestamp" -> new java.util.Date(System.currentTimeMillis()),
-      "gitHash" -> new java.lang.Object(){
-        override def toString(): String = {
-          try {
-            val extracted = new java.io.InputStreamReader(
-              java.lang.Runtime.getRuntime().exec("git rev-parse HEAD").getInputStream())
-            (new java.io.BufferedReader(extracted)).readLine()
-          } catch {      case t: Throwable => "get git hash failed"    }
-        }}.toString()
     ),
   )
 
