@@ -6,6 +6,15 @@ import dao.model._
 import java.sql.Connection
 
 class TriggerDao {
+  def deleteByEmotionRecordId(id: Long, userId: Long)(implicit connection: Connection): Int = {
+    SQL(
+      """
+        |DELETE FROM emotion_record_triggers
+        |WHERE parent_emotion_record_id = {id}
+        |AND user_id = {userId}
+        |""".stripMargin).on("id" -> id, "userId" -> userId).executeUpdate()
+  }
+
   def findAll()(implicit connection: Connection): List[Trigger] = {
     SQL("SELECT * FROM triggers").as(Trigger.parser.*)
   }

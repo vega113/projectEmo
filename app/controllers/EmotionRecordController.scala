@@ -10,8 +10,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import service.{DateTimeService, EmotionRecordService, NoteService, TagService}
 
-import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, YearMonth, ZonedDateTime}
+import java.time.ZonedDateTime
 import javax.inject._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -75,7 +74,10 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
     token.body.validate[Note].fold(
       errors => handleError(errors, "noteTodo", token),
       note => {
-        noteService.insert(emotionRecordId, note).flatMap {
+        noteService.insert(note.copy(
+          emotionRecordId = Option(emotionRecordId),
+          userId = Option(token.user.userId)
+        )).flatMap {
           case Some(_) => fetchRecord(emotionRecordId, token.user.userId).map(record => Ok(Json.toJson(record)))
           case None => Future.successful(InternalServerError)
         }
@@ -160,16 +162,13 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   def deleteTag(id: Long): Action[AnyContent] =
     Action andThen authenticatedAction async { implicit token =>
       logger.info("deleting tag: " + id)
-      emotionRecordService.findEmotionRecordIdByUserIdTagId(token.user.userId, id).flatMap {
-        case Some(emotionRecordId) => tagService.delete(emotionRecordId, id).map {
-          case true =>
-            logger.info("deleted tag: " + id)
-            Ok
-          case false =>
-            logger.info("failed to delete tag: " + id)
-            BadRequest(Json.obj("message" -> s"Invalid tag id: $id"))
-        }
-        case None => Future.successful(BadRequest(Json.obj("message" -> s"Invalid tag id: $id")))
+      tagService.delete(token.user.userId, id).map {
+        case true =>
+          logger.info("deleted tag: " + id)
+          Ok
+        case false =>
+          logger.info("failed to delete tag: " + id)
+          BadRequest(Json.obj("message" -> s"Invalid tag id: $id"))
       }
     }
 
@@ -182,7 +181,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       tagData => {
         logger.info("adding tag: " + tagData.tagName)
         emotionRecordService.findByIdForUser(tagData.emotionRecordId, token.user.userId).flatMap {
-          case Some(_) => tagService.insert(tagData.emotionRecordId, tagData.tagName).map {
+          case Some(_) => tagService.insert(tagData.emotionRecordId, token.user.userId, tagData.tagName).map {
             case true => Ok
             case false => BadRequest(Json.obj("message" -> s"Invalid tag name: ${tagData.tagName}"))
           }

@@ -69,11 +69,17 @@ export class DisplayEmotionComponent {
               this.emotion.tags = this.emotion.tags?.filter((t: Tag) => {
                 return t.tagId !== tag.tagId;
               });
+              this.snackBar.open(`Tag deleted successfully: ${tag.tagName}`, 'Close', {
+                duration: 5000,
+              });
+              console.log('Tag deleted successfully');
               this.emotionStateService.updateNewEmotion(this.emotion);
-              // this.noteForm.reset();
             }
+          } else {
+            this.snackBar.open(`Error deleting tag ${tag.tagName}`, 'Close', {
+              duration: 5000,
+            });
           }
-          console.log('Tag deleted successfully');
         },
         error: (error) => {
           console.error('Error deleting tag', error);
@@ -94,12 +100,14 @@ export class DisplayEmotionComponent {
             this.emotion?.tags?.push({tagName: tagName});
           }
           event.chipInput!.clear();
-          console.log('Tag added successfully');
+          this.snackBar.open(`Tag added successfully: ${tagName}`, 'Close', {
+            duration: 5000,
+          });
         },
         error: (error) => {
           console.error('Error adding tag', error);
           this.isLoadingNotes = false;
-          this.snackBar.open('Error adding tag', 'Close', {
+          this.snackBar.open(`Error adding tag ${tagName}`, 'Close', {
             duration: 5000,
           });
         }

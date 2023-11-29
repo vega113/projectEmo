@@ -1,7 +1,7 @@
 package service
 
 import com.google.inject.ImplementedBy
-import dao.model.{NoteTodo, UserTodo}
+import dao.model.{Note, NoteTodo, UserTodo}
 import dao.{DatabaseExecutionContext, NoteTodoDao, UserTodoDao}
 import net.logstash.logback.argument.StructuredArguments._
 import org.slf4j.{Logger, LoggerFactory}
@@ -10,12 +10,13 @@ import java.sql.Connection
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.language.implicitConversions
 
 @ImplementedBy(classOf[NoteTodoServiceImpl])
 trait NoteTodoService {
-  def insert(noteId: Long, todo: NoteTodo): Future[Option[Long]]
+  def insert(todo: NoteTodo): Future[Option[Long]]
 
-  def extractTodos(text: String): List[NoteTodo]
+  def extractTodos(note: Note): List[NoteTodo]
 
   def acceptNoteTodo(userId: Long, noteTodoId: Long): Future[Boolean]
 
@@ -28,16 +29,16 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
                                     titleService: TitleService) extends NoteTodoService {
   private val logger: Logger = LoggerFactory.getLogger(classOf[NoteTodoServiceImpl])
 
-  override def insert(noteId: Long, todo: NoteTodo): Future[Option[Long]] = {
-    logger.info("Inserting note todo, noteId: {}", value("noteId", noteId))
+  override def insert(todo: NoteTodo): Future[Option[Long]] = {
+    logger.info("Inserting note todo, userId: {}", value("userId", todo.userId))
     databaseExecutionContext.withConnection({ implicit connection =>
-      val todoId: Long = noteTodoDao.insert(noteId, todo) match {
+      val todoId: Long = noteTodoDao.insert(todo) match {
         case Some(id) =>
-          logger.info(s"Inserted note todo {} {}:", value("noteId", noteId), value("todo", todo))
+          logger.info(s"Inserted note todo {} {}:", value("noteId", todo.noteId), value("todo", todo))
           id
         case None =>
           val errorMsg = s"Failed to insert note todo: {}"
-          logger.error(errorMsg, Map("noteId" -> noteId, "todo" -> todo))
+          logger.error(errorMsg, Map("noteId" -> todo.noteId, "todo" -> todo))
           throw new Exception(errorMsg)
       }
       Future.successful(Some(todoId))
@@ -53,47 +54,45 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
       }
     }
 
-    def createUserTodoFromNoteTodo(userId: Long, noteTodoId: Long)(implicit connection: Connection): Unit = {
-      val noteTodo = noteTodoDao.findById(noteTodoId)
-      noteTodo match {
-        case Some(todo) =>
-          val userNoteTodo = UserTodo(None, Option(userId), todo.title, Option(todo.description), None,
-            isDone = false,
-            isArchived = false, isDeleted = false, isAi = todo.isAi, isRead = Some(false), None, None)
-          userTodoDao.insert(userNoteTodo.copy(userId = Option(userId))) match {
-            case Some(id) =>
-              logger.info(s"Inserted user todo: {}", value("userTodo", userNoteTodo.copy(id = Some(id))))
-            case None =>
-              val errorMsg = s"Failed to insert user todo: {}"
-              logger.error(errorMsg, Map("userTodo" -> userNoteTodo))
-              throw new Exception(errorMsg)
-          }
-          logger.info(s"Inserted user todo: {}", value("userTodo", userNoteTodo))
+    def createUserTodoFromNoteTodo(todo: NoteTodo, noteTodoId: Long)(implicit connection: Connection): Boolean = {
+
+      val userNoteTodo = UserTodo(None, Option(userId), todo.title, Option(todo.description), None,
+        isDone = false,
+        isArchived = false, isDeleted = false, isAi = todo.isAi, isRead = Some(false), Some(noteTodoId), None, None)
+      userTodoDao.insert(userNoteTodo.copy(userId = Option(userId))) match {
+        case Some(id) =>
+          logger.info(s"Inserted user todo: {}", value("userTodo", userNoteTodo.copy(id = Some(id))))
+          id > 0
+        case None =>
+          val errorMsg = s"Failed to insert user todo: {}"
+          logger.error(errorMsg, Map("userTodo" -> userNoteTodo))
+          throw new Exception(errorMsg)
       }
     }
 
     Future {
       databaseExecutionContext.withConnection({ implicit connection =>
-        val isNotesBelongsToUser = noteTodoDao.verifyNoteTodoBelongsToUser(userId, noteTodoId)
-        if (isNotesBelongsToUser) {
-          val updated: Boolean = noteTodoDao.acceptNoteTodo(noteTodoId)
-          logAcceptedStatus(updated)
-          if(updated) {
-            createUserTodoFromNoteTodo(userId, noteTodoId)
-          }
-          updated
-        }
-        else {
-          logger.error(s"Note todo does not belong to user: {}", value("noteId", noteTodoId))
-          false
+        noteTodoDao.findById(noteTodoId) match {
+          case Some(noteTodo) =>
+            val updated: Boolean = noteTodoDao.acceptNoteTodo(noteTodo.userId.
+              getOrElse(throw new Exception("userId is None")), noteTodoId)
+            logAcceptedStatus(updated)
+            if (updated) {
+              createUserTodoFromNoteTodo(noteTodo, noteTodoId)
+            }
+            updated
+          case None =>
+            logger.error(s"Failed to find note todo: {}", value("noteId", noteTodoId))
+            false
         }
       })
     }
   }
-override def extractTodos(text: String): List[NoteTodo] = {
+override def extractTodos(note: Note): List[NoteTodo] = {
   val todoRegex = "(?s)(?<=\\[\\[).+?(?=]])".r
-  todoRegex.findAllIn(text).toList.map(todo => NoteTodo(None, titleService.makeTitle(todo), todo, isAccepted = Some(false),
-    isAi = Some(false))).filter(_.description.nonEmpty)
+  todoRegex.findAllIn(note.text).toList.map(todo => NoteTodo(None, titleService.makeTitle(todo), todo, isAccepted = Some(false),
+    isAi = Some(false), noteId = note.id, userId = note.userId, emotionRecordId = note.emotionRecordId
+  )).filter(_.description.nonEmpty)
 }
 
   override def fetchById(id: Long): Future[Option[NoteTodo]] = {

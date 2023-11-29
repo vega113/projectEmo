@@ -10,7 +10,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.sequence
 import scala.math.Ordered.orderingToOrdered
-import scala.util.Success
 
 @ImplementedBy(classOf[EmotionRecordServiceImpl])
 trait EmotionRecordService {
@@ -160,10 +159,10 @@ class EmotionRecordServiceImpl @Inject()(
         case Some(emotionRecordId) =>
           sequence(emotionRecord.notes.map(note => {
             val title = note.title.getOrElse(titleService.makeTitle(note.text))
-            noteService.insert(emotionRecordId, note.copy(title = Some(title)))
+            noteService.insert(note.copy(title = Some(title), emotionRecordId = Some(emotionRecordId), userId = emotionRecord.userId))
           }))
 
-          tagService.insert(emotionRecordId, emotionRecord.tags.toSet)
+          tagService.insert(emotionRecordId, emotionRecord.userId, emotionRecord.tags.toSet)
 
           for {
             subEmotion <- emotionRecord.subEmotions
@@ -199,8 +198,8 @@ class EmotionRecordServiceImpl @Inject()(
       val isEmotionRecordDeleted = emotionRecordDao.deleteByIdAndUserId(id, userId)
       if (isEmotionRecordDeleted) {
         noteService.deleteByEmotionRecordId(id, userId)
-//        tagService.deleteByEmotionRecordId(id, userId) //TODO: add deletion for tags and triggers
-//        triggerService.deleteByEmotionRecordId(id, userId)
+        tagService.deleteByEmotionRecordId(id, userId)
+        triggerService.deleteByEmotionRecordId(id, userId)
       }
       isEmotionRecordDeleted
     }))
@@ -266,5 +265,10 @@ class EmotionRecordServiceImpl @Inject()(
       emotionRecordsToDoughnutEmotionTypeChartData(records),
       emotionRecordsToDoughnutTriggerChartData(records)
     )
+
+  private implicit def userIdOptToLong: Option[Long] => Long = {
+    case Some(userId) => userId
+    case None => throw new Exception("User id not found")
+  }
 }
 

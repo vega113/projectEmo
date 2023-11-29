@@ -44,13 +44,13 @@ class NoteDao @Inject()(dateTimeService: DateTimeService, noteTodoDao: NoteTodoD
     SQL("SELECT * FROM notes WHERE noteId = {id}").on("id" -> id).as(Note.parser.singleOpt)
   }
 
-  def insert(emotionRecordId: Long, note: Note)(implicit connection: Connection): Option[Long] = {
+  def insert(note: Note)(implicit connection: Connection): Option[Long] = {
     val noteId: Option[Long] = SQL(
       """
           INSERT INTO notes (title, text, description, suggestion, emotion_record_id)
           VALUES ({title}, {text}, {description}, {suggestion}, {emotionRecordId})""").
       on("title" -> note.title, "text" -> note.text, "description" -> note.description, "suggestion" -> note.suggestion,
-      "emotionRecordId" -> emotionRecordId).
+      "emotionRecordId" -> note.emotionRecordId).
       executeInsert()
     noteId
   }

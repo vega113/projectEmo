@@ -11,6 +11,8 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[TriggerServiceImpl])
 trait TriggerService {
+  def deleteByEmotionRecordId(id: Long, userId: Long) : Future[Boolean]
+
   def findAll(): Future[List[Trigger]]
 
   def insert(emotionRecordId: Long, triggers: List[Trigger]): Future[Boolean]
@@ -49,4 +51,11 @@ class TriggerServiceImpl @Inject()(
       Future.successful(true)
     })
   }
+
+    override def deleteByEmotionRecordId(id: Long, userId: Long): Future[Boolean] = {
+      databaseExecutionContext.withConnection({ implicit connection =>
+        triggerDao.deleteByEmotionRecordId(id, userId)
+        Future.successful(true)
+      })
+    }
 }

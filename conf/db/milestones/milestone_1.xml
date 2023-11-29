@@ -382,4 +382,130 @@
         <dropColumn tableName="notes" columnName="last_deleted"/>
     </changeSet>
 
+    <changeSet id="add_user_id_to_emotion_record_triggers_table" author="vega">
+        <addColumn tableName="emotion_record_triggers">
+            <column name="user_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="update_user_id_in_emotion_record_triggers_table" author="vega">
+        <update tableName="emotion_record_triggers">
+            <column name="user_id" valueComputed="(SELECT user_id FROM emotion_records WHERE emotion_records.id = emotion_record_triggers.parent_emotion_record_id)"/>
+            <where>parent_emotion_record_id IN (SELECT id FROM emotion_records)</where>
+        </update>
+    </changeSet>
+
+
+    <changeSet id="add_user_id_to_tags_table" author="vega">
+        <addColumn tableName="tags">
+            <column name="user_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_emotion_record_id_to_tags_table" author="vega">
+        <addColumn tableName="tags">
+            <column name="emotion_record_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="update_user_id_in_tags_table" author="vega">
+        <update tableName="tags">
+            <column name="user_id" valueComputed="(SELECT emotion_records.user_id FROM emotion_records JOIN emotion_record_tags ON emotion_records.id = emotion_record_tags.emotion_record_id WHERE emotion_record_tags.tag_id = tags.id)"/>
+            <where>emotion_record_id IN (SELECT id FROM emotion_records)</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="update_emotion_record_id_in_tags_table" author="vega">
+        <update tableName="tags">
+            <column name="emotion_record_id" valueComputed="(SELECT emotion_record_id FROM emotion_record_tags WHERE emotion_record_tags.tag_id = tags.id)"/>
+            <where>emotion_record_id IN (SELECT id FROM emotion_records)</where>
+        </update>
+    </changeSet>
+
+
+    <changeSet id="add_user_id_to_note_todos_table" author="vega">
+        <addColumn tableName="note_todos">
+            <column name="user_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_emotion_record_id_to_note_todos_table" author="vega">
+        <addColumn tableName="note_todos">
+            <column name="emotion_record_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="update_user_id_in_note_todos_table" author="vega">
+        <update tableName="note_todos">
+            <column name="user_id" valueComputed="(SELECT user_id FROM notes JOIN note_note_todos ON notes.id = note_note_todos.note_id WHERE note_note_todos.note_todo_id = note_todos.id)"/>
+            <where>id IN (SELECT note_todo_id FROM note_note_todos)</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="update_emotion_record_id_in_note_todos_table" author="vega">
+        <update tableName="note_todos">
+            <column name="emotion_record_id" valueComputed="(SELECT emotion_record_id FROM notes JOIN note_note_todos ON notes.id = note_note_todos.note_id WHERE note_note_todos.note_todo_id = note_todos.id)"/>
+            <where>id IN (SELECT note_todo_id FROM note_note_todos)</where>
+        </update>
+    </changeSet>
+
+
+    <changeSet id="update_user_id_in_notes_table_by_emotion_record" author="vega">
+        <update tableName="notes">
+            <column name="user_id" valueComputed="(SELECT user_id FROM emotion_records WHERE emotion_records.id = notes.emotion_record_id)"/>
+            <where>emotion_record_id IN (SELECT id FROM emotion_records)</where>
+        </update>
+    </changeSet>
+
+
+    <changeSet id="add_note_id_to_note_todos_table" author="vega">
+        <addColumn tableName="note_todos">
+            <column name="note_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="update_note_id_in_note_todos_table" author="vega">
+        <update tableName="note_todos">
+            <column name="note_id" valueComputed="(SELECT note_id FROM note_note_todos WHERE note_note_todos.note_todo_id = note_todos.id)"/>
+            <where>id IN (SELECT note_todo_id FROM note_note_todos)</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="update_user_id_in_note_todos_table_from_notes_table" author="vega">
+        <update tableName="note_todos">
+            <column name="note_id" valueComputed="(SELECT id FROM notes WHERE notes.id = note_todos.note_id)"/>
+            <where>note_id IN (SELECT id FROM notes)</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="update_user_id_in_note_todos_table_from_notes_table_user" author="vega">
+        <update tableName="note_todos">
+            <column name="user_id" valueComputed="(SELECT user_id FROM notes WHERE notes.id = note_todos.note_id)"/>
+            <where>note_id IN (SELECT id FROM notes)</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="add_note_todo_id_to_user_todo_table" author="vega">
+        <addColumn tableName="user_todos">
+            <column name="note_todo_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+
+
 </databaseChangeLog>

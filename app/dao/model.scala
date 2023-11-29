@@ -1,7 +1,7 @@
 package dao
 
 import java.time.{LocalDate, LocalDateTime}
-import anorm._
+import anorm.{~, _}
 import anorm.SqlParser._
 import auth.model.TokenData
 import play.api.libs.json.{Format, Json}
@@ -74,6 +74,7 @@ object model {
                    todos: Option[List[NoteTodo]] = None,
                    isDeleted: Option[Boolean] = None,
                    lastUpdated: Option[LocalDateTime] = None,
+                   userId: Option[Long] = None,
                    emotionRecordId: Option[Long] = None,
                    created: Option[LocalDateTime] = None
                  )
@@ -97,6 +98,7 @@ object model {
                    isDeleted: Boolean,
                    isAi: Option[Boolean],
                    isRead: Option[Boolean] = None,
+                   noteTodoId: Option[Long] = None,
                    lastUpdated: Option[LocalDateTime] = None,
                    created: Option[LocalDateTime]
                  )
@@ -107,6 +109,9 @@ object model {
                        description: String,
                        isAccepted: Option[Boolean] = Some(false),
                        isAi: Option[Boolean] = Some(true),
+                       userId: Option[Long] = None,
+                       emotionRecordId: Option[Long] = None,
+                       noteId: Option[Long] = None,
                        created: Option[LocalDateTime] = None
                      )
 
@@ -284,9 +289,10 @@ object Note {
         get[Option[String]]("suggestion") ~
         get[Option[Boolean]]("is_deleted") ~
         get[Option[LocalDateTime]]("last_updated") ~
+        get[Option[Long]]("user_id") ~
         get[Option[Long]]("emotion_record_id") ~
         get[Option[LocalDateTime]]("created") map {
-        case id ~ title ~ noteText ~ description ~ suggestion ~ isDeleted ~ lastUpdated ~ emotionRecordId ~ created =>
+        case id ~ title ~ noteText ~ description ~ suggestion ~ isDeleted ~ lastUpdated ~ userId ~ emotionRecordId ~ created =>
           Note(
             id,
             title,
@@ -297,6 +303,7 @@ object Note {
             isDeleted,
             lastUpdated,
             emotionRecordId,
+            userId,
             created
           )
       }
@@ -317,12 +324,26 @@ object Note {
         bool("is_deleted") ~
         get[Option[Boolean]]("is_ai") ~
         get[Option[Boolean]]("is_read") ~
+        get[Option[Long]]("note_todo_id") ~
         get[Option[LocalDateTime]]("created") ~
         get[Option[LocalDateTime]]("last_updated") map {
-        case id ~ userId ~ title ~ description ~ color ~ isDone ~ isArchived ~ isDeleted ~ isAi ~ isRead ~ created
-          ~ lastUpdated =>
-          UserTodo(id, userId, title, description, color, isDone, isArchived, isDeleted, isAi, isRead, lastUpdated,
-            created)
+        case id ~ userId ~ title ~ description ~ color ~ isDone ~ isArchived ~ isDeleted ~ isAi ~ isRead ~ noteTodoId
+          ~ created ~ lastUpdated =>
+          UserTodo(
+            id,
+            userId,
+            title,
+            description,
+            color,
+            isDone,
+            isArchived,
+            isDeleted,
+            isAi,
+            isRead,
+            noteTodoId,
+            lastUpdated,
+            created
+          )
       }
     }
   }
@@ -336,13 +357,19 @@ object Note {
         str("description") ~
         get[Option[Boolean]]("is_accepted") ~
         get[Option[Boolean]]("is_ai") ~
+        get[Option[Long]]("user_id") ~
+        get[Option[Long]]("emotion_record_id") ~
+        get[Option[Long]]("note_id") ~
         get[Option[LocalDateTime]]("created") map {
-        case id ~ title ~ description ~ isAccepted ~ isAi ~ created =>
+        case id ~ title ~ description ~ isAccepted ~ userId ~ emotionRecordId ~ noteId ~ isAi ~ created =>
           NoteTodo(
             id,
             title,
             description,
             isAccepted,
+            userId,
+            emotionRecordId,
+            noteId,
             isAi,
             created
           )
