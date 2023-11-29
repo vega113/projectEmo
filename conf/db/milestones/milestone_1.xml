@@ -505,6 +505,72 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="delete_emotion_record_tags_table" author="vega">
+        <dropTable tableName="emotion_record_tags"/>
+    </changeSet>
+    <changeSet id="add_sub_emotion_id_to_emotion_records_table" author="vega">
+        <addColumn tableName="emotion_records">
+            <column name="sub_emotion_id" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="update_sub_emotion_id_in_emotion_records_table" author="vega">
+        <update tableName="emotion_records">
+            <column name="sub_emotion_id" valueComputed="(SELECT parent_sub_emotion_id FROM emotion_record_sub_emotions WHERE emotion_record_sub_emotions.parent_emotion_record_id = emotion_records.id)"/>
+            <where>id IN (SELECT parent_emotion_record_id FROM emotion_record_sub_emotions)</where>
+        </update>
+    </changeSet>
+    <changeSet id="delete_emotion_record_sub_emotions_table" author="vega">
+        <dropTable tableName="emotion_record_sub_emotions"/>
+    </changeSet>
+    <changeSet id="delete_emotion_record_triggers_table" author="vega">
+        <dropTable tableName="emotion_record_triggers"/>
+    </changeSet>
+    <changeSet id="delete_emotion_record_notes_table" author="vega">
+        <dropTable tableName="emotion_record_notes"/>
+    </changeSet>
+    <changeSet id="delete_note_note_todos_table" author="vega">
+        <dropTable tableName="note_note_todos"/>
+    </changeSet>
+
+    <changeSet id="modify_note_template_table" author="vega">
+        <!-- Change id to be a number with auto increment -->
+        <dropPrimaryKey tableName="note_template"/>
+        <dropColumn tableName="note_template" columnName="id"/>
+        <addColumn tableName="note_template">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Change label to title -->
+        <renameColumn tableName="note_template" oldColumnName="label" newColumnName="title" columnDataType="varchar(255)"/>
+
+        <!-- Change value to text -->
+        <modifyDataType tableName="note_template" columnName="value" newDataType="text"/>
+
+        <!-- Add last_updated column -->
+        <addColumn tableName="note_template">
+            <column name="last_updated" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Add user_id column -->
+        <addColumn tableName="note_template">
+            <column name="user_id" type="bigint" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!-- Add is_deleted column -->
+        <addColumn tableName="note_template">
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 
 

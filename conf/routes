@@ -47,6 +47,9 @@ DELETE         /api/user/todo/:userTodoId                                       
 
 POST           /api/user                                                                        controllers.UserController.createUser()
 
+# version
+GET            /api/version                                                                     controllers.VersionController.version
+
 # Emotion cache routes
 
 GET            /api/emotionCache                                                                controllers.EmotionDataController.fetchEmotionData()

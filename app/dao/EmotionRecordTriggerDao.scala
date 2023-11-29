@@ -10,8 +10,7 @@ class EmotionRecordTriggerDao {
       """
         |SELECT t.*
         |FROM triggers t
-        |JOIN emotion_record_triggers ert ON t.trigger_id = ert.parent_trigger_id
-        |WHERE ert.parent_emotion_record_id = {emotionRecordId}
+        |WHERE t.emotion_record_id = {emotionRecordId}
         |""".stripMargin).on("emotionRecordId" -> emotionRecordId).as(Trigger.parser.*)
   }
 

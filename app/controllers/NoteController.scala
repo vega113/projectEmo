@@ -2,19 +2,16 @@ package controllers
 
 import auth.AuthenticatedAction
 import dao.model.Note
+import net.logstash.logback.argument.StructuredArguments._
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import service.model.DetectEmotionRequest
 import service.{EmotionDetectionService, EmotionRecordService, NoteService, NoteTodoService}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import net.logstash.logback.argument.StructuredArguments._
-import service.model.DetectEmotionRequest
-
-import scala.util.Success
-
 
 class NoteController @Inject()(cc: ControllerComponents,
                                noteService: NoteService,
@@ -33,15 +30,11 @@ class NoteController @Inject()(cc: ControllerComponents,
 
   def deleteNote(id: Long): Action[AnyContent] =
     Action andThen authenticatedAction async { implicit token =>
-      emotionRecordService.findEmotionRecordIdByUserIdNoteId(token.user.userId, id).flatMap {
-        case Some(emotionRecordId) => noteService.delete(emotionRecordId, id).map {
-          case true => Ok
-          case false => BadRequest(Json.obj("message" -> s"Invalid note id: $id"))
-        }
-        case None => Future.successful(BadRequest(Json.obj("message" -> s"Invalid note id: $id")))
+      noteService.delete(token.user.userId, id).map {
+        case true => Ok
+        case false => BadRequest(Json.obj("message" -> s"Invalid note id: $id"))
       }
   }
-
 
   def detectEmotion(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
     logger.info("Detecting emotion")

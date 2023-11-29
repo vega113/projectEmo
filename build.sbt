@@ -15,7 +15,7 @@ javaOptions ++= Seq(
 )
 
 lazy val root = (project in file("."))
-  .enablePlugins(PlayScala, GatlingPlugin)
+  .enablePlugins(PlayScala, GatlingPlugin, BuildInfoPlugin)
   .settings(
     name := "projectEmo",
     libraryDependencies ++= Seq(
@@ -24,7 +24,20 @@ lazy val root = (project in file("."))
     ),
     watchSources ++= (baseDirectory.value / "ui/emo-app/src" ** "*").get,
     inConfig(GatlingIt)(Defaults.testSettings),
+    buildInfoKeys := Seq[BuildInfoKey](
+      version,
+      "buildTimestamp" -> new java.util.Date(System.currentTimeMillis()),
+      "gitHash" -> new java.lang.Object(){
+        override def toString(): String = {
+          try {
+            val extracted = new java.io.InputStreamReader(
+              java.lang.Runtime.getRuntime().exec("git rev-parse HEAD").getInputStream())
+            (new java.io.BufferedReader(extracted)).readLine()
+          } catch {      case t: Throwable => "get git hash failed"    }
+        }}.toString()
+    ),
   )
+
 
 GatlingIt / resourceDirectory := baseDirectory.value / "gatling/resources"
 GatlingIt / scalaSource := baseDirectory.value / "gatling"
@@ -36,7 +49,8 @@ resolvers += "Typesafe Simple Repository" at "https://repo.typesafe.com/typesafe
 resolvers += "Atlassian's Maven Public Repository" at "https://packages.atlassian.com/maven-public/"
 resolvers += Resolver.jcenterRepo
 
-dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.11.4"
+dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-databind" % "2.15.1"
+libraryDependencies += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.15.1"
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
 dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"

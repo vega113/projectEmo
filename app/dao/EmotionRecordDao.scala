@@ -24,19 +24,6 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       .executeInsert()
   }
 
-  def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long)(implicit connection: Connection): Option[Long] = {
-    SQL("SELECT emotion_record_id FROM emotion_record_notes inner join emotion_records on id=emotion_record_id" +
-      " WHERE note_id = {noteId} and user_id = {userId}").
-      on("noteId" -> noteId, "userId" -> userId).
-      as(SqlParser.scalar[Long].singleOpt)
-  }
-
-  def findEmotionRecordIdByUserIdTagId(userId: Long, tagId: Long)(implicit connection: Connection): Option[Long] = {
-    SQL("SELECT emotion_record_id FROM emotion_record_tags inner join emotion_records on id=emotion_record_id" +
-      " WHERE tag_id = {tagId} and user_id = {userId}").
-      on("tagId" -> tagId, "userId" -> userId).
-      as(SqlParser.scalar[Long].singleOpt)
-  }
 
   def findAllByUserIdAndDateRange(userId: Long, startDate: String, endDate: String)(implicit connection: Connection): List[EmotionRecord] = {
     val emotionRecords = SQL("SELECT * FROM emotion_records WHERE user_id = {userId} AND created BETWEEN {startDate} AND {endDate}").

@@ -10,15 +10,15 @@
 - [X] Add a new emotion type: "Other" and allow user to add a custom emotion type
 - [ ] ~~Emotion type should by a table in the DB and it should be connected directly to the emotion record table~~
 - [ ] Cache the emotion cache data in state service
-- [ ] Test insert notes in different languages
+- [X] Test insert notes in different languages
 - [X] Logout the current user in case the token is invalid on some request
 - [ ] Add internalization
-- [ ] Allow to edit the note 
-- [ ] Allow all the parameters
+- [ ] ~~Allow to edit the note~~
+- [ ] ~~Allow all the parameters~~
 - [X] Allow to let AI choose the parameters by reading the note
 - [X] Add an option to create emotion out of text (from a note) and determine all the parameters using AI. Also output explanation for every choice.
 - [X] Change emotion intensity to have 5 steps, like: low, moderate, high... and replace the color cue with words and a tooltip that will explain in details the intensity definitions.
 - [X] Idea for a chart - evolution of emotions over time: negative/neutral/positive as there can be more than one emotion per day. this will provide more detailed view on what happened over time.
 - [ ] Allow emotions to be publicly shared
 - [ ] allow to create an emotion for another person
-- [ ] Fix the future handling of the database execution, need to wrap with Future instead of returning the result wrapped into immediate future
+- [ ] ~~Fix the future handling of the database execution, need to wrap with Future instead of returning the result wrapped into immediate future~~

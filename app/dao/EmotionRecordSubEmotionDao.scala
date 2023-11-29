@@ -9,10 +9,10 @@ class EmotionRecordSubEmotionDao {
   def findAllSubEmotionsByEmotionRecordId(emotionRecordId: Long)(implicit connection: Connection): List[SubEmotion] = {
   SQL(
     """
-      |SELECT s.*
-      |FROM sub_emotions s
-      |JOIN emotion_record_sub_emotions erse ON s.sub_emotion_id = erse.parent_sub_emotion_id
-      |WHERE erse.parent_emotion_record_id = {emotionRecordId}
+      |SELECT se.*
+      |FROM emotion_records er
+      |JOIN sub_emotions se ON er.sub_emotion_id = se.sub_emotion_id
+      |WHERE er.id = {emotionRecordId}
       |""".stripMargin).on("emotionRecordId" -> emotionRecordId).as(SubEmotion.parser.*)
   }
 

@@ -27,10 +27,6 @@ trait EmotionRecordService {
 
   def delete(id: Long, userId: Long): Future[Boolean]
 
-  def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long): Future[Option[Long]]
-
-  def findEmotionRecordIdByUserIdTagId(userId: Long, id: Long): Future[Option[Long]]
-
   def groupRecordsByDate(records: List[EmotionRecord]): List[EmotionRecordDay]
 
   def fetchRecordsForMonthByDate(userId: Long, startDateTime: Instant, endDateTime: Instant): Future[List[EmotionRecord]]
@@ -249,16 +245,6 @@ class EmotionRecordServiceImpl @Inject()(
 
     chartData.map(data => data.copy(color = computeColor(data.name)))
   }
-
-  override def findEmotionRecordIdByUserIdNoteId(userId: Long, noteId: Long): Future[Option[Long]] =
-    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.findEmotionRecordIdByUserIdNoteId(userId, noteId)
-    }))
-
-  override def findEmotionRecordIdByUserIdTagId(userId: Long, noteId: Long): Future[Option[Long]] =
-    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
-      emotionRecordDao.findEmotionRecordIdByUserIdTagId(userId, noteId)
-    }))
 
   override def emotionRecordsToDoughnutEmotionTypeTriggerChartData(records: List[EmotionRecord]): DoughnutEmotionTypesTriggersChartData =
     DoughnutEmotionTypesTriggersChartData(
