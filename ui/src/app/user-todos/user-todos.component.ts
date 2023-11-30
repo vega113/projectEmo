@@ -50,22 +50,25 @@ export class UserTodosComponent implements OnInit {
   complete(todo: UserTodo): void {
     this.editingTodoId = todo.id!;
     todo.isDone = !todo.isDone;
-    this.userTodoService.complete(todo).subscribe({
-      next: todos => {
-        this.todos = todos;
-        this.editingTodoId = null;
-        this.refresh();
-        const action = todo.isDone ? 'completed' : 'activated';
-        this.snackBar.open(`Todo ${action}: : ${todo.title}`, 'Close', {
-          duration: this.snackBarDuration,
+    setTimeout(
+      () => {
+        this.userTodoService.complete(todo).subscribe({
+          next: todos => {
+            this.todos = todos;
+            this.editingTodoId = null;
+            this.refresh();
+            const action = todo.isDone ? 'completed' : 'activated';
+            this.snackBar.open(`Todo ${action}: ${todo.title}`, 'Close', {
+              duration: this.snackBarDuration,
+            });
+          },
+          error: err => {
+            const action = todo.isDone ? 'complete' : 'activate';
+            this.handleError(err, `Failed to ${action} todo: ${todo.title}`)
+          }
         });
-      },
-      error: err => {
-        const action = todo.isDone ? 'complete' : 'activate';
-        this.handleError(err, `Failed to ${action} todo: ${todo.title}`)
-      }
-
-    });
+      }, 500
+    )
   }
 
   archive(todo: UserTodo): void {
@@ -144,6 +147,10 @@ export class UserTodosComponent implements OnInit {
 
   postponeActionTitle(isArchived: boolean): string {
     return isArchived ? 'Activate' : 'Postpone';
+  }
+
+  completeActionTitle(isDone: boolean): string {
+    return isDone ?  'Uncheck' : 'Check Done';
   }
 
   openAddTodoDialog(): void {
