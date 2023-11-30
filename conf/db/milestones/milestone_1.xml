@@ -581,14 +581,14 @@
     </changeSet>
 
 
-    <changeSet id="delete_columns_from_triggers_table" author="vega">
+    <changeSet id="delete_column_user_id_from_triggers_table" author="vega">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="triggers" columnName="user_id"/>
         </preConditions>
         <dropColumn tableName="triggers" columnName="user_id"/>
     </changeSet>
 
-    <changeSet id="delete_columns_from_triggers_table" author="vega">
+    <changeSet id="delete_column_emotion_record_id_from_triggers_table" author="vega">
         <preConditions onFail="MARK_RAN">
             <columnExists tableName="triggers" columnName="emotion_record_id"/>
         </preConditions>
