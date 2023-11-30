@@ -40,6 +40,8 @@ object model {
                             emotionType: String,
                             userId: Option[Long],
                             emotion: Option[Emotion],
+                            subEmotionId: Option[String],
+                            triggerId: Option[Long],
                             intensity: Int,
                             subEmotions: List[SubEmotion],
                             triggers: List[Trigger],
@@ -88,20 +90,20 @@ object model {
   import java.time.LocalDateTime
 
   case class UserTodo(
-                   id: Option[Long],
-                   userId: Option[Long],
-                   title: String,
-                   description: Option[String],
-                   color: Option[String],
-                   isDone: Boolean,
-                   isArchived: Boolean,
-                   isDeleted: Boolean,
-                   isAi: Option[Boolean],
-                   isRead: Option[Boolean] = None,
-                   noteTodoId: Option[Long] = None,
-                   lastUpdated: Option[LocalDateTime] = None,
-                   created: Option[LocalDateTime]
-                 )
+                       id: Option[Long],
+                       userId: Option[Long],
+                       title: String,
+                       description: Option[String],
+                       color: Option[String],
+                       isDone: Boolean,
+                       isArchived: Boolean,
+                       isDeleted: Boolean,
+                       isAi: Option[Boolean],
+                       isRead: Option[Boolean] = None,
+                       noteTodoId: Option[Long] = None,
+                       lastUpdated: Option[LocalDateTime] = None,
+                       created: Option[LocalDateTime]
+                     )
 
   case class NoteTodo(
                        id: Option[Long],
@@ -123,6 +125,7 @@ object model {
 
   @unused
   case class EmotionRecordTag(emotionRecordId: Long, tagId: Long)
+
   @unused
   case class NoteTag(noteId: Long, tagId: Long)
 
@@ -142,13 +145,14 @@ object model {
   case class SunburstData(name: String, value: Option[Int], children: List[SunburstData], color: Option[String] = None)
 
   case class DoughnutChartData(name: String, recordsCount: Int, intensitySum: Int, color: Option[String] = None)
+
   case class DoughnutEmotionTypesTriggersChartData(emotionTypes: List[DoughnutChartData], triggers: List[DoughnutChartData])
 
   case class LineChartTrendDataRow(
-                                date: LocalDate,
-                                emotionTypeAccumulated: Map[String, LineChartData],
-                                triggersAccumulated: Map[String, LineChartData],
-                              )
+                                    date: LocalDate,
+                                    emotionTypeAccumulated: Map[String, LineChartData],
+                                    triggersAccumulated: Map[String, LineChartData],
+                                  )
 
   case class LineChartTrendDataSet(
                                     rows: List[LineChartTrendDataRow],
@@ -156,10 +160,8 @@ object model {
                                     triggerTypes: List[String],
                                     colors: Map[String, String],
                                   )
+
   case class LineChartData(recordsCount: Int, intensitySum: Int)
-
-
-
 
 
   case class EmotionDetectionResult(
@@ -210,7 +212,7 @@ object model {
         get[Option[String]]("emotion_name") ~
         get[Option[String]]("emotion_type") ~
         get[Option[String]]("emotion_description") map {
-        case id ~ emotionName ~  emotionType ~ emotionDescription  =>
+        case id ~ emotionName ~ emotionType ~ emotionDescription =>
           Emotion(id, emotionName, emotionType, emotionDescription)
       }
     }
@@ -230,23 +232,26 @@ object model {
     }
   }
 
-object EmotionRecord {
-  implicit val emotionRecordFormat: Format[EmotionRecord] = Json.format[EmotionRecord]
+  object EmotionRecord {
+    implicit val emotionRecordFormat: Format[EmotionRecord] = Json.format[EmotionRecord]
 
-implicit val parser: RowParser[EmotionRecord] = {
-  get[Option[Long]]("id") ~
-    str("emotion_type") ~
-    get[Option[Long]]("user_id") ~
-    get[Option[String]]("emotion_id") ~
-    get[Option[Int]]("intensity") ~
-    get[Option[LocalDateTime]]("created") ~
-    get[Option[LocalDateTime]]("last_updated") map {
-    case id ~ emotionType ~ userId ~ emotionId ~ intensity ~ created ~ lastUpdated =>
-      EmotionRecord(id, emotionType, userId, Some(Emotion(emotionId, None, None, None)), intensity.getOrElse(0), List.empty, List.empty, List.empty,
-        List.empty, None, lastUpdated, created)
+    implicit val parser: RowParser[EmotionRecord] = {
+      get[Option[Long]]("id") ~
+        str("emotion_type") ~
+        get[Option[Long]]("user_id") ~
+        get[Option[String]]("emotion_id") ~
+        get[Option[Int]]("intensity") ~
+        get[Option[String]]("sub_emotion_id") ~
+        get[Option[Long]]("trigger_id") ~
+        get[Option[LocalDateTime]]("created") ~
+        get[Option[LocalDateTime]]("last_updated") map {
+        case id ~ emotionType ~ userId ~ emotionId ~ intensity ~ subEmotionId ~ triggerId ~ created ~ lastUpdated =>
+          EmotionRecord(id, emotionType, userId, Some(Emotion(emotionId, None, None, None)), subEmotionId, triggerId,
+            intensity.getOrElse(0), List.empty, List.empty, List.empty,
+            List.empty, None, lastUpdated, created)
+      }
+    }
   }
-}
-}
 
   object Trigger {
     implicit val triggerFormat: Format[Trigger] = Json.format[Trigger]
@@ -257,7 +262,7 @@ implicit val parser: RowParser[EmotionRecord] = {
         get[Option[Long]]("trigger_parent_id") ~
         get[Option[Long]]("created_by_user") ~
         get[Option[String]]("description") ~
-        get[Option[LocalDateTime]]("created")map {
+        get[Option[LocalDateTime]]("created") map {
         case triggerId ~ triggerName ~ parentId ~ createdByUser ~ description ~ created =>
           Trigger(triggerId, triggerName, parentId, createdByUser, description, created)
       }
@@ -278,7 +283,7 @@ implicit val parser: RowParser[EmotionRecord] = {
     }
   }
 
-object Note {
+  object Note {
     implicit val noteFormat: Format[Note] = Json.format[Note]
 
     implicit val parser: RowParser[Note] = {
@@ -315,7 +320,7 @@ object Note {
 
     implicit val parser: RowParser[UserTodo] = {
       get[Option[Long]]("id") ~
-      get[Option[Long]]("user_id") ~
+        get[Option[Long]]("user_id") ~
         str("title") ~
         get[Option[String]]("description") ~
         get[Option[String]]("color") ~

@@ -572,6 +572,17 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="add_trigger_id_to_emotion_records_table" author="vega">
+        <addColumn tableName="emotion_records">
+            <column name="trigger_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
+    <changeSet id="delete_columns_from_triggers_table" author="vega">
+        <dropColumn tableName="triggers" columnName="user_id"/>
+        <dropColumn tableName="triggers" columnName="emotion_record_id"/>
+    </changeSet>
 
 </databaseChangeLog>

@@ -195,7 +195,6 @@ class EmotionRecordServiceImpl @Inject()(
       if (isEmotionRecordDeleted) {
         noteService.deleteByEmotionRecordId(id, userId)
         tagService.deleteByEmotionRecordId(id, userId)
-        triggerService.deleteByEmotionRecordId(id, userId)
       }
       isEmotionRecordDeleted
     }))

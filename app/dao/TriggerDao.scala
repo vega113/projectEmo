@@ -23,14 +23,14 @@ class TriggerDao {
     SQL("SELECT * FROM triggers WHERE id = {id}").on("id" -> id).as(Trigger.parser.singleOpt)
   }
 
-  def insert(trigger: Trigger, emotionRecordId: Long)(implicit connection: Connection): Option[Long] = {
+  def insert(trigger: Trigger, triggerParentId: Long)(implicit connection: Connection): Option[Long] = {
     val triggerId: Option[Long] = SQL(
       """
         |INSERT INTO triggers (trigger_id, trigger_name, created_by_user, description, trigger_parent_id)
         |VALUES ({triggerId}, {triggerName},  {createdByUser}, {description}, {triggerParentId})
         |""".stripMargin).on("triggerId" -> trigger.triggerId, "triggerName" -> trigger.triggerName,
         "createdByUser" -> trigger.createdByUser, "description" -> trigger.description,
-      "triggerParentId" -> emotionRecordId
+      "triggerParentId" -> triggerParentId
       ).executeInsert()
     triggerId
   }
@@ -55,8 +55,9 @@ class TriggerDao {
   def linkTriggerToEmotionRecord(triggerId: Long, emotionRecordId: Long)(implicit connection: Connection): Long = {
     SQL(
       """
-      INSERT INTO emotion_record_triggers (parent_trigger_id, parent_emotion_record_id)
-      VALUES ({triggerId}, {emotionRecordId})""").
-      on("triggerId" -> triggerId, "emotionRecordId" -> emotionRecordId).executeUpdate()
+        |UPDATE emotion_records
+        |SET trigger_id = {triggerId}
+        |WHERE id = {emotionRecordId}
+        |""".stripMargin).on("triggerId" -> triggerId, "emotionRecordId" -> emotionRecordId).executeUpdate()
   }
 }

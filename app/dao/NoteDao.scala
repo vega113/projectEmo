@@ -18,7 +18,7 @@ class NoteDao @Inject()(dateTimeService: DateTimeService, noteTodoDao: NoteTodoD
   }
 
   def findAllByEmotionRecordId(id: Long)(implicit connection: Connection): List[Note] = {
-    SQL("SELECT * FROM notes inner join emotion_record_notes on id = note_id  WHERE emotion_record_id = {id}").on("id" -> id).as(Note.parser.*)
+    SQL("SELECT * FROM notes  WHERE emotion_record_id = {id}").on("id" -> id).as(Note.parser.*)
   }
 
   def findAllNotDeletedByEmotionRecordId(id: Long)(implicit connection: Connection): List[Note] = {
@@ -53,10 +53,6 @@ class NoteDao @Inject()(dateTimeService: DateTimeService, noteTodoDao: NoteTodoD
       "emotionRecordId" -> note.emotionRecordId).
       executeInsert()
     noteId
-  }
-
-  def findEmotionRecordIdByNoteId(noteId: Long)(implicit connection: Connection): Option[Long] = {
-    SQL("SELECT emotion_record_id FROM emotion_record_notes WHERE note_id = {noteId}").on("noteId" -> noteId).as(SqlParser.scalar[Long].singleOpt)
   }
 
   def update(note: Note)(implicit connection: Connection): Int = {

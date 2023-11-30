@@ -30,12 +30,12 @@ class TriggerServiceImpl @Inject()(
     })
   }
 
-  override def insert(emotionRecordId: Long, triggers: List[Trigger]): Future[Boolean] = {
+  override def insert(triggerParentId: Long, triggers: List[Trigger]): Future[Boolean] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       val triggerIds = triggers.map(trigger => {
-        triggerDao.insert(trigger, emotionRecordId) match {
+        triggerDao.insert(trigger, triggerParentId) match {
           case Some(id) =>
-            triggerDao.linkTriggerToEmotionRecord(id, emotionRecordId)
+            logger.info(s"Inserted trigger ${trigger.triggerName} with id $id")
             id
           case None =>
             logger.error(s"Failed to insert trigger ${trigger.triggerName}")

@@ -12,16 +12,15 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
                                  emotionDao: EmotionDao,
                                  noteDao: NoteDao,
                                  tagDao: TagDao,
-                                  dateTimeService: DateTimeService
+                                 dateTimeService: DateTimeService
                                 ) {
   def linkSubEmotionToEmotionRecord(subEmotionId: String, emotionRecordId: Long)(implicit connection: Connection): Option[Long] = {
     SQL(
       """
-      INSERT INTO emotion_record_sub_emotions(parent_emotion_record_id, parent_sub_emotion_id)
-      VALUES ({emotionRecordId}, {subEmotionId})
-      """).on("subEmotionId" -> subEmotionId,
-      "emotionRecordId" -> emotionRecordId)
-      .executeInsert()
+        |UPDATE emotion_records
+        |SET sub_emotion_id = {subEmotionId}
+        |WHERE id = {emotionRecordId}
+        |""".stripMargin).on("subEmotionId" -> subEmotionId, "emotionRecordId" -> emotionRecordId).executeInsert()
   }
 
 
@@ -42,8 +41,8 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       emotionRecord <- emotionRecords
       id <- emotionRecord.id.toList
     } yield emotionRecord.copy(
-      emotion = emotionRecord.emotion.map(emotion => emotion.id.flatMap(emotionId => emotionDao.findById(emotionId))) .
-        getOrElse(emotionRecord.emotion) ,
+      emotion = emotionRecord.emotion.map(emotion => emotion.id.flatMap(emotionId => emotionDao.findById(emotionId))).
+        getOrElse(emotionRecord.emotion),
       subEmotions = emotionRecordSubEmotionDao.findAllSubEmotionsByEmotionRecordId(id),
       triggers = emotionRecordTriggerDao.findAllTriggersByEmotionRecordId(id),
       notes = noteDao.findAllNotDeletedByEmotionRecordId(id),
@@ -71,16 +70,21 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
   def insert(emotionRecord: EmotionRecord)(implicit connection: Connection): Option[Long] = {
     val idOpt: Option[Long] = SQL(
       """
-      INSERT INTO emotion_records (emotion_type, emotion_id, user_id, intensity, created)
-      VALUES ({emotionType}, {emotionId}, {userId}, {intensity}, {created})
-    """).on("userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
-        "emotionType" -> emotionRecord.emotionType,
-        "emotionId" -> emotionRecord.emotion.flatMap(_.id),
-        "intensity" -> emotionRecord.intensity,
-        "created" -> emotionRecord.created)
-      .executeInsert()
+    INSERT INTO emotion_records (emotion_type, emotion_id, user_id, intensity, created, is_deleted, sub_emotion_id, trigger_id)
+    VALUES ({emotionType}, {emotionId}, {userId}, {intensity}, {created}, {isDeleted}, {subEmotionId}, {triggerId})
+    """).on(
+      "userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
+      "emotionType" -> emotionRecord.emotionType,
+      "emotionId" -> emotionRecord.emotion.flatMap(_.id),
+      "intensity" -> emotionRecord.intensity,
+      "created" -> emotionRecord.created,
+      "isDeleted" -> emotionRecord.isDeleted.getOrElse(false), // Assuming isDeleted is an Option[Boolean]
+      "subEmotionId" -> emotionRecord.subEmotionId,
+      "triggerId" -> emotionRecord.triggerId
+    ).executeInsert()
     idOpt
   }
+
 
   def update(emotionRecord: EmotionRecord)(implicit connection: Connection): Int = {
     val updatedCount = SQL(

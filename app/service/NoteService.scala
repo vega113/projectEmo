@@ -25,8 +25,6 @@ trait NoteService {
 
   def delete(userId: Long, id: Long): Future[Boolean]
 
-  def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]]
-
   def extractTags(text: String): Set[Tag]
 }
 
@@ -160,13 +158,6 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
   override def delete(emotionRecordId: Long, noteId: Long): Future[Boolean] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful(noteDao.deleteByEmotionRecordId(noteId, emotionRecordId) > 0)
-    })
-  }
-
-
-  override def findEmotionRecordIdByNoteId(noteId: Long): Future[Option[Long]] = {
-    databaseExecutionContext.withConnection({ implicit connection =>
-      Future.successful(noteDao.findEmotionRecordIdByNoteId(noteId))
     })
   }
 
