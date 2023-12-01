@@ -17,6 +17,7 @@
         <app-todo-tab [label]="'Completed'" [todos]="completedTodos" (complete)="complete($event)"
                       (archive)="archive($event)" (delete)="delete($event)" (edit)="update($event)"
                       [postponeActionTitle]="postponeActionTitle" [completeActionTitle]="completeActionTitle"
+                      (moveToTop)="moveToTop($event)"
         >
 
         </app-todo-tab>
@@ -25,6 +26,10 @@
         <app-todo-tab [label]="'Postponed'" [todos]="archivedTodos" (complete)="complete($event)"
                       (delete)="delete($event)" (edit)="update($event)"
                       (archive)="archive($event)" [postponeActionTitle]="postponeActionTitle"
-                      [completeActionTitle]="completeActionTitle"></app-todo-tab>
+                      [completeActionTitle]="completeActionTitle"
+                      (moveToTop)="moveToTop($event)"
+        >
+
+        </app-todo-tab>
     </mat-tab>
 </mat-tab-group>
