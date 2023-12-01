@@ -9,12 +9,17 @@
     <mat-tab label="Active ({{activeTodos.length}})">
         <app-todo-tab [label]="'Active'" [todos]="activeTodos" (complete)="complete($event)" (archive)="archive($event)"
                       (delete)="delete($event)" (edit)="update($event)"
-                      [postponeActionTitle]="postponeActionTitle" [completeActionTitle]="completeActionTitle"></app-todo-tab>
+                      [postponeActionTitle]="postponeActionTitle" [completeActionTitle]="completeActionTitle"
+                      (moveToTop)="moveToTop($event)"
+        ></app-todo-tab>
     </mat-tab>
     <mat-tab label="Completed ({{completedTodos.length}})">
         <app-todo-tab [label]="'Completed'" [todos]="completedTodos" (complete)="complete($event)"
                       (archive)="archive($event)" (delete)="delete($event)" (edit)="update($event)"
-                      [postponeActionTitle]="postponeActionTitle" [completeActionTitle]="completeActionTitle"></app-todo-tab>
+                      [postponeActionTitle]="postponeActionTitle" [completeActionTitle]="completeActionTitle"
+        >
+
+        </app-todo-tab>
     </mat-tab>
     <mat-tab label="Postponed ({{archivedTodos.length}})">
         <app-todo-tab [label]="'Postponed'" [todos]="archivedTodos" (complete)="complete($event)"

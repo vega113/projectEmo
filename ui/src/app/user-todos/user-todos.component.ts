@@ -57,13 +57,13 @@ export class UserTodosComponent implements OnInit {
             this.todos = todos;
             this.editingTodoId = null;
             this.refresh();
-            const action = todo.isDone ? 'completed' : 'activated';
+            const action = todo.isDone ? 'completed' : 'un-completed';
             this.snackBar.open(`Todo ${action}: ${todo.title}`, 'Close', {
               duration: this.snackBarDuration,
             });
           },
           error: err => {
-            const action = todo.isDone ? 'complete' : 'activate';
+            const action = todo.isDone ? 'complete' : 'un-complete';
             this.handleError(err, `Failed to ${action} todo: ${todo.title}`)
           }
         });
@@ -83,7 +83,10 @@ export class UserTodosComponent implements OnInit {
           duration: this.snackBarDuration,
         });
       },
-      error: err => this.handleError(err, `Failed to archive todo ${todo.title}`)
+      error: err => {
+        const action = todo.isDone ? 'archive' : 'activate';
+        this.handleError(err, `Failed to ${action} todo ${todo.title}`)
+      }
     });
   }
 
@@ -131,7 +134,7 @@ export class UserTodosComponent implements OnInit {
         this.todos = todos;
         this.editingTodoId = null;
         this.refresh();
-        this.snackBar.open(`Todo updated 111: ${todo.title}`, 'Close', {
+        this.snackBar.open(`Todo updated: ${todo.title}`, 'Close', {
           duration: this.snackBarDuration,
         });
       },
@@ -139,18 +142,12 @@ export class UserTodosComponent implements OnInit {
     });
   }
 
-  onPageChange(event: any): void {
-    this.page = event.pageIndex;
-    this.size = event.pageSize;
-    this.fetchTodos();
-  }
-
   postponeActionTitle(isArchived: boolean): string {
     return isArchived ? 'Activate' : 'Postpone';
   }
 
   completeActionTitle(isDone: boolean): string {
-    return isDone ?  'Uncheck' : 'Check Done';
+    return isDone ?  'Un-complete' : 'Mark completed';
   }
 
   openAddTodoDialog(): void {
@@ -183,6 +180,19 @@ export class UserTodosComponent implements OnInit {
     console.error(err);
     this.snackBar.open(errorMsg, 'Close', {
       duration: this.snackBarDuration,
+    });
+  }
+
+  moveToTop(todo: UserTodo) {
+    this.userTodoService.update(todo).subscribe({
+      next: todos => {
+        this.todos = todos;
+        this.refresh();
+        this.snackBar.open(`Todo moved to top: ${todo.title}`, 'Close', {
+          duration: this.snackBarDuration,
+        });
+      },
+      error: err => this.handleError(err, `Failed to move todo to top: ${todo.title}`)
     });
   }
 }

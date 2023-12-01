@@ -23,3 +23,12 @@ mat-panel-title {
     width: 100%;
     text-overflow: ellipsis;
 }
+
+.checkbox-button-container {
+  display: flex;
+  align-items: center;
+}
+.checkbox-button-container mat-checkbox {
+  margin-right: 1px;
+  padding-right: 1px;
+}

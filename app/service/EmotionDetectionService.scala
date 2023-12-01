@@ -9,6 +9,7 @@ import service.model._
 import service.serviceModel.ChatGptApiResponse
 
 import javax.inject.Inject
+import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
@@ -34,14 +35,19 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
     }
   }
 
+  /**
+   * Makes an API call to detect emotion based on the given request.
+   */
   private def makeApiCall(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
     val headers = createHeaders
 
     val payload = createPayload(request)
-    logger.info(s"Making API call with payload: $payload")
+    val timeoutDuration = config.get[Duration]("openai.timeout")
+    logger.info(s"Making API call with payload: $payload, timeout: $timeoutDuration")
 
     // Make the API call
     ws.url(config.get[String]("openai.url"))
+      .withRequestTimeout(timeoutDuration)
       .withHttpHeaders(headers.toSeq: _*)
       .post(payload)
       .flatMap { response =>

@@ -27,7 +27,7 @@ class UserTodoDao @Inject()(dateTimeService: DateTimeService) {
   }
 
   def fetchByUserId(userId: Long)(implicit connection: Connection): List[UserTodo] = {
-    SQL("SELECT * FROM user_todos WHERE user_id = {userId} and is_deleted = false order by created desc")
+    SQL("SELECT * FROM user_todos WHERE user_id = {userId} and is_deleted <> true order by last_updated desc")
       .on("userId" -> userId)
       .as(UserTodo.parser.*)
   }

@@ -595,5 +595,88 @@
         <dropColumn tableName="triggers" columnName="emotion_record_id"/>
     </changeSet>
 
+    <changeSet id="add_is_admin_column_to_users_table" author="vega">
+        <addColumn tableName="users">
+            <column name="is_admin" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="create_table_ai_assistants" author="vega">
+        <createTable tableName="ai_assistants">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_id" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_default" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id ="insert_ai_assistants" author="vega">
+        <insert tableName="ai_assistants">
+            <column name="name" value="Emotions Expert v0.1 for EmoSig"/>
+            <column name="description" value="You are an expert in recognizing and categorizing human emotions. You are also an expert in psychology and personal couching. You work for EmoSig company, which specializes in emotion tracking and providing clients with AI powered emotions feedback."/>
+            <column name="is_default" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+    <changeSet id="create_user_info_table" author="vega">
+        <createTable tableName="user_info">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bio" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            <column name="ai_assistant_id" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="thread_id" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="add_tokens_columns_to_user_info_table" author="vega">
+        <addColumn tableName="user_info">
+            <column name="tokens_used_total" type="bigint" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+            <column name="tokens_used_last_month" type="bigint" defaultValueNumeric="0">
+                <constraints nullable="true"/>
+            </column>
+            <column name="tokens_available" type="bigint" defaultValueNumeric="5000">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>

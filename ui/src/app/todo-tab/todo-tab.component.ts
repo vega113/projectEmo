@@ -31,6 +31,7 @@ export class TodoTabComponent {
     @Output() archive = new EventEmitter<UserTodo>();
     @Output() delete = new EventEmitter<UserTodo>();
     @Output() edit = new EventEmitter<UserTodo>();
+    @Output() moveToTop = new EventEmitter<UserTodo>();
     @Input() postponeActionTitle!: (isArchived: boolean) => string;
     @Input() completeActionTitle!: (isDone: boolean) => string;
 
