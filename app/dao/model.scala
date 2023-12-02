@@ -19,7 +19,8 @@ object model {
                    lastName: Option[String],
                    email: String,
                    isPasswordHashed: Option[Boolean],
-                   created: Option[LocalDateTime] = None
+                   created: Option[LocalDateTime] = None,
+                   isAdmin: Option[Boolean] = None
                  ) {
     def toTokenData: TokenData = TokenData(userId.
       getOrElse(throw new RuntimeException(s"No user Id found, username: $username")),
@@ -164,6 +165,9 @@ object model {
   case class LineChartData(recordsCount: Int, intensitySum: Int)
 
 
+
+
+
   case class EmotionDetectionResult(
                                      emotionType: String,
                                      intensity: Int,
@@ -173,8 +177,8 @@ object model {
                                      tags: Option[List[Tag]],
                                      todos: Option[List[NoteTodo]],
                                      textTitle: Option[String],
-                                     description: String,
-                                     suggestion: String
+                                     description: Option[String],
+                                     suggestion: Option[String]
                                    )
 
   case class EmotionFromNoteResult(
@@ -197,9 +201,10 @@ object model {
         get[Option[String]]("last_name") ~
         str("email") ~
         get[Option[Boolean]]("is_password_hashed") ~
-        get[Option[LocalDateTime]]("created") map {
-        case userId ~ username ~ password ~ firstName ~ lastName ~ email ~ isPasswordHashed ~ created =>
-          User(userId, username, password, firstName, lastName, email, isPasswordHashed, created)
+        get[Option[LocalDateTime]]("created") ~
+        get[Option[Boolean]]("is_admin") map {
+        case userId ~ username ~ password ~ firstName ~ lastName ~ email ~ isPasswordHashed ~ created ~ isAdmin =>
+          User(userId, username, password, firstName, lastName, email, isPasswordHashed, created, isAdmin)
       }
     }
   }
@@ -267,6 +272,8 @@ object model {
           Trigger(triggerId, triggerName, parentId, createdByUser, description, created)
       }
     }
+    def fromName(name: String): Trigger = Trigger(None, Some(name), None, None, None)
+
   }
 
   @unused

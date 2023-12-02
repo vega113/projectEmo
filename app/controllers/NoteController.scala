@@ -6,8 +6,9 @@ import net.logstash.logback.argument.StructuredArguments._
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
+import service.ai.EmotionDetectionService
 import service.model.DetectEmotionRequest
-import service.{EmotionDetectionService, EmotionRecordService, NoteService, NoteTodoService}
+import service.{NoteService, NoteTodoService}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,7 +16,6 @@ import scala.concurrent.Future
 
 class NoteController @Inject()(cc: ControllerComponents,
                                noteService: NoteService,
-                               emotionRecordService: EmotionRecordService,
                                emotionDetectionService: EmotionDetectionService,
                                noteTodoService: NoteTodoService,
                                authenticatedAction: AuthenticatedAction)

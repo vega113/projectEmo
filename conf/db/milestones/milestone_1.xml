@@ -632,7 +632,7 @@
         </createTable>
     </changeSet>
     <changeSet id ="insert_ai_assistants" author="vega">
-        <insert tableName="ai_assistants">
+        <insert tableName="ç">
             <column name="name" value="Emotions Expert v0.1 for EmoSig"/>
             <column name="description" value="You are an expert in recognizing and categorizing human emotions. You are also an expert in psychology and personal couching. You work for EmoSig company, which specializes in emotion tracking and providing clients with AI powered emotions feedback."/>
             <column name="is_default" valueBoolean="true"/>
@@ -677,6 +677,40 @@
             </column>
         </addColumn>
     </changeSet>
-
+    <changeSet id="add_columns_to_ai_assistants_table" author="vega">
+        <addColumn tableName="ai_assistants">
+            <column name="created_at_provider" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="assistant_type" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="create_ai_thread_table" author="vega">
+        <createTable tableName="ai_thread">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="external_id" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="thread_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="modify_created_at_provider_to_bigint" author="vega">
+        <modifyDataType tableName="ai_assistants" columnName="created_at_provider" newDataType="bigint"/>
+    </changeSet>
 
 </databaseChangeLog>

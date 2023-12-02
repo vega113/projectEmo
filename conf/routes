@@ -8,7 +8,7 @@ GET            /                                                                
 
 # Login
 POST           /api/login                                                                       controllers.LoginController.login
-POST           /api/logout                                                                       controllers.LoginController.logout
+POST           /api/logout                                                                      controllers.LoginController.logout
 
 # EmotionRecordWithRelations routes
 POST           /api/emotionRecord                                                               controllers.EmotionRecordController.insert()
@@ -42,6 +42,9 @@ POST           /api/user/todo                                                   
 PUT            /api/user/todo                                                                   controllers.UserTodoController.edit()
 DELETE         /api/user/todo/:userTodoId                                                       controllers.UserTodoController.delete(userTodoId: Long)
 
+# AI Admin routes
+POST           /api/ai/admin/assistant                                                          controllers.AiAdminController.createAssistant()
+DELETE         /api/ai/admin/assistant/:externalId                                              controllers.AiAdminController.deleteAssistantByExternal(externalId)
 
 # User routes
 
