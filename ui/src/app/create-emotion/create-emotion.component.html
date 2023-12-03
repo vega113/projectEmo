@@ -38,11 +38,13 @@
           </mat-form-field>
         </div>
         <mat-action-row>
-          <button mat-button color="primary"  type="button" (click)="detectEmotions()">
-            Analyze Emotion with AI
-            <mat-spinner *ngIf="isLoadingNotes" diameter="24" [style.marginRight.px]="4"></mat-spinner>
+          <button mat-button color="primary"  type="button" (click)="detectEmotions()" [disabled]="isDetectingEmotionWithAI">
+            <div class="button-content">
+              <mat-spinner *ngIf="isDetectingEmotionWithAI" diameter="24"></mat-spinner>
+              <span>Analyze Emotion with AI</span>
+            </div>
           </button>
-          <button mat-button color="primary"  type="button" (click)="skipToManualEntry()">Next (Or skip to manual)</button>
+          <button mat-button color="primary"  type="button" (click)="skipToManualEntry()">Enter manually</button>
         </mat-action-row>
       </mat-expansion-panel>
 
@@ -73,10 +75,6 @@
               <input matSliderThumb formControlName="intensity">
             </mat-slider>
           </div>
-
-
-
-
           <mat-form-field>
             <mat-label>Main Emotion</mat-label>
 
@@ -103,9 +101,11 @@
           </mat-form-field>
           <mat-action-row>
             <button mat-button color="primary"  type="button" (click)="backToNoteEntry()">Back to Note</button>
-            <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid">
-              Save
-              <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24" [style.marginRight.px]="4"></mat-spinner>
+            <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid || isSavingEmotionRecord">
+              <div class="button-content">
+                <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>
+                <span>Save</span>
+              </div>
             </button>
           </mat-action-row>
         </mat-expansion-panel>

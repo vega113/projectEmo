@@ -51,7 +51,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
 
   maxNoteLength = 1000;
 
-  isLoadingNotes: boolean = false;
+  isDetectingEmotionWithAI: boolean = false;
   isSavingEmotionRecord: boolean = false;
 
   emotionTypes: string[] = [];
@@ -68,7 +68,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
   private triggerSubscription!: Subscription;
   private emotionDetected: EmotionDetectionResult | undefined;
 
-  placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note. To add a todo, simply enclose it in double square brackets like this: [[<your todo here>]].";
+  placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Include more context or personal thoughts to convey your emotions more clearly. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note. To add a todo, simply enclose it in double square brackets like this: [[<your todo here>]]. ";
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
               private authService: AuthService,
@@ -118,18 +118,18 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   detectEmotions() {
-    this.isLoadingNotes = true;
+    this.isDetectingEmotionWithAI = true;
     console.log('Detecting emotion for text: ', this.emotionForm.get("emotionNote")?.value);
     this.noteService.detectEmotion(this.emotionForm.get("emotionNote")?.value).subscribe({
       next: (response: EmotionFromNoteResult) => {
         console.log('Emotion detected successfully', response);
         this.handleNoteSubmission(response);
-        this.isLoadingNotes = false;
+        this.isDetectingEmotionWithAI = false;
         this.setStep(1);
       },
       error: (error) => {
         console.error('Error detecting emotion', error);
-        this.isLoadingNotes = false;
+        this.isDetectingEmotionWithAI = false;
         this.snackBar.open('Error detecting emotion', 'Close', {
           duration: 5000,
         });
