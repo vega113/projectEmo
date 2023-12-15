@@ -11,43 +11,7 @@ import java.time.LocalDateTime
 object model {
   case class DetectEmotionRequest(text: String, userId: Long)
 
-  case class ChatGptMetadata(value1: String)
-  object ChatGptMetadata {
-    implicit val chatGptMetadataFormat: Format[ChatGptMetadata] = Json.format[ChatGptMetadata]
-  }
-  case class ChatGptCreateAssistantRequest(instructions: String,
-                                           name: String,
-                                           tools: Option[List[(String, String)]],
-                                           model: String,
-                                           fileIds: Option[List[String]], // up to 20 files
-                                           metadata: Option[ChatGptMetadata] // up to 16 key-value pairs. Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
-                                   )
-  case class ChatGptCreateAssistantResponse(
-                                      id: String,
-                                      `object`: String,
-                                      created_at: Long,
-                                      name: String,
-                                      description: Option[String],
-                                      model: String,
-                                      instructions: String,
-                                      tools: List[Tool],
-                                      file_ids: List[String],
-                                      metadata: Map[String, String]
-                                    ) {
-    def toAiAssistant: AiAssistant = {
-      AiAssistant(
-        id = None,
-        externalId = id,
-        name = name,
-        description = description,
-        isDefault = false,
-        created = LocalDateTime.now(),
-        lastUpdated = Option(LocalDateTime.now()),
-        createdAtProvider = created_at,
-        assistantType = Some("EmoDetection")
-      )
-    }
-  }
+
 
   case class EmoCreateAssistantRequest(
                                         instructions: String,
@@ -60,22 +24,14 @@ object model {
     implicit val emoCreateAssistantRequestFormat: Format[EmoCreateAssistantRequest] = Json.format[EmoCreateAssistantRequest]
   }
 
-  case class ChatGptDeleteAssistantResponse(
-                                              id: String,
-                                              `object`: String,
-                                              deleted: Boolean
-                                           )
-  object ChatGptDeleteAssistantResponse {
-    implicit val deleteAssistantResponseFormat: Format[ChatGptDeleteAssistantResponse] = Json.format[ChatGptDeleteAssistantResponse]
-  }
 
   case class AiThread(
-                       id: Int,
+                       id: Option[Long],
                        externalId: String,
                        userId: Long,
                        threadType: String,
                        isDeleted: Boolean,
-                       created: LocalDateTime,
+                       created: Option[LocalDateTime],
                      )
   object AiThread {
     implicit val aiThreadFormat: Format[AiThread] = Json.format[AiThread]
@@ -166,9 +122,7 @@ object model {
                                has_more: Boolean,
                              )
 
-  object ChatGptCreateAssistantRequest {
-    implicit val createAssistantRequestFormat: Format[ChatGptCreateAssistantRequest] = Json.format[ChatGptCreateAssistantRequest]
-  }
+
 
   object AiMessage {
     implicit val aiMessageFormat: Format[AiMessage] = Json.format[AiMessage]
@@ -204,7 +158,5 @@ object model {
     implicit val threadMessageFormat: Format[ThreadMessage] = Json.format[ThreadMessage]
   }
 
-  object ChatGptCreateAssistantResponse {
-    implicit val createAssistantResponseFormat: Format[ChatGptCreateAssistantResponse] = Json.format[ChatGptCreateAssistantResponse]
-  }
+
 }

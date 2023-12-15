@@ -8,6 +8,20 @@ import service.model.AiThread
 import java.sql.Connection
 
 class AiDao {
+  def insertAiThread(aiThread: AiThread)(implicit connection: Connection): Option[Long] = {
+    SQL(
+      """
+        |INSERT INTO ai_threads (external_id, user_id, thread_type, is_deleted, created)
+        |VALUES ({externalId}, {userId}, {threadType}, false, {created})
+        |""".stripMargin
+    ).on(
+      "externalId" -> aiThread.externalId,
+      "userId" -> aiThread.userId,
+      "threadType" -> aiThread.threadType,
+      "created" -> aiThread.created
+    ).executeInsert()
+  }
+
   def fetchThreadById(id: Long)(implicit connection: Connection): Option[AiThread] = {
     SQL(
       """

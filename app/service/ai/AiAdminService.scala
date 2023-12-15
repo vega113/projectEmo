@@ -1,10 +1,11 @@
 package service.ai
 
 import com.google.inject.ImplementedBy
+import dao.AiAssistant
 import play.api.Configuration
 import play.api.libs.json.Json
-import play.api.libs.ws.WSClient
-import service.model.{AiAssistant, ChatGptCreateAssistantRequest, ChatGptCreateAssistantResponse, ChatGptDeleteAssistantResponse, EmoCreateAssistantRequest}
+import service.ai.ChatGptModel._
+import service.model.EmoCreateAssistantRequest
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,11 +27,8 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
   private lazy val logger = play.api.Logger(getClass)
   override def createAssistant(emoRequest: EmoCreateAssistantRequest): Future[AiAssistant] = {
     logger.info(s"Creating assistant for request: $emoRequest")
-    val apiKey = config.get[String]("openai.apikey")
-    val timeoutDuration = config.get[Duration]("openai.timeout")
-    val baseUrl = config.get[String]("openai.baseUrl")
     val model = config.get[String]("openai.model")
-    val urlStr = s"$baseUrl/v1/assistants"
+    val urlStr = s"/v1/assistants"
     val gptRequest: ChatGptCreateAssistantRequest = ChatGptCreateAssistantRequest(
       instructions = emoRequest.instructions,
       name = emoRequest.name,
@@ -39,9 +37,8 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
       fileIds = None,
       metadata = None
     )
-    import service.model.ChatGptCreateAssistantResponse.createAssistantResponseFormat
-    val response: Future[ChatGptCreateAssistantResponse] = aiAssistantApiService.makeApiPostCall(gptRequest, urlStr,
-      timeoutDuration, apiKey)
+    import ChatGptCreateAssistantResponse.createAssistantResponseFormat
+    val response: Future[ChatGptCreateAssistantResponse] = aiAssistantApiService.makeApiPostCall(urlStr, gptRequest)
     response.onComplete{
       case scala.util.Success(value) =>
         logger.info(s"Successfully created assistant: $value")
@@ -64,14 +61,10 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
   override def deleteAssistantByExternalId(externalId: String): Future[ChatGptDeleteAssistantResponse] = {
     logger.info(s"Deleting assistant with external id: $externalId")
 
-    val apiKey = config.get[String]("openai.apikey")
-    val timeoutDuration = config.get[Duration]("openai.timeout")
-    val baseUrl = config.get[String]("openai.baseUrl")
-    val model = config.get[String]("openai.model")
-    val urlStr = s"$baseUrl/v1/assistants/$externalId"
+    val path = s"/v1/assistants/$externalId"
 
-    import service.model.ChatGptDeleteAssistantResponse.deleteAssistantResponseFormat
-    val response = aiAssistantApiService.makeApiDeleteCall(urlStr, timeoutDuration, apiKey)
+    import ChatGptDeleteAssistantResponse.deleteAssistantResponseFormat
+    val response = aiAssistantApiService.makeApiDeleteCall(path)
     response.onComplete {
       case scala.util.Success(value) =>
         logger.info(s"Successfully deleted assistant: $value")

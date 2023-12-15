@@ -2,7 +2,9 @@ package service.ai
 
 import com.google.inject.Inject
 import dao.AiAssistant
+import play.api.libs.json.Json
 import service.UserInfoService
+import service.ai.ChatGptModel.ChatGptCreateThreadResponse
 import service.model.{AiMessage, AiThread, ThreadRun}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,7 +28,8 @@ trait AiAssistantService {
 
 }
 
-class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInfoService: UserInfoService) extends AiAssistantService {
+class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInfoService: UserInfoService,
+                                               apiService: AiAssistantApiService) extends AiAssistantService {
 
   private lazy val logger = play.api.Logger(getClass)
 
@@ -39,11 +42,10 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
     }
   }
 
-  def createThreadForUser(userId: Long, threadType: String): AiThread = {
+  private def createThreadForUser(userId: Long): Future[ChatGptCreateThreadResponse] = {
     logger.info(s"Creating thread for user $userId")
-    val aiThread = ??? // call API to create thread createThreadResponse case class 
-    aiDbService.saveAiThreadAsync(aiThread)
-    aiThread
+    val path: String = "/v1/threads"
+    apiService.makeApiPostCall[ChatGptCreateThreadResponse](path)
   }
 
   override def createOrFetchThread(userId: Long, aiAssistant: AiAssistant, threadType: String): Future[AiThread] = {
@@ -51,10 +53,16 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
     fetchThreadForUser(userId).flatMap {
       case Some(thread) => Future.successful(thread)
       case _ =>
-        createThreadForUser(userId, threadType)
-        // update user info with thread id
-        // return thread
-        ??? // TODO
+        val response = createThreadForUser(userId).flatMap { response =>
+          val aiThread = response.toAiThread(userId, threadType)
+          val internalThreadId: Future[Option[Long]] =  aiDbService.saveAiThread(aiThread)
+          internalThreadId.map(id => aiThread.copy(id = id))
+        }
+        response.onComplete {
+          case scala.util.Success(value) => logger.info(s"Successfully created thread: ${value.id}")
+          case scala.util.Failure(exception) => logger.error(s"Failed to create thread: $exception")
+        }
+        response
     }
   }
 

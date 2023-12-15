@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[AiDbServiceImpl])
 trait AiDbService {
-  def saveAiThreadAsync(aiThread: Nothing): Future[Option[Long]]
+  def saveAiThread(aiThread: AiThread): Future[Option[Long]]
 
   def deleteAiAssistantByExternalId(externalId: String): Future[Boolean]
 
@@ -92,6 +92,12 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
   override def fetchThreadById(id: Long): Future[Option[AiThread]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful(aiDao.fetchThreadById(id))
+    })
+  }
+
+  override def saveAiThread(aiThread: AiThread): Future[Option[Long]] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(aiDao.insertAiThread(aiThread))
     })
   }
 }

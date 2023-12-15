@@ -1,31 +1,37 @@
 package service.ai
 
 import com.google.inject.ImplementedBy
+import play.api.Configuration
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 
 import javax.inject.Inject
-import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration.Duration
 import scala.util.Try
 
 @ImplementedBy(classOf[AiAssistantApiServiceImpl])
 trait AiAssistantApiService {
+  def makeApiPostCall[ReqType : Writes, RespType : Reads](path: String, request: ReqType)(implicit ec: ExecutionContext): Future[RespType]
+  def makeApiPostCall[RespType : Reads](path: String)(implicit ec: ExecutionContext): Future[RespType]
 
-  def createHeaders(apKey: String): Map[String, String]
-  def makeApiPostCall[ReqType : Writes, RespType : Reads](request: ReqType, urlStr: String, timeout: Duration, apiKey: String): Future[RespType]
-
-  def makeApiDeleteCall[RespType : Reads](urlStr: String, timeout: Duration, apiKey: String): Future[RespType]
+  def makeApiDeleteCall[RespType : Reads](path: String)(implicit executionContext: ExecutionContext): Future[RespType]
 }
-class AiAssistantApiServiceImpl @Inject()(ws: WSClient)
+class AiAssistantApiServiceImpl @Inject()(ws: WSClient, config: Configuration)
                                          (implicit ec: ExecutionContext) extends AiAssistantApiService {
 
   private lazy val logger = play.api.Logger(getClass)
-  override def makeApiPostCall[ReqType : Writes, RespType : Reads](request: ReqType, urlStr: String, timeout: Duration, apiKey: String): Future[RespType] = {
+
+  private lazy val apiKey = config.get[String]("openai.apikey")
+  private lazy val timeout = config.get[Duration]("openai.timeout")
+  private lazy val baseUrl = config.get[String]("openai.baseUrl")
+
+  override def makeApiPostCall[RespType : Reads](path: String)(implicit ec: ExecutionContext): Future[RespType] = makeApiPostCall(path, "")
+  override def makeApiPostCall[ReqType : Writes, RespType : Reads](path: String, request: ReqType)(implicit ec: ExecutionContext): Future[RespType] = {
     val headers = createHeaders(apiKey)
     val payload = Json.toJson(request)
     logger.info(s"Making API call with payload: $payload, timeout: $timeout")
-
+     val urlStr = s"$baseUrl$path"
     // Make the API call
     ws.url(urlStr)
       .withRequestTimeout(timeout)
@@ -49,11 +55,12 @@ class AiAssistantApiServiceImpl @Inject()(ws: WSClient)
           logger.error(s"Received unexpected status ${response.status} : ${response.body}")
           Future.failed(new Exception(s"Received unexpected status ${response.status} : ${response.body}"))
         }
-      }
+      }(ec)
   }
 
-  override def makeApiDeleteCall[RespType : Reads](urlStr: String, timeout: Duration, apiKey: String): Future[RespType] = {
+  override def makeApiDeleteCall[RespType : Reads](path: String)(implicit ec: ExecutionContext): Future[RespType] = {
     val headers = createHeaders(apiKey)
+    val urlStr = s"$baseUrl$path"      
     ws.url(urlStr)
       .withRequestTimeout(timeout)
       .withHttpHeaders(headers.toSeq: _*)
@@ -76,11 +83,10 @@ class AiAssistantApiServiceImpl @Inject()(ws: WSClient)
           logger.error(s"Received unexpected status ${response.status} : ${response.body}")
           Future.failed(new Exception(s"Received unexpected status ${response.status} : ${response.body}"))
         }
-      }
+      }(ec)
   }
 
-
-  override def createHeaders(apKey: String): Map[String, String] = {
+  private def createHeaders(apKey: String): Map[String, String] = {
     Map(
       "Content-Type" -> "application/json",
       "Authorization" -> s"Bearer $apKey",
