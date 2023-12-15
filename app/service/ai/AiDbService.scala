@@ -1,12 +1,11 @@
 package service.ai
 
 import com.google.inject.ImplementedBy
-import dao.DatabaseExecutionContext
+import dao.{AiAssistant, DatabaseExecutionContext}
 import dao.ai.AiDao
 import dao.model.AiDbObj
 import play.api.libs.json.{JsValue, Json, Reads}
-import play.api.libs.ws.WSResponse
-import service.model.AiAssistant
+import service.model.AiThread
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,10 +13,22 @@ import scala.concurrent.Future
 
 @ImplementedBy(classOf[AiDbServiceImpl])
 trait AiDbService {
+  def saveAiThreadAsync(aiThread: Nothing): Future[Option[Long]]
+
   def deleteAiAssistantByExternalId(externalId: String): Future[Boolean]
 
   def saveAiResponseAsync(userId: Long, response: JsValue): Future[Option[Long]]
   def saveAiAssistantAsync(aiAssistant: AiAssistant): Future[Option[Long]]
+
+  def fetchAiAssistantByExternalId(externalId: String): Future[Option[AiAssistant]]
+
+  def fetchDefaultAiAssistantForType(assistantType: String): Future[Option[AiAssistant]]
+
+  def fetchThreadByExternalId(externalId: String): Future[Option[AiThread]]
+
+  def fetchThreadById(id: Long): Future[Option[AiThread]]
+
+  def fetchThreadByUserIdAndType(userId: Long, assistantType: String): Future[Option[AiThread]]
 }
 
 class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionContext, aiDao: AiDao) extends AiDbService {
@@ -51,6 +62,36 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
   override def deleteAiAssistantByExternalId(externalId: String): Future[Boolean] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful(aiDao.deleteAiAssistantByExternalId(externalId))
+    })
+  }
+
+  override def fetchAiAssistantByExternalId(externalId: String): Future[Option[AiAssistant]] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(aiDao.fetchAiAssistantByExternalId(externalId))
+    })
+  }
+
+  override def fetchDefaultAiAssistantForType(assistantType: String): Future[Option[AiAssistant]] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(aiDao.fetchDefaultAiAssistantForType(assistantType))
+    })
+  }
+
+  override def fetchThreadByExternalId(externalId: String): Future[Option[AiThread]] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(aiDao.fetchThreadByExternalId(externalId))
+    })
+  }
+
+  override def fetchThreadByUserIdAndType(userId: Long, assistantType: String): Future[Option[AiThread]] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(aiDao.fetchThreadByUserIdAndType(userId, assistantType))
+    })
+  }
+
+  override def fetchThreadById(id: Long): Future[Option[AiThread]] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(aiDao.fetchThreadById(id))
     })
   }
 }

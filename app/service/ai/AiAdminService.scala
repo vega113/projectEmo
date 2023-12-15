@@ -10,6 +10,7 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
+import scala.language.postfixOps
 
 @ImplementedBy(classOf[AiAdminServiceImpl])
 trait AiAdminService {
@@ -47,11 +48,11 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
         aiService.saveAiResponseAsync(1, Json.toJson(value))
       case scala.util.Failure(exception) => logger.error(s"Failed to create assistant: $exception")
     }
-    val aiAssistant = response.map(_.toAiAssistant)
+    val aiAssistant: Future[AiAssistant] = response.map(_.toAiAssistant).map(_.copy(isDefault = emoRequest.isDefault,
+      assistantType = Option(emoRequest.assistantType)))
     aiAssistant.onComplete {
       case scala.util.Success(value) =>
         aiService.saveAiAssistantAsync(value)
-
         logger.info(s"Successfully saved assistant: $value")
       case scala.util.Failure(exception) => logger.error(s"Failed to save assistant: $exception")
     }

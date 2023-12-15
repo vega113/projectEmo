@@ -22,7 +22,7 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
   private lazy val logger = play.api.Logger(getClass)
 
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
-    logger.info(s"Detecting emotion for request: $request")
+    logger.info(s"V2 Detecting emotion for request: $request")
     // fetch assistant for user
     // fetch thread for user
     // add new message to thread
@@ -30,7 +30,7 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
     // fetch last message by assistant for thread older than date externalCreatedAt
     for {
       aiAssistant <- aiAssistantService.fetchAssistantForUser(request.userId, assistantType)
-      aiThread <- aiAssistantService.fetchThreadForUser(request.userId)
+      aiThread <- aiAssistantService.createOrFetchThread(request.userId, aiAssistant, assistantType)
       externalThreadId <- aiAssistantService.createOrFetchThread(request.userId, aiAssistant, assistantType).map(_.externalId)
       aiMessage <- aiAssistantService.addMessageToThread(externalThreadId, request.text)
       instructions <- aiAssistantService.makeRunInstructionsForUser(request.userId)

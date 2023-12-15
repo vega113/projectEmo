@@ -1,9 +1,12 @@
 package service
 
+import anorm.{Macro, RowParser}
 import dao.model.{NoteTodo, Tag, Trigger}
 import play.api.libs.json.{Format, Json}
+import Macro.ColumnNaming
+import dao.AiAssistant
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.LocalDateTime
 
 object model {
   case class DetectEmotionRequest(text: String, userId: Long)
@@ -49,7 +52,8 @@ object model {
   case class EmoCreateAssistantRequest(
                                         instructions: String,
                                         name: String,
-                                        isDefault: Boolean
+                                        isDefault: Boolean,
+                                        assistantType: String = "EmoDetection"
                                       )
 
   object EmoCreateAssistantRequest {
@@ -65,18 +69,6 @@ object model {
     implicit val deleteAssistantResponseFormat: Format[ChatGptDeleteAssistantResponse] = Json.format[ChatGptDeleteAssistantResponse]
   }
 
-  case class AiAssistant(
-                          id: Option[Int],
-                          externalId: String,
-                          name: String,
-                          description: Option[String],
-                          isDefault: Boolean,
-                          created: LocalDateTime,
-                          lastUpdated: Option[LocalDateTime],
-                          createdAtProvider: Long,
-                          assistantType: Option[String]
-                        )
-
   case class AiThread(
                        id: Int,
                        externalId: String,
@@ -85,6 +77,10 @@ object model {
                        isDeleted: Boolean,
                        created: LocalDateTime,
                      )
+  object AiThread {
+    implicit val aiThreadFormat: Format[AiThread] = Json.format[AiThread]
+    implicit val parser: RowParser[AiThread] = Macro.namedParser[AiThread](ColumnNaming.SnakeCase)
+  }
 
   case class AiMessage(
                         id: Int,
@@ -172,14 +168,6 @@ object model {
 
   object ChatGptCreateAssistantRequest {
     implicit val createAssistantRequestFormat: Format[ChatGptCreateAssistantRequest] = Json.format[ChatGptCreateAssistantRequest]
-  }
-
-  object AiAssistant {
-    implicit val aiAssistantFormat: Format[AiAssistant] = Json.format[AiAssistant]
-  }
-
-  object AiThread {
-    implicit val aiThreadFormat: Format[AiThread] = Json.format[AiThread]
   }
 
   object AiMessage {

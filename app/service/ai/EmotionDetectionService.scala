@@ -45,8 +45,9 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
     val timeoutDuration = config.get[Duration]("openai.timeout")
     logger.info(s"Making API call with payload: $payload, timeout: $timeoutDuration")
 
+    val url =  config.get[String]("openai.baseUrl") + "/v1/chat/completions"
     // Make the API call
-    ws.url(config.get[String]("openai.url"))
+    ws.url(url)
       .withRequestTimeout(timeoutDuration)
       .withHttpHeaders(headers.toSeq: _*)
       .post(payload)
