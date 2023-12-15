@@ -11,8 +11,8 @@ class AiDao {
   def insertAiThread(aiThread: AiThread)(implicit connection: Connection): Option[Long] = {
     SQL(
       """
-        |INSERT INTO ai_threads (external_id, user_id, thread_type, is_deleted, created)
-        |VALUES ({externalId}, {userId}, {threadType}, false)
+        |INSERT INTO ai_threads (external_id, user_id, thread_type)
+        |VALUES ({externalId}, {userId}, {threadType})
         |""".stripMargin
     ).on(
       "externalId" -> aiThread.externalId,

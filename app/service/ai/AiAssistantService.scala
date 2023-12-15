@@ -53,14 +53,24 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
     fetchThreadForUser(userId).flatMap {
       case Some(thread) => Future.successful(thread)
       case _ =>
-        val response = createThreadForUser(userId).flatMap { response =>
-          val aiThread = response.toAiThread(userId, threadType)
-          val internalThreadId: Future[Option[Long]] = aiDbService.saveAiThread(aiThread)
-          internalThreadId.map(id => aiThread.copy(id = id))
+        val response = for {
+          createThreadResponse <- createThreadForUser(userId)
+          newAiThread = createThreadResponse.toAiThread(userId, threadType)
+          internalThreadIdOption <- aiDbService.saveAiThread(newAiThread)
+          internalThreadId <- internalThreadIdOption.fold(
+            Future.failed[Long](new Exception("Failed to get internalThreadId")))(Future.successful)
+          aiAssistantId <- aiAssistant.id.fold(
+            Future.failed[Long](new Exception("Failed to get aiAssistant.id")))(x => Future.successful(x))
+          _ <- userInfoService.upsertUserInfo(userId, aiAssistantId, internalThreadId)
+        } yield {
+          newAiThread.copy(id = Some(internalThreadId))
         }
         response.onComplete {
-          case scala.util.Success(value) => logger.info(s"Successfully created thread: ${value.id}")
+          case scala.util.Success(value) if value.id.isDefined =>
+            //
+            logger.info(s"Successfully created thread: ${value.id.get}")
           case scala.util.Failure(exception) => logger.error(s"Failed to create thread: $exception", exception)
+          case scala.util.Success(value) => logger.error(s"Failed to create thread: $value")
         }
         response
     }
