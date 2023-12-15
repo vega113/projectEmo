@@ -60,7 +60,7 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
         }
         response.onComplete {
           case scala.util.Success(value) => logger.info(s"Successfully created thread: ${value.id}")
-          case scala.util.Failure(exception) => logger.error(s"Failed to create thread: $exception")
+          case scala.util.Failure(exception) => logger.error(s"Failed to create thread: $exception", exception)
         }
         response
     }
@@ -69,10 +69,14 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
   private def fetchThreadForUser(userId: Long): Future[Option[AiThread]] = {
     userInfoService.fetchUserInfo(userId).map {
       case Some(userInfo) => userInfo.threadId
-      case None => throw new Exception(s"Could not find user info for user $userId")
+      case _ =>
+        logger.info(s"Could not find user info for user $userId")
+        None
     }.flatMap {
       case Some(threadId) => aiDbService.fetchThreadById(threadId)
-      case None => Future.failed(new Exception(s"Could not find thread for user $userId"))
+      case None =>
+        logger.info(s"Could not find thread for user $userId")
+        Future.successful(None)
     }
   }
 
