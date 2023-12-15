@@ -30,8 +30,8 @@ class AiAssistantApiServiceImpl @Inject()(ws: WSClient, config: Configuration)
   override def makeApiPostCall[ReqType : Writes, RespType : Reads](path: String, request: ReqType)(implicit ec: ExecutionContext): Future[RespType] = {
     val headers = createHeaders(apiKey)
     val payload = Json.toJson(request)
-    logger.info(s"Making API call with payload: $payload, timeout: $timeout")
      val urlStr = s"$baseUrl$path"
+    logger.info(s"Making API call with payload: $payload, timeout: $timeout, url: $urlStr")
     // Make the API call
     ws.url(urlStr)
       .withRequestTimeout(timeout)

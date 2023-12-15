@@ -55,7 +55,7 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
       case _ =>
         val response = createThreadForUser(userId).flatMap { response =>
           val aiThread = response.toAiThread(userId, threadType)
-          val internalThreadId: Future[Option[Long]] =  aiDbService.saveAiThread(aiThread)
+          val internalThreadId: Future[Option[Long]] = aiDbService.saveAiThread(aiThread)
           internalThreadId.map(id => aiThread.copy(id = id))
         }
         response.onComplete {
