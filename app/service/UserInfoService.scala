@@ -1,12 +1,13 @@
 package service
 
-import com.google.inject.Inject
+import com.google.inject.{ImplementedBy, Inject}
 import dao.AiAssistant.UserInfo
 import dao.{DatabaseExecutionContext, UserInfoDao}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+@ImplementedBy(classOf[UserInfoServiceImpl])
 trait UserInfoService {
   def fetchUserInfo(userId: Long): Future[Option[UserInfo]]
 }

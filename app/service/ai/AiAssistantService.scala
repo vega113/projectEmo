@@ -1,8 +1,7 @@
 package service.ai
 
-import com.google.inject.Inject
+import com.google.inject.{ImplementedBy, Inject}
 import dao.AiAssistant
-import play.api.libs.json.Json
 import service.UserInfoService
 import service.ai.ChatGptModel.ChatGptCreateThreadResponse
 import service.model.{AiMessage, AiThread, ThreadRun}
@@ -10,6 +9,7 @@ import service.model.{AiMessage, AiThread, ThreadRun}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+@ImplementedBy(classOf[ChatGptAiAssistantServiceImpl])
 trait AiAssistantService {
   def fetchAssistantForUser(userId: Long, aiAssistantType: String): Future[AiAssistant]
 
