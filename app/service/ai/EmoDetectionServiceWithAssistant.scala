@@ -30,7 +30,6 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
     // fetch last message by assistant for thread older than date externalCreatedAt
     for {
       aiAssistant <- aiAssistantService.fetchAssistantForUser(request.userId, assistantType)
-      aiThread <- aiAssistantService.createOrFetchThread(request.userId, aiAssistant, assistantType)
       externalThreadId <- aiAssistantService.createOrFetchThread(request.userId, aiAssistant, assistantType).map(_.externalId)
       aiMessage <- aiAssistantService.addMessageToThread(externalThreadId, request.text)
       instructions <- aiAssistantService.makeRunInstructionsForUser(request.userId)

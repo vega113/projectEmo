@@ -88,7 +88,10 @@ object ChatGptModel {
 
   case class Content(`type`: String, text: TextContent)
 
-  case class ChatGptAddMessageResponse(id: String, `object`: String, created_at: Long, thread_id: String, role: String, content: List[Content], file_ids: List[String], assistant_id: String, run_id: String, metadata: Map[String, String]) {
+  case class ChatGptAddMessageResponse(id: String, `object`: String, created_at: Long, thread_id: String, role: String,
+                                       content: List[Content], file_ids: List[String],
+                                       assistant_id: Option[String], run_id: Option[String],
+                                       metadata: Map[String, String]) {
     def toAiMessage: AiMessage = {
       val message = content.map(_.text.value).mkString(" ")
       AiMessage(
