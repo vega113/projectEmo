@@ -1,5 +1,8 @@
 package service.ai
 
+import akka.actor.ActorSystem
+import akka.stream.RestartSettings
+import akka.stream.scaladsl.Source
 import com.google.inject.{ImplementedBy, Inject}
 import dao.AiAssistant
 import play.api.Configuration
@@ -17,6 +20,7 @@ trait AiAssistantService {
   def createOrFetchThread(userId: Long, aiAssistant: AiAssistant, threadType: String): Future[AiThread]
 
   def fetchAllMessagesForThread(externalThreadId: String): Future[List[AiMessage]]
+
   def fetchLastMessageByAssistantForThreadOlderThan(questionMessage: AiMessage): Future[AiMessage]
 
   def addMessageToThread(externalThreadId: String, message: String): Future[AiMessage]
@@ -30,9 +34,10 @@ trait AiAssistantService {
 
 }
 
-class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInfoService: UserInfoService,
-                                               apiService: AiAssistantApiService,
-                                               config: Configuration) extends AiAssistantService {
+class ChatGptAiAssistantServiceImpl @Inject()(aiDbService: AiDbService, userInfoService: UserInfoService,
+                                              apiService: AiAssistantApiService,
+                                              config: Configuration,
+                                              system: ActorSystem) extends AiAssistantService {
 
   private lazy val logger = play.api.Logger(getClass)
 
@@ -128,7 +133,7 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
   }
 
   override def runThread(externalThreadId: String, aiAssistantId: String, instructions: Option[String]): Future[ChatGptThreadRunResponse] = {
-logger.info(s"Running assistant for thread $externalThreadId")
+    logger.info(s"Running assistant for thread $externalThreadId")
     val path: String = s"/v1/threads/$externalThreadId/runs"
     val body = ChatGptThreadRunRequest(
       assistant_id = aiAssistantId,
@@ -144,5 +149,44 @@ logger.info(s"Running assistant for thread $externalThreadId")
     response
   }
 
-  override def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ChatGptThreadRunResponse] = ???
+  import akka.actor.ActorSystem
+  import akka.stream.scaladsl.{RestartSource, Sink}
+  import scala.concurrent.duration._
+
+  override def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ChatGptThreadRunResponse] = {
+    val minBackoff = 5.seconds
+    val maxBackoff = 15.seconds
+    val randomFactor = 0.2
+
+    implicit val actorSystem: ActorSystem = system
+
+    val settings = RestartSettings(minBackoff, maxBackoff, randomFactor)
+    val startTime = System.nanoTime()
+
+    val source = RestartSource.withBackoff(settings) { () =>
+      val response = Source.future {
+        val path: String = s"/v1/threads/$externalThreadId/runs/$threadRunId"
+        apiService.makeApiGetCall[ChatGptThreadRunResponse](path)
+      }
+      response.recoverWithRetries(0, {
+        case ex: Exception =>
+          logger.error(s"Error while polling thread run: $ex, threadRunId: $threadRunId," +
+            s" externalThreadId: $externalThreadId")
+          Source.empty
+      })
+    }
+
+    source.takeWhile(out => {
+      logger.info(s"Polling thread run for thread $externalThreadId, runId: $threadRunId, status: ${out.status}")
+      out.status match {
+        case "completed" => false
+        case _ => true
+      }
+    }, inclusive = false).runWith(Sink.last).map { result =>
+      val endTime = System.nanoTime()
+      val elapsedTime = (endTime - startTime) / 1e9d
+      logger.info(s"Total elapsed time for polling: $elapsedTime seconds, thread $externalThreadId, runId: $threadRunId")
+      result
+    }
+  }
 }

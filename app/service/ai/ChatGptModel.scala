@@ -146,7 +146,7 @@ object ChatGptModel {
                                           thread_id: String,
                                           status: String,
                                           started_at: Option[Long],
-                                          expires_at: Long,
+                                          expires_at: Option[Long],
                                           cancelled_at: Option[Long],
                                           failed_at: Option[Long],
                                           completed_at: Option[Long],
