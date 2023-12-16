@@ -2,8 +2,9 @@ package service.ai
 
 import com.google.inject.{ImplementedBy, Inject}
 import dao.AiAssistant
+import play.api.Configuration
 import service.UserInfoService
-import service.ai.ChatGptModel.{ChatGptAddMessageRequest, ChatGptAddMessageResponse, ChatGptCreateThreadResponse}
+import service.ai.ChatGptModel.{ChatGptAddMessageRequest, ChatGptAddMessageResponse, ChatGptCreateThreadResponse, ChatGptThreadRunRequest, ChatGptThreadRunResponse}
 import service.model.{AiMessage, AiThread, ThreadRun}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,14 +23,16 @@ trait AiAssistantService {
 
   def makeRunInstructionsForUser(userId: Long): Future[Option[String]]
 
-  def runAssistant(externalThreadId: String, aiAssistantId: String, instructions: Option[String]): Future[ThreadRun]
+  def runThread(externalThreadId: String, aiAssistantId: String, instructions: Option[String]): Future[ChatGptThreadRunResponse
+  ]
 
-  def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ThreadRun]
+  def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ChatGptThreadRunResponse]
 
 }
 
 class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInfoService: UserInfoService,
-                                               apiService: AiAssistantApiService) extends AiAssistantService {
+                                               apiService: AiAssistantApiService,
+                                               config: Configuration) extends AiAssistantService {
 
   private lazy val logger = play.api.Logger(getClass)
 
@@ -100,18 +103,37 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
     val body = ChatGptAddMessageRequest(
       role = "user",
       content = message, None, None)
-    apiService.makeApiPostCall[ChatGptAddMessageRequest, ChatGptAddMessageResponse](path, body).map { response =>
+    val resp = apiService.makeApiPostCall[ChatGptAddMessageRequest, ChatGptAddMessageResponse](path, body).map { response =>
       response.toAiMessage
     }
+    resp.onComplete({
+      case scala.util.Success(value) => logger.info(s"Successfully added message to thread $externalThreadId", value)
+      case scala.util.Failure(exception) => logger.error(s"Failed to add message to thread $externalThreadId", exception)
+    })
+    resp
   }
 
   override def makeRunInstructionsForUser(userId: Long): Future[Option[String]] = {
-    logger.info(s"Making run instructions for user $userId")
-
-    Future.successful(None)
+    val perRunInstructions = None
+    logger.info(s"Making per run instructions for user $userId V2: $perRunInstructions")
+    Future.successful(perRunInstructions)
   }
 
-  override def runAssistant(externalThreadId: String, aiAssistantId: String, instructions: Option[String]): Future[ThreadRun] = ???
+  override def runThread(externalThreadId: String, aiAssistantId: String, instructions: Option[String]): Future[ChatGptThreadRunResponse] = {
+logger.info(s"Running assistant for thread $externalThreadId")
+    val path: String = s"/v1/threads/$externalThreadId/runs"
+    val body = ChatGptThreadRunRequest(
+      assistant_id = aiAssistantId,
+      instructions = instructions,
+      model = config.getOptional[String]("openai.model")
+    )
+    val response = apiService.makeApiPostCall[ChatGptThreadRunRequest, ChatGptThreadRunResponse](path, body)
+    response.onComplete {
+      case scala.util.Success(value) => logger.info(s"Successfully ran assistant for thread $externalThreadId")
+      case scala.util.Failure(exception) => logger.error(s"Failed to run assistant for thread $externalThreadId", exception)
+    }
+    response
+  }
 
-  override def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ThreadRun] = ???
+  override def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ChatGptThreadRunResponse] = ???
 }

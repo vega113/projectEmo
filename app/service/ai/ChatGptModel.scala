@@ -125,4 +125,39 @@ object ChatGptModel {
   object ChatGptAddMessageRequest {
     implicit val addMessageRequestFormat: Format[ChatGptAddMessageRequest] = Json.format[ChatGptAddMessageRequest]
   }
+
+  case class ChatGptThreadRunRequest(
+                                         assistant_id: String,
+                                         instructions: Option[String],
+                                         model: Option[String],
+                                       )
+  object ChatGptThreadRunRequest {
+    implicit val runAssistantRequestFormat: Format[ChatGptThreadRunRequest] = Json.format[ChatGptThreadRunRequest]
+  }
+
+  case class ChatGptThreadRunResponse(
+                                          id: String,
+                                          `object`: String,
+                                          created_at: Long,
+                                          assistant_id: String,
+                                          thread_id: String,
+                                          status: String,
+                                          started_at: Option[Long],
+                                          expires_at: Long,
+                                          cancelled_at: Option[Long],
+                                          failed_at: Option[Long],
+                                          completed_at: Option[Long],
+                                          last_error: Option[String],
+                                          model: String,
+                                          instructions: String,
+                                          tools: List[Tool],
+                                          file_ids: List[String],
+                                          metadata: Map[String, String]
+                                        ) {
+
+  }
+
+  object ChatGptThreadRunResponse {
+    implicit val runAssistantResponseFormat: Format[ChatGptThreadRunResponse] = Json.format[ChatGptThreadRunResponse]
+  }
 }

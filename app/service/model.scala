@@ -73,26 +73,6 @@ object model {
 
   case class Tool(`type`: String)
 
-  case class ThreadRun(
-                        id: String,
-                        `object`: String,
-                        created_at: Long,
-                        assistant_id: String,
-                        thread_id: String,
-                        status: String,
-                        started_at: Option[Long],
-                        expires_at: Long,
-                        cancelled_at: Option[Long],
-                        failed_at: Option[Long],
-                        completed_at: Option[Long],
-                        last_error: Option[String],
-                        model: String,
-                        instructions: String,
-                        tools: List[Tool],
-                        file_ids: List[String],
-                        metadata: Map[String, String]
-                      )
-
   case class Text(value: String, annotations: List[String])
 
   case class Content(`type`: String, text: Text)
@@ -138,9 +118,6 @@ object model {
 
   object Tool {
     implicit val toolFormat: Format[Tool] = Json.format[Tool]
-  }
-  object ThreadRun {
-    implicit val threadRunFormat: Format[ThreadRun] = Json.format[ThreadRun]
   }
 
   object Text {
