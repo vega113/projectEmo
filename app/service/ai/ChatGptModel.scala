@@ -2,7 +2,7 @@ package service.ai
 
 import dao.AiAssistant
 import play.api.libs.json.{Format, Json}
-import service.ai.ChatGptModel.{ChatGptAddMessageResponse, Content, TextContent}
+import service.ai.ChatGptModel.{ChatGptMessageResponse, Content, TextContent}
 import service.model.{AiMessage, AiThread, Tool}
 
 import java.time.LocalDateTime
@@ -88,10 +88,10 @@ object ChatGptModel {
 
   case class Content(`type`: String, text: TextContent)
 
-  case class ChatGptAddMessageResponse(id: String, `object`: String, created_at: Long, thread_id: String, role: String,
-                                       content: List[Content], file_ids: List[String],
-                                       assistant_id: Option[String], run_id: Option[String],
-                                       metadata: Map[String, String]) {
+  case class ChatGptMessageResponse(id: String, `object`: String, created_at: Long, thread_id: String, role: String,
+                                    content: List[Content], file_ids: List[String],
+                                    assistant_id: Option[String], run_id: Option[String],
+                                    metadata: Map[String, String]) {
     def toAiMessage: AiMessage = {
       val message = content.map(_.text.value).mkString(" ")
       AiMessage(
@@ -114,8 +114,8 @@ object ChatGptModel {
     implicit val contentFormat: Format[Content] = Json.format[Content]
   }
 
-  object ChatGptAddMessageResponse {
-    implicit val addMessageRequestFormat: Format[ChatGptAddMessageResponse] = Json.format[ChatGptAddMessageResponse]
+  object ChatGptMessageResponse {
+    implicit val addMessageRequestFormat: Format[ChatGptMessageResponse] = Json.format[ChatGptMessageResponse]
   }
 
   case class ChatGptAddMessageRequest(
@@ -162,5 +162,19 @@ object ChatGptModel {
 
   object ChatGptThreadRunResponse {
     implicit val runAssistantResponseFormat: Format[ChatGptThreadRunResponse] = Json.format[ChatGptThreadRunResponse]
+  }
+
+  case class ChatGptResponseMessages(
+                                      `object`: String,
+                                      data: List[ChatGptMessageResponse],
+                                      first_id: String,
+                                      last_id: String,
+                                      has_more: Boolean,
+                                    ){
+
+  }
+
+  object ChatGptResponseMessages {
+    implicit val responseMessagesFormat: Format[ChatGptResponseMessages] = Json.format[ChatGptResponseMessages]
   }
 }

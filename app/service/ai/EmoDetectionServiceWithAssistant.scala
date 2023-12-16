@@ -34,7 +34,7 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
       aiMessage <- aiAssistantService.addMessageToThread(externalThreadId, request.text)
       instructions <- aiAssistantService.makeRunInstructionsForUser(request.userId)
       threadRunInitial <- aiAssistantService.runThread(externalThreadId, aiAssistant.externalId, instructions)
-      threadRunCompleted <- aiAssistantService.pollThreadRunUntilComplete(externalThreadId, threadRunInitial.id)
+      _ <- aiAssistantService.pollThreadRunUntilComplete(externalThreadId, threadRunInitial.id)
       responseAiMessage <- aiAssistantService.fetchLastMessageByAssistantForThreadOlderThan(aiMessage)
     } yield {
       logger.info(s"Response from AI: $responseAiMessage")

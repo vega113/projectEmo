@@ -45,15 +45,7 @@ class NoteController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       note => {
-        Try{
-          emotionDetectionServiceV2.detectEmotion(DetectEmotionRequest(note.text, token.user.userId)).onComplete(
-            {
-              case scala.util.Success(value) => logger.info(s"Successfully detected emotion v2: $value")
-              case scala.util.Failure(exception) => logger.error(s"Failed to detect emotion v2: $exception", exception)
-            }
-          )
-        }
-        emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId)).map { resp =>
+        emotionDetectionServiceV2.detectEmotion(DetectEmotionRequest(note.text, token.user.userId)).map { resp =>
           Ok(Json.toJson(resp))
         }
       })
