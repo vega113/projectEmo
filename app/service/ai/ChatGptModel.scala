@@ -2,12 +2,12 @@ package service.ai
 
 import dao.AiAssistant
 import play.api.libs.json.{Format, Json}
-import service.model.{AiThread, Tool}
+import service.ai.ChatGptModel.{ChatGptAddMessageResponse, Content, TextContent}
+import service.model.{AiMessage, AiThread, Tool}
 
 import java.time.LocalDateTime
 
 object ChatGptModel {
-
 
   case class ChatGptCreateAssistantRequest(instructions: String,
                                            name: String,
@@ -16,9 +16,11 @@ object ChatGptModel {
                                            fileIds: Option[List[String]], // up to 20 files
                                            metadata: Option[Map[String, String]] // up to 16 key-value pairs. Keys can be a maximum of 64 characters long and values can be a maxium of 512 characters long.
                                           )
+
   object ChatGptCreateAssistantRequest {
     implicit val createAssistantRequestFormat: Format[ChatGptCreateAssistantRequest] = Json.format[ChatGptCreateAssistantRequest]
   }
+
   case class ChatGptCreateAssistantResponse(
                                              id: String,
                                              `object`: String,
@@ -55,6 +57,7 @@ object ChatGptModel {
                                              `object`: String,
                                              deleted: Boolean
                                            )
+
   object ChatGptDeleteAssistantResponse {
     implicit val deleteAssistantResponseFormat: Format[ChatGptDeleteAssistantResponse] = Json.format[ChatGptDeleteAssistantResponse]
   }
@@ -66,7 +69,7 @@ object ChatGptModel {
                                           metadata: Map[String, String]
                                         ) {
 
-    def  toAiThread(userId: Long, threadType: String): AiThread =
+    def toAiThread(userId: Long, threadType: String): AiThread =
       AiThread(
         id = None,
         externalId = id,
@@ -79,5 +82,47 @@ object ChatGptModel {
 
   object ChatGptCreateThreadResponse {
     implicit val createThreadResponseFormat: Format[ChatGptCreateThreadResponse] = Json.format[ChatGptCreateThreadResponse]
+  }
+
+  case class TextContent(value: String, annotations: List[Map[String, String]])
+
+  case class Content(`type`: String, text: TextContent)
+
+  case class ChatGptAddMessageResponse(id: String, `object`: String, created_at: Long, thread_id: String, role: String, content: List[Content], file_ids: List[String], assistant_id: String, run_id: String, metadata: Map[String, String]) {
+    def toAiMessage: AiMessage = {
+      val message = content.map(_.text.value).mkString(" ")
+      AiMessage(
+        externalId = id,
+        externalThreadId = thread_id,
+        role = role,
+        message = message,
+        externalCreated = created_at,
+        created = LocalDateTime.now()
+      )
+    }
+  }
+
+
+  object TextContent {
+    implicit val textContentFormat: Format[TextContent] = Json.format[TextContent]
+  }
+
+  object Content {
+    implicit val contentFormat: Format[Content] = Json.format[Content]
+  }
+
+  object ChatGptAddMessageResponse {
+    implicit val addMessageRequestFormat: Format[ChatGptAddMessageResponse] = Json.format[ChatGptAddMessageResponse]
+  }
+
+  case class ChatGptAddMessageRequest(
+                                       role: String,
+                                       content: String,
+                                       file_ids: Option[List[String]],
+                                       metadata: Option[Map[String, String]]
+                                     )
+
+  object ChatGptAddMessageRequest {
+    implicit val addMessageRequestFormat: Format[ChatGptAddMessageRequest] = Json.format[ChatGptAddMessageRequest]
   }
 }

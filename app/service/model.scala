@@ -39,16 +39,12 @@ object model {
   }
 
   case class AiMessage(
-                        id: Int,
                         externalId: String,
-                        threadId: Long,
                         externalThreadId: String,
-                        userId: Long,
                         role: String,
                         message: String,
                         externalCreated: Long,
-                        created: LocalDateTime,
-                        rawResponse: String
+                        created: LocalDateTime
                       )
 
   case class EmotionDetectionResultAssistant(

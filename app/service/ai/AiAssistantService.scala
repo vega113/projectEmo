@@ -3,7 +3,7 @@ package service.ai
 import com.google.inject.{ImplementedBy, Inject}
 import dao.AiAssistant
 import service.UserInfoService
-import service.ai.ChatGptModel.ChatGptCreateThreadResponse
+import service.ai.ChatGptModel.{ChatGptAddMessageRequest, ChatGptAddMessageResponse, ChatGptCreateThreadResponse}
 import service.model.{AiMessage, AiThread, ThreadRun}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -94,9 +94,22 @@ class ChatGptAiAssistantServiceImpl @Inject() (aiDbService: AiDbService, userInf
 
   override def fetchLastMessageByAssistantForThreadOlderThan(questionMessage: AiMessage): Future[AiMessage] = ???
 
-  override def addMessageToThread(externalThreadId: String, message: String): Future[AiMessage] = ???
+  override def addMessageToThread(externalThreadId: String, message: String): Future[AiMessage] = {
+    logger.info(s"Adding message to thread $externalThreadId")
+    val path: String = s"/v1/threads/$externalThreadId/messages"
+    val body = ChatGptAddMessageRequest(
+      role = "user",
+      content = message, None, None)
+    apiService.makeApiPostCall[ChatGptAddMessageRequest, ChatGptAddMessageResponse](path, body).map { response =>
+      response.toAiMessage
+    }
+  }
 
-  override def makeRunInstructionsForUser(userId: Long): Future[Option[String]] = ???
+  override def makeRunInstructionsForUser(userId: Long): Future[Option[String]] = {
+    logger.info(s"Making run instructions for user $userId")
+
+    Future.successful(None)
+  }
 
   override def runAssistant(externalThreadId: String, aiAssistantId: String, instructions: Option[String]): Future[ThreadRun] = ???
 
