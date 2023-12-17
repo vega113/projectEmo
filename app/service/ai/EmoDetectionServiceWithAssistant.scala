@@ -3,7 +3,7 @@ package service.ai
 import com.google.inject.ImplementedBy
 import dao.model.EmotionDetectionResult
 import play.api.libs.json.Json
-import service.model.{DetectEmotionRequest, EmotionDetectionEmotions, EmotionDetectionExtendedResult}
+import service.model.DetectEmotionRequest
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,11 +23,6 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
 
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
     logger.info(s"V2 Detecting emotion for request: $request")
-    // fetch assistant for user
-    // fetch thread for user
-    // add new message to thread
-    // run assistant
-    // fetch last message by assistant for thread older than date externalCreatedAt
     for {
       aiAssistant <- aiAssistantService.fetchAssistantForUser(request.userId, assistantType)
       externalThreadId <- aiAssistantService.createOrFetchThread(request.userId, aiAssistant, assistantType).map(_.externalId)
