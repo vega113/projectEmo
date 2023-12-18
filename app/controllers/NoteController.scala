@@ -6,17 +6,19 @@ import net.logstash.logback.argument.StructuredArguments._
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import service.ai.EmotionDetectionService
+import service.ai.{EmoDetectionServiceWithAssistant, EmotionDetectionService}
 import service.model.DetectEmotionRequest
 import service.{NoteService, NoteTodoService}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
 
 class NoteController @Inject()(cc: ControllerComponents,
                                noteService: NoteService,
                                emotionDetectionService: EmotionDetectionService,
+                               emotionDetectionServiceV2: EmoDetectionServiceWithAssistant,
                                noteTodoService: NoteTodoService,
                                authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc){
@@ -43,11 +45,19 @@ class NoteController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       note => {
-        emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId)).map { resp =>
+        val v1EmotionFuture = emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId))
+        val v2EmotionFuture = emotionDetectionServiceV2.detectEmotion(DetectEmotionRequest(note.text, token.user.userId))
+
+        Future.firstCompletedOf(Seq(v1EmotionFuture, v2EmotionFuture)).map { resp =>
           Ok(Json.toJson(resp))
+        }.recover {
+          case e: Exception =>
+            logger.error(s"Failed to detect emotion: $e", e)
+            InternalServerError(Json.obj("message" -> "Failed to detect emotion"))
         }
-      })
-    }
+      }
+    )
+  }
 
   def acceptTodo(noteTodoId: Long):Action[AnyContent] =
     Action andThen authenticatedAction async { implicit token =>

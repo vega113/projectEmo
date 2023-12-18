@@ -6,7 +6,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import service.UserService
 import service.ai.AiAdminService
-import service.model.{ChatGptCreateAssistantRequest, EmoCreateAssistantRequest}
+import service.model.EmoCreateAssistantRequest
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global

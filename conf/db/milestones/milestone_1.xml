@@ -713,4 +713,8 @@
         <modifyDataType tableName="ai_assistants" columnName="created_at_provider" newDataType="bigint"/>
     </changeSet>
 
+    <changeSet id="rename_ai_thread_to_ai_threads" author="vega">
+        <renameTable oldTableName="ai_thread" newTableName="ai_threads"/>
+    </changeSet>
+
 </databaseChangeLog>

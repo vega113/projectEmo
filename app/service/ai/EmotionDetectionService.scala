@@ -24,7 +24,8 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
   private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Serenity\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"Other\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
 
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
-    if(request.text.startsWith("FAKE")) {
+    val startTime = System.nanoTime()
+    val responseFuture =  if(request.text.startsWith("FAKE")) {
       Future.successful(Json.parse(fakeEmoDetectionResult).as[EmotionDetectionResult])
     } else {
       makeApiCall(request).recoverWith {
@@ -32,6 +33,18 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
           logger.error(s"Failed to detect emotion for request: $request", e)
           Future.failed(e)
       }
+    }
+    responseFuture.onComplete {
+      case scala.util.Success(_) =>
+        logger.info(s"Successfully detected emotion for request using V1, userId: ${request.userId}")
+      case scala.util.Failure(e) =>
+        logger.error(s"Failed to detect emotion for request using V1, userId: ${request.userId}", e)
+    }
+    responseFuture.andThen {
+      case _ =>
+        val endTime = System.nanoTime()
+        val elapsedTime = (endTime - startTime) / 1e9d
+        logger.info(s"Total elapsed time for detectEmotion V1: $elapsedTime seconds")
     }
   }
 
@@ -45,8 +58,9 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
     val timeoutDuration = config.get[Duration]("openai.timeout")
     logger.info(s"Making API call with payload: $payload, timeout: $timeoutDuration")
 
+    val url =  config.get[String]("openai.baseUrl") + "/v1/chat/completions"
     // Make the API call
-    ws.url(config.get[String]("openai.url"))
+    ws.url(url)
       .withRequestTimeout(timeoutDuration)
       .withHttpHeaders(headers.toSeq: _*)
       .post(payload)
@@ -59,7 +73,7 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
                   logger.info(s"Deserialization successful: $result")
                   val content = result.choices.head.message.content
                   val emotionDetectionResult = Json.parse(content).as[EmotionDetectionResult]
-                  aiService.saveAiResponseAsync(request.userId, response.json)
+                  aiService.saveAiResponse(request.userId, response.json)
                   emotionDetectionResult
                 case JsError(errors) =>
                   logger.error(s"Deserialization failed: $errors, response: ${response.json}")

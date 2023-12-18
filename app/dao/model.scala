@@ -468,3 +468,66 @@ object model {
     }
   }
 }
+
+
+case class AiAssistant(
+                        id: Option[Int],
+                        externalId: String,
+                        name: String,
+                        description: Option[String],
+                        isDefault: Boolean,
+                        created: LocalDateTime,
+                        lastUpdated: Option[LocalDateTime],
+                        createdAtProvider: Long,
+                        assistantType: Option[String]
+                      )
+
+object AiAssistant {
+  implicit val aiAssistantFormat: Format[AiAssistant] = Json.format[AiAssistant]
+  implicit val parser: RowParser[AiAssistant] = {
+    get[Option[Int]]("id") ~
+      str("external_id") ~
+      str("name") ~
+      get[Option[String]]("description") ~
+      bool("is_default") ~
+      get[LocalDateTime]("created") ~
+      get[Option[LocalDateTime]]("last_updated") ~
+      get[Long]("created_at_provider") ~
+      get[Option[String]]("assistant_type") map {
+      case id ~ externalId ~ name ~ description ~ isDefault ~ created ~ lastUpdated ~ createdAtProvider ~ assistantType =>
+        AiAssistant(id, externalId, name, description, isDefault, created, lastUpdated, createdAtProvider, assistantType)
+    }
+  }
+
+  case class UserInfo(
+                       id: Int,
+                       userId: Int,
+                       bio: Option[String],
+                       aiAssistantId: Option[Int],
+                       threadId: Option[Int],
+                       created: LocalDateTime,
+                       lastUpdated: Option[LocalDateTime],
+                       tokensUsedTotal: Option[Long],
+                       tokensUsedLastMonth: Option[Long],
+                       tokensAvailable: Option[Long]
+                     )
+
+  object UserInfo {
+    implicit val userInfoFormat: Format[UserInfo] = Json.format[UserInfo]
+    implicit val parser: RowParser[UserInfo] = {
+      get[Int]("id") ~
+        get[Int]("user_id") ~
+        get[Option[String]]("bio") ~
+        get[Option[Int]]("ai_assistant_id") ~
+        get[Option[Int]]("thread_id") ~
+        get[LocalDateTime]("created") ~
+        get[Option[LocalDateTime]]("last_updated") ~
+        get[Option[Long]]("tokens_used_total") ~
+        get[Option[Long]]("tokens_used_last_month") ~
+        get[Option[Long]]("tokens_available") map {
+        case id ~ userId ~ bio ~ aiAssistantId ~ threadId ~ created ~ lastUpdated ~ tokensUsedTotal ~ tokensUsedLastMonth ~ tokensAvailable =>
+          UserInfo(id, userId, bio, aiAssistantId, threadId, created, lastUpdated, tokensUsedTotal, tokensUsedLastMonth, tokensAvailable)
+      }
+    }
+  }
+}
