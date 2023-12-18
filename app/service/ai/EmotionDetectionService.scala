@@ -34,11 +34,17 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
           Future.failed(e)
       }
     }
+    responseFuture.onComplete {
+      case scala.util.Success(_) =>
+        logger.info(s"Successfully detected emotion for request using V1, userId: ${request.userId}")
+      case scala.util.Failure(e) =>
+        logger.error(s"Failed to detect emotion for request using V1, userId: ${request.userId}", e)
+    }
     responseFuture.andThen {
       case _ =>
         val endTime = System.nanoTime()
-        val elapsedTime = (endTime - startTime) / 1e6 // to milliseconds
-        logger.info(s"Total elapsed time for detectEmotion V1: $elapsedTime ms")
+        val elapsedTime = (endTime - startTime) / 1e9d
+        logger.info(s"Total elapsed time for detectEmotion V1: $elapsedTime seconds")
     }
   }
 
@@ -67,7 +73,7 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
                   logger.info(s"Deserialization successful: $result")
                   val content = result.choices.head.message.content
                   val emotionDetectionResult = Json.parse(content).as[EmotionDetectionResult]
-                  aiService.saveAiResponseAsync(request.userId, response.json)
+                  aiService.saveAiResponse(request.userId, response.json)
                   emotionDetectionResult
                 case JsError(errors) =>
                   logger.error(s"Deserialization failed: $errors, response: ${response.json}")

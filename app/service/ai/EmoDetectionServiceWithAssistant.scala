@@ -22,8 +22,9 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
   private lazy val logger = play.api.Logger(getClass)
 
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
+    val startTime = System.nanoTime()
     logger.info(s"V2 Detecting emotion for request: $request")
-    for {
+    val responseFuture = for {
       aiAssistant <- aiAssistantService.fetchAssistantForUser(request.userId, assistantType)
       externalThreadId <- aiAssistantService.createOrFetchThread(request.userId, aiAssistant, assistantType).map(_.externalId)
       aiMessage <- aiAssistantService.addMessageToThread(externalThreadId, request.text)
@@ -32,9 +33,21 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
       _ <- aiAssistantService.pollThreadRunUntilComplete(externalThreadId, threadRunInitial.id)
       responseAiMessage <- aiAssistantService.fetchLastMessageByAssistantForThreadOlderThan(aiMessage)
     } yield {
-      logger.info(s"Response from AI: $responseAiMessage")
       parseAiResponse(responseAiMessage.message)
     }
+    responseFuture.onComplete {
+      case scala.util.Success(_) =>
+        logger.info(s"Successfully detected emotion for request using V2, userId: ${request.userId}")
+      case scala.util.Failure(e) =>
+        logger.error(s"Failed to detect emotion for request using V2, userId: ${request.userId}", e)
+    }
+    responseFuture.andThen {
+      case _ =>
+        val endTime = System.nanoTime()
+        val elapsedTime = (endTime - startTime) / 1e9d
+        logger.info(s"Total elapsed time for detectEmotion V2: $elapsedTime seconds")
+    }
+    responseFuture
   }
 
   private def parseAiResponse(message: String) = {

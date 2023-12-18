@@ -20,8 +20,6 @@ trait AiAssistantService {
 
   def createOrFetchThread(userId: Long, aiAssistant: AiAssistant, threadType: String): Future[AiThread]
 
-  def fetchAllMessagesForThread(externalThreadId: String): Future[List[AiMessage]]
-
   def fetchLastMessageByAssistantForThreadOlderThan(questionMessage: AiMessage): Future[AiMessage]
 
   def addMessageToThread(externalThreadId: String, message: String): Future[AiMessage]
@@ -106,16 +104,15 @@ class ChatGptAiAssistantServiceImpl @Inject()(aiDbService: AiDbService, userInfo
     }
   }
 
-  override def fetchAllMessagesForThread(externalThreadId: String): Future[List[AiMessage]] = ???
-
   override def fetchLastMessageByAssistantForThreadOlderThan(questionMessage: AiMessage): Future[AiMessage] = {
     logger.info(s"Fetching last message by assistant for thread ${questionMessage.externalThreadId}")
     val path: String = s"/v1/threads/${questionMessage.externalThreadId}/messages?limit=1"
     val response = apiService.makeApiGetCall[ChatGptResponseMessages](path)
 
     response.onComplete {
-      case scala.util.Success(value) => logger.info(s"Successfully fetched last message by assistant for thread" +
-        s" ${questionMessage.externalThreadId}, response: $value")
+      case scala.util.Success(value) =>
+        logger.info(s"Successfully fetched last message by assistant for thread" +
+        s" ${questionMessage.externalThreadId}")
       case scala.util.Failure(exception) => logger.error(s"Failed to fetch last message by assistant for thread" +
         s" ${questionMessage.externalThreadId}", exception)
     }
@@ -140,7 +137,7 @@ class ChatGptAiAssistantServiceImpl @Inject()(aiDbService: AiDbService, userInfo
   }
 
   override def makeRunInstructionsForUser(userId: Long): Future[Option[String]] = {
-    val perRunInstructions = Option(config.get[String]("openai.systemPromt"))
+    val perRunInstructions = None
     logger.info(s"Making per run instructions for user $userId V2")
     Future.successful(perRunInstructions)
   }
@@ -166,48 +163,42 @@ class ChatGptAiAssistantServiceImpl @Inject()(aiDbService: AiDbService, userInfo
   import akka.stream.scaladsl.{RestartSource, Sink}
   import scala.concurrent.duration._
 
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.{RestartSource, Sink, Source}
-import akka.stream.RestartSettings
-import scala.concurrent.duration._
+  import akka.actor.ActorSystem
+  import akka.stream.scaladsl.{RestartSource, Sink, Source}
+  import akka.stream.RestartSettings
+  import scala.concurrent.duration._
 
-override def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ChatGptThreadRunResponse] = {
-  val initialInterval = 5.seconds
-  val initialCount = 6
-  val minBackoff = 5.seconds
-  val maxBackoff = 30.seconds
-  val randomFactor = 0.2
+  override def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ChatGptThreadRunResponse] = {
+    val initialInterval = 5.seconds
+    val initialCount = 6
+    val minBackoff = 5.seconds
+    val maxBackoff = 30.seconds
+    val randomFactor = 0.2
 
-  implicit val actorSystem: ActorSystem = system
+    implicit val actorSystem: ActorSystem = system
 
-  val settings = RestartSettings(minBackoff, maxBackoff, randomFactor)
-  val startTime = System.nanoTime()
+    val settings = RestartSettings(minBackoff, maxBackoff, randomFactor)
 
-  val initialSource = Source.tick(initialInterval, initialInterval, NotUsed).take(initialCount).mapAsync(1) { _ =>
-    val path: String = s"/v1/threads/$externalThreadId/runs/$threadRunId"
-    apiService.makeApiGetCall[ChatGptThreadRunResponse](path)
-  }
-
-  val backoffSource = RestartSource.withBackoff(settings) { () =>
-    Source.future {
+    val initialSource = Source.tick(initialInterval, initialInterval, NotUsed).take(initialCount).mapAsync(1) { _ =>
       val path: String = s"/v1/threads/$externalThreadId/runs/$threadRunId"
       apiService.makeApiGetCall[ChatGptThreadRunResponse](path)
     }
-  }
 
-  val source = initialSource.concat(backoffSource)
-
-  source.takeWhile(out => {
-    logger.info(s"Polling thread run for thread $externalThreadId, runId: $threadRunId, status: ${out.status}")
-    out.status match {
-      case "completed" => false
-      case _ => true
+    val backoffSource = RestartSource.withBackoff(settings) { () =>
+      Source.future {
+        val path: String = s"/v1/threads/$externalThreadId/runs/$threadRunId"
+        apiService.makeApiGetCall[ChatGptThreadRunResponse](path)
+      }
     }
-  }, inclusive = false).runWith(Sink.last).map { result =>
-    val endTime = System.nanoTime()
-    val elapsedTime = (endTime - startTime) / 1e9d
-    logger.info(s"Total elapsed time for polling: $elapsedTime seconds, thread $externalThreadId, runId: $threadRunId")
-    result
+
+    val source = initialSource.concat(backoffSource)
+
+    source.takeWhile(out => {
+      logger.info(s"Polling thread run for thread $externalThreadId, runId: $threadRunId, status: ${out.status}")
+      out.status match {
+        case "completed" => false
+        case _ => true
+      }
+    }, inclusive = false).runWith(Sink.last)
   }
-}
 }

@@ -17,7 +17,7 @@ trait AiDbService {
 
   def deleteAiAssistantByExternalId(externalId: String): Future[Boolean]
 
-  def saveAiResponseAsync(userId: Long, response: JsValue): Future[Option[Long]]
+  def saveAiResponse(userId: Long, response: JsValue): Future[Option[Long]]
   def saveAiAssistantAsync(aiAssistant: AiAssistant): Future[Option[Long]]
 
   def fetchAiAssistantByExternalId(externalId: String): Future[Option[AiAssistant]]
@@ -35,14 +35,14 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
 
   private lazy val logger = play.api.Logger(getClass)
   private def insert(aiResponse: AiDbObj): Option[Long] = {
-    logger.info( s"inserting AiResponse: $aiResponse")
+    logger.info( s"inserting AiResponse for userId: ${aiResponse.userId}")
     databaseExecutionContext.withConnection({ implicit connection =>
       aiDao.insert(aiResponse)
     })
     None
   }
 
-  override def saveAiResponseAsync(userId: Long, response: JsValue): Future[Option[Long]] = {
+  override def saveAiResponse(userId: Long, response: JsValue): Future[Option[Long]] = {
     val idFut: Future[Option[Long]] = Future(insert(
       AiDbObj(None, Json.stringify(response), userId, None))
     )

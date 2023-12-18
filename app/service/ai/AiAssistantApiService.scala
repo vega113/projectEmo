@@ -12,14 +12,14 @@ import scala.util.Try
 
 @ImplementedBy(classOf[AiAssistantApiServiceImpl])
 trait AiAssistantApiService {
-  def makeApiGetCall[RespType : Reads](path: String)(implicit ec: ExecutionContext): Future[RespType]
+  def makeApiGetCall[RespType : Reads](path: String, userId: Option[Long] = None)(implicit ec: ExecutionContext): Future[RespType]
 
   def makeApiPostCall[ReqType : Writes, RespType : Reads](path: String, request: ReqType)(implicit ec: ExecutionContext): Future[RespType]
   def makeApiPostCall[RespType : Reads](path: String)(implicit ec: ExecutionContext): Future[RespType]
 
   def makeApiDeleteCall[RespType : Reads](path: String)(implicit executionContext: ExecutionContext): Future[RespType]
 }
-class AiAssistantApiServiceImpl @Inject()(ws: WSClient, config: Configuration)
+class AiAssistantApiServiceImpl @Inject()(ws: WSClient, config: Configuration, aiService: AiDbService)
                                          (implicit ec: ExecutionContext) extends AiAssistantApiService {
 
   private lazy val logger = play.api.Logger(getClass)
@@ -97,7 +97,7 @@ class AiAssistantApiServiceImpl @Inject()(ws: WSClient, config: Configuration)
     )
   }
 
-  override def makeApiGetCall[RespType: Reads](path: String)(implicit ec: ExecutionContext): Future[RespType] = {
+  override def makeApiGetCall[RespType: Reads](path: String, userId: Option[Long] = None)(implicit ec: ExecutionContext): Future[RespType] = {
     val headers = createHeaders(apiKey)
     val urlStr = s"$baseUrl$path"
     logger.info(s"Making API GET call with timeout: $timeout, url: $urlStr")
@@ -111,7 +111,10 @@ class AiAssistantApiServiceImpl @Inject()(ws: WSClient, config: Configuration)
             Try {
               response.json.validate[RespType] match {
                 case JsSuccess(result, _) =>
-                  logger.info(s"Deserialization successful: $result")
+                  logger.trace(s"Deserialization successful: $result")
+                  userId.foreach {
+                    aiService.saveAiResponse(_, response.json)
+                  }
                   result
                 case JsError(errors) =>
                   logger.error(s"Deserialization failed: $errors, response: ${response.json}")

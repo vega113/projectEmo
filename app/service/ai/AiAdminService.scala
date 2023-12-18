@@ -17,8 +17,6 @@ import scala.language.postfixOps
 trait AiAdminService {
   def createAssistant(emoRequest: EmoCreateAssistantRequest): Future[AiAssistant]
 
-  def modifyAssistant(request: ChatGptCreateAssistantRequest): Future[AiAssistant]
-
   def deleteAssistantByExternalId(externalId: String): Future[ChatGptDeleteAssistantResponse]
 }
 
@@ -42,7 +40,7 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
     response.onComplete{
       case scala.util.Success(value) =>
         logger.info(s"Successfully created assistant: $value")
-        aiService.saveAiResponseAsync(1, Json.toJson(value))
+        aiService.saveAiResponse(1, Json.toJson(value))
       case scala.util.Failure(exception) => logger.error(s"Failed to create assistant: $exception")
     }
     val aiAssistant: Future[AiAssistant] = response.map(_.toAiAssistant).map(_.copy(isDefault = emoRequest.isDefault,
@@ -56,8 +54,6 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
     aiAssistant
   }
 
-  override def modifyAssistant(request: ChatGptCreateAssistantRequest): Future[AiAssistant] = ???
-
   override def deleteAssistantByExternalId(externalId: String): Future[ChatGptDeleteAssistantResponse] = {
     logger.info(s"Deleting assistant with external id: $externalId")
 
@@ -69,7 +65,7 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
       case scala.util.Success(value) =>
         logger.info(s"Successfully deleted assistant: $value")
         aiService.deleteAiAssistantByExternalId(externalId)
-        aiService.saveAiResponseAsync(1, Json.toJson(value))
+        aiService.saveAiResponse(1, Json.toJson(value))
       case scala.util.Failure(exception) => logger.error(s"Failed to delete assistant: $exception")
     }
     response
