@@ -112,9 +112,6 @@ class AiAssistantApiServiceImpl @Inject()(ws: WSClient, config: Configuration, a
               response.json.validate[RespType] match {
                 case JsSuccess(result, _) =>
                   logger.trace(s"Deserialization successful: $result")
-                  userId.foreach {
-                    aiService.saveAiResponse(_, response.json)
-                  }
                   result
                 case JsError(errors) =>
                   logger.error(s"Deserialization failed: $errors, response: ${response.json}")

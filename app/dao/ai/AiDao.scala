@@ -123,11 +123,12 @@ class AiDao {
   def insert(response: AiDbObj)(implicit connection: Connection): Option[Long] = {
     SQL(
       """
-        |INSERT INTO ai_responses (response, user_id)
-        |VALUES ({response}, {userId})
+        |INSERT INTO ai_responses (response, user_id, original_text, tag, elapsed_time)
+        |VALUES ({response}, {userId}, {originalText}, {tag}, {elapsedTime})
         |""".stripMargin)
       .on(
-        "response" -> response.response, "userId" -> response.userId
+        "response" -> response.response, "userId" -> response.userId, "originalText" -> response.originalText,
+        "tag" -> response.tag, "elapsedTime" -> response.elapsedTime
       ).executeInsert()
   }
 }
