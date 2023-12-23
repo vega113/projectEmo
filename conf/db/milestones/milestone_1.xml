@@ -717,4 +717,27 @@
         <renameTable oldTableName="ai_thread" newTableName="ai_threads"/>
     </changeSet>
 
+    <changeSet id="add_original_text_to_ai_responses_table" author="username">
+        <addColumn tableName="ai_responses">
+            <column name="original_text" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_tag_to_ai_responses_table" author="vega">
+        <addColumn tableName="ai_responses">
+            <column name="tag" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_elapsed_time_to_ai_responses_table" author="vega">
+        <addColumn tableName="ai_responses">
+            <column name="elapsed_time" type="double">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

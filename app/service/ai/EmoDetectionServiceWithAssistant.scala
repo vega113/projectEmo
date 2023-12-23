@@ -8,6 +8,7 @@ import service.model.DetectEmotionRequest
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Success
 
 @ImplementedBy(classOf[EmoDetectionServiceWithAssistantImpl])
 trait EmoDetectionServiceWithAssistant {
@@ -16,6 +17,7 @@ trait EmoDetectionServiceWithAssistant {
 
 class EmoDetectionServiceWithAssistantImpl @Inject()(
                                                       aiAssistantService: AiAssistantService,
+                                                      aiDbService: AiDbService
                                                     ) extends EmoDetectionServiceWithAssistant {
   private val assistantType = "EmoDetection"
 
@@ -24,7 +26,7 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
     val startTime = System.nanoTime()
     logger.info(s"V2 Detecting emotion for request: $request")
-    val responseFuture = for {
+    val responseFuture: Future[EmotionDetectionResult] = for {
       aiAssistant <- aiAssistantService.fetchAssistantForUser(request.userId, assistantType)
       externalThreadId <- aiAssistantService.createOrFetchThread(request.userId, aiAssistant, assistantType).map(_.externalId)
       aiMessage <- aiAssistantService.addMessageToThread(externalThreadId, request.text)
@@ -42,10 +44,12 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
         logger.error(s"Failed to detect emotion for request using V2, userId: ${request.userId}", e)
     }
     responseFuture.andThen {
-      case _ =>
+      case Success(x) =>
         val endTime = System.nanoTime()
         val elapsedTime = (endTime - startTime) / 1e9d
         logger.info(s"Total elapsed time for detectEmotion V2: $elapsedTime seconds")
+        aiDbService.saveAiResponse(request.userId, EmotionDetectionResult.emotionDetectionResultFormat.writes(x),
+          Option(request.text), Option("emo detection v2"), Option(elapsedTime))
     }
     responseFuture
   }

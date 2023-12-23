@@ -40,7 +40,7 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
     response.onComplete{
       case scala.util.Success(value) =>
         logger.info(s"Successfully created assistant: $value")
-        aiService.saveAiResponse(1, Json.toJson(value))
+        aiService.saveAiResponse(1, Json.toJson(value), Option(emoRequest.instructions), Option("createAssistant"))
       case scala.util.Failure(exception) => logger.error(s"Failed to create assistant: $exception")
     }
     val aiAssistant: Future[AiAssistant] = response.map(_.toAiAssistant).map(_.copy(isDefault = emoRequest.isDefault,
@@ -65,7 +65,7 @@ class AiAdminServiceImpl @Inject() (aiService: AiDbService, config: Configuratio
       case scala.util.Success(value) =>
         logger.info(s"Successfully deleted assistant: $value")
         aiService.deleteAiAssistantByExternalId(externalId)
-        aiService.saveAiResponse(1, Json.toJson(value))
+        aiService.saveAiResponse(1, Json.toJson(value), Option("delete assistant"))
       case scala.util.Failure(exception) => logger.error(s"Failed to delete assistant: $exception")
     }
     response

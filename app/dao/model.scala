@@ -187,7 +187,8 @@ object model {
                                   )
 
 
-  case class AiDbObj(id: Option[String], response: String, userId: Long, created: Option[LocalDateTime])
+  case class AiDbObj(id: Option[String], response: String, userId: Long, originalText: Option[String],
+                     tag: Option[String], elapsedTime: Option[Double], created: Option[LocalDateTime])
 
 
   object User {
@@ -461,9 +462,12 @@ object model {
       get[Option[String]]("id") ~
         str("response") ~
         get[Long]("user_id") ~
+        get[Option[String]]("original_text") ~
+        get[Option[String]]("tag") ~
+        get[Option[Double]]("elapsed_time") ~
         get[Option[LocalDateTime]]("created") map {
-        case id ~ response ~ userId ~ created =>
-          AiDbObj(id, response, userId, created)
+        case id ~ response ~ userId ~ originalText ~ tag ~ elapsedTime ~ created =>
+          AiDbObj(id, response, userId, originalText, tag, elapsedTime, created)
       }
     }
   }

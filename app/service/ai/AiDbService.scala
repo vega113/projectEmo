@@ -17,7 +17,11 @@ trait AiDbService {
 
   def deleteAiAssistantByExternalId(externalId: String): Future[Boolean]
 
-  def saveAiResponse(userId: Long, response: JsValue): Future[Option[Long]]
+  def saveAiResponse(userId: Long, response: JsValue,
+                     originalText: Option[String] = None,
+                     tag: Option[String] = None,
+                     elapsedTime: Option[Double] = None,
+                    ): Future[Option[Long]]
   def saveAiAssistantAsync(aiAssistant: AiAssistant): Future[Option[Long]]
 
   def fetchAiAssistantByExternalId(externalId: String): Future[Option[AiAssistant]]
@@ -42,9 +46,13 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
     None
   }
 
-  override def saveAiResponse(userId: Long, response: JsValue): Future[Option[Long]] = {
+  override def saveAiResponse(userId: Long, response: JsValue,
+                              originalText: Option[String] = None,
+                              tag: Option[String] = None,
+                              elapsedTime: Option[Double] = None,
+                             ): Future[Option[Long]] = {
     val idFut: Future[Option[Long]] = Future(insert(
-      AiDbObj(None, Json.stringify(response), userId, None))
+      AiDbObj(None, Json.stringify(response), userId, originalText, tag, elapsedTime, None))
     )
     idFut.onComplete {
       case scala.util.Success(_) => logger.info(s"Successfully saved AI response for user: $userId")
