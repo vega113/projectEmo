@@ -39,7 +39,7 @@ class NoteController @Inject()(cc: ControllerComponents,
   }
 
   def detectEmotion(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
-    logger.info("Detecting emotion")
+    logger.info("V1 Detecting emotion")
     token.body.validate[Note].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
@@ -52,8 +52,8 @@ class NoteController @Inject()(cc: ControllerComponents,
           Ok(Json.toJson(resp))
         }.recover {
           case e: Exception =>
-            logger.error(s"Failed to detect emotion: $e", e)
-            InternalServerError(Json.obj("message" -> "Failed to detect emotion"))
+            logger.error(s"V1 Failed to detect emotion: $e", e)
+            InternalServerError(Json.obj("message" -> "V1 Failed to detect emotion"))
         }
       }
     )
