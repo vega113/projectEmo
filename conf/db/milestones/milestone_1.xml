@@ -740,4 +740,16 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="add_ideas_to_triggers_table" author="vega">
+        <insert tableName="triggers">
+            <column name="trigger_name" value="Ideas"/>
+            <column name="description" value="Ideas definition"/>
+        </insert>
+    </changeSet>
+    <changeSet id="update_description_for_ideas_trigger" author="vega">
+        <update tableName="triggers">
+            <column name="description" value="Ideas"/>
+            <where>trigger_name='Ideas'</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>
