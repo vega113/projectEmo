@@ -80,7 +80,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
               private dateService: DateService) {
     this.emotionForm = this.fb.group({
       emotionType: [''],
-      intensity: [1],
+      intensity: [0],
       emotion: [''],
       trigger: [''],
       subEmotion: [''],

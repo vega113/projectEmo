@@ -44,6 +44,8 @@
               <button mat-button color="primary" type="button" (click)="skipToManualEntry()">Enter manually</button>
             </mat-action-row>
           </div>
+
+          <app-note-form [emotionForm]="emotionForm"></app-note-form>
         </mat-expansion-panel>
 
         <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
