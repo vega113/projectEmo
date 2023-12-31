@@ -148,4 +148,6 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
             duration: this.snackBarDuration,
         });
     }
+
+    protected readonly alert = alert;
 }

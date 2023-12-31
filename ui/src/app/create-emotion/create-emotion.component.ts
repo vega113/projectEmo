@@ -4,7 +4,7 @@ import {
   QueryList,
   ViewChildren
 } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {EmotionCacheService} from '../services/emotion-cache.service';
@@ -49,7 +49,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
 
   step = 0;
 
-  maxNoteLength = 1000;
+  maxNoteLength = 2000; // TODO: Should be fetched from the backend
 
   isDetectingEmotionWithAI: boolean = false;
   isSavingEmotionRecord: boolean = false;
@@ -92,6 +92,7 @@ export class CreateEmotionComponent implements OnInit, AfterViewInit, OnDestroy 
       textTitle: [''],
       description: [''],
       suggestion: [''],
+      emotionTime: [''],
     });
   }
 

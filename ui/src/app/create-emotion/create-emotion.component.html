@@ -8,51 +8,43 @@
     <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
 
       <mat-accordion class="create-emotion-accordion" multi>
-        <mat-expansion-panel (opened)="setStep(0)" hideToggle>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Date
-          </mat-panel-title>
-          <mat-panel-description>
-            Choose a date
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-        <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
-      </mat-expansion-panel>
-
-      <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Emotion Note
-          </mat-panel-title>
-          <mat-panel-description>
-            Write a note to describe this emotion.
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-        <div class="note-field-wrapper">
-          <label for="note">Add a note (max {{maxNoteLength}} chars):</label>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Note</mat-label>
-            <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength" [placeholder]="placeHolderText"></textarea>
-            <mat-hint align="end">{{emotionForm.get('emotionNote')?.value.length || 0}}/{{maxNoteLength}}</mat-hint>
-          </mat-form-field>
-        </div>
-        <mat-action-row>
-          <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid || isSavingEmotionRecord">
-            <div class="button-content">
-              <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>
-              <span>Save</span>
+        <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Write a note
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div>
+            <div class="note-field-wrapper">
+              <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
+              <label for="note">Add a note (max {{ maxNoteLength }} chars):</label>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Note</mat-label>
+                <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength"
+                          [placeholder]="placeHolderText"></textarea>
+                <mat-hint align="end">{{ emotionForm.get('emotionNote')?.value.length || 0 }}/{{ maxNoteLength }}
+                </mat-hint>
+              </mat-form-field>
             </div>
-          </button>
-          <button mat-button color="primary"  type="button" (click)="detectEmotions()" [disabled]="isDetectingEmotionWithAI">
-            <div class="button-content">
-              <mat-spinner *ngIf="isDetectingEmotionWithAI" diameter="24"></mat-spinner>
-              <span>Analyze Emotion with AI</span>
-            </div>
-          </button>
-          <button mat-button color="primary"  type="button" (click)="skipToManualEntry()">Enter manually</button>
-        </mat-action-row>
-      </mat-expansion-panel>
+            <mat-action-row>
+              <button mat-button color="primary" type="submit"
+                      [disabled]="emotionForm.invalid || isSavingEmotionRecord">
+                <div class="button-content">
+                  <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>
+                  <span>Save</span>
+                </div>
+              </button>
+              <button mat-button color="primary" type="button" (click)="detectEmotions()"
+                      [disabled]="isDetectingEmotionWithAI">
+                <div class="button-content">
+                  <mat-spinner *ngIf="isDetectingEmotionWithAI" diameter="24"></mat-spinner>
+                  <span>Analyze Emotion with AI</span>
+                </div>
+              </button>
+              <button mat-button color="primary" type="button" (click)="skipToManualEntry()">Enter manually</button>
+            </mat-action-row>
+          </div>
+        </mat-expansion-panel>
 
         <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
           <mat-expansion-panel-header>
@@ -64,19 +56,20 @@
             <mat-label>Emotion Category</mat-label>
             <mat-select formControlName="emotionType">
               <mat-option #emotionTypeOptions *ngFor="let emotionType of makeEmotionTypesList()"
-                          [value]="emotionType">{{ emotionType }}</mat-option>
+                          [value]="emotionType">{{ emotionType }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
 
           <div class="intensity-container">
             <label class="intensity-label">Emotion Intensity</label>
             <mat-slider
-                    discrete
-                    showTickMarks
-                    min="0"
-                    max="5"
-                    step="1"
-                    [color]="emotionForm.get('emotionType') ? getSliderColor(emotionForm.get('emotionType')?.value) : undefined"
+              discrete
+              showTickMarks
+              min="0"
+              max="5"
+              step="1"
+              [color]="emotionForm.get('emotionType') ? getSliderColor(emotionForm.get('emotionType')?.value) : undefined"
             >
               <input matSliderThumb formControlName="intensity">
             </mat-slider>
@@ -86,7 +79,8 @@
 
             <mat-select formControlName="emotion">
               <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
-                          [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}</mat-option>
+                          [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
 
@@ -94,7 +88,8 @@
             <mat-label>Associated Emotion</mat-label>
             <mat-select formControlName="subEmotion">
               <mat-option #subEmotionOptions *ngFor="let subEmotion of makeSubEmotionsList()"
-                          [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}</mat-option>
+                          [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
 
@@ -102,11 +97,12 @@
             <mat-label>Reason</mat-label>
             <mat-select formControlName="trigger">
               <mat-option #triggerOptions *ngFor="let trigger of makeTriggersList()"
-                          [value]="trigger">{{ trigger.description }}</mat-option>
+                          [value]="trigger">{{ trigger.description }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
           <mat-action-row>
-            <button mat-button color="primary"  type="button" (click)="backToNoteEntry()">Back to Note</button>
+            <button mat-button color="primary" type="button" (click)="backToNoteEntry()">Back to Note</button>
             <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid || isSavingEmotionRecord">
               <div class="button-content">
                 <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>

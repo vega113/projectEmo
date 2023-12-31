@@ -35,7 +35,7 @@
         </mat-card-content>
       </mat-card>
 
-      <mat-form-field class="example-chip-list">
+      <mat-form-field *ngIf="emotion.tags[0]" class="example-chip-list">
         <mat-label>Note Tags</mat-label>
         <mat-chip-grid #chipGrid>
           <mat-chip-row *ngFor="let tag of emotion.tags"
