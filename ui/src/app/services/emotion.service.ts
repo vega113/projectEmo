@@ -148,6 +148,7 @@ export class EmotionService {
 
     updateEmotionRecord(emotionRecord: EmotionRecord): Observable<EmotionRecord> {
       const headers = this.authService.getAuthorizationHeader();
+      headers.set('Content-Type', 'application/json');
       return this.http.put<EmotionRecord>(`${environment.baseUrl}/emotionRecord`, emotionRecord, {headers}).
       pipe(catchError(resp => this.errorService.handleError(resp)))
     }
