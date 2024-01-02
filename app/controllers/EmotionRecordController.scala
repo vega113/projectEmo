@@ -92,10 +92,9 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
-        emotionRecordService.update(emotionRecord.copy(userId = Option(token.user.userId))).map {
-          case 1 => Ok(Json.toJson(emotionRecord))
-          case _ => NotFound
-        }
+        for {
+          updated <- emotionRecordService.update(emotionRecord)
+        } yield Ok(Json.toJson(updated))
       }
     )
   }
@@ -128,7 +127,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       logger.info(s"entering findRecordsByDayByUserIdForMonth monthStart: $monthStart, monthEnd: $monthEnd")
       Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
         case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
-          from.toInstant, to.toInstant).map(emotionRecordService.groupRecordsByDate).
+            from.toInstant, to.toInstant).map(emotionRecordService.groupRecordsByDate).
           map(emotionRecordService.generateLineChartTrendDataSetForEmotionTypesTriggers).
           map(emotionRecords => Ok(Json.toJson(emotionRecords)))
         case Failure(_) =>

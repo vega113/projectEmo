@@ -30,7 +30,7 @@
             </span>
           </div>
           <div>
-            <strong>Created:</strong> {{  this.dateService.formatDateFromDb( emotion.created!) }}
+            <strong>Created:</strong> {{  this.formatDateFromDb() }}
           </div>
         </mat-card-content>
       </mat-card>
@@ -68,6 +68,10 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
             {{noteElem.text}}
+
+            <mat-action-row>
+              <button mat-button color="primary" type="button" (click)="openAnalyzeManuallyDialog()">Analyze Emotion Manually</button>
+            </mat-action-row>
           </mat-expansion-panel>
 
           <mat-expansion-panel *ngIf="noteElem.description">

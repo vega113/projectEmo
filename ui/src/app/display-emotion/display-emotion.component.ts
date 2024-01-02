@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
 import { EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
@@ -6,6 +6,9 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {DateService} from "../services/date.service";
 import {MatChipInputEvent} from "@angular/material/chips";
 import { Router } from '@angular/router';
+import {MatDialog} from "@angular/material/dialog";
+import {EmotionAnalyzerComponent} from "../emotion-analyzer/emotion-analyzer.component";
+import {formatDate} from "@angular/common";
 
 
 @Component({
@@ -20,7 +23,8 @@ export class DisplayEmotionComponent {
               private emotionStateService: EmotionStateService,
               private snackBar: MatSnackBar,
               public dateService: DateService,
-              private router: Router) {
+              private router: Router,
+              public dialog: MatDialog) {
   }
 
   noteTemplates: NoteTemplate[] | null = null;
@@ -41,6 +45,18 @@ export class DisplayEmotionComponent {
 
   separatorKeysCodes: number[] = [13, 188];
   addOnBlur: any = true;
+  openAnalyzeManuallyDialog() {
+    console.log('Open analyze manually dialog', this.emotion );
+    const dialogRef = this.dialog.open(EmotionAnalyzerComponent, {
+      width: '45%', height: '45%', data: { emotionRecord: this.emotion }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        alert(`The dialog was closed with result: ${result}`);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -112,5 +128,11 @@ export class DisplayEmotionComponent {
           });
         }
       });
+  }
+
+  protected readonly formatDate = formatDate;
+
+  formatDateFromDb() {
+    return this.dateService.formatDateFromDb( this.emotion?.created!)
   }
 }

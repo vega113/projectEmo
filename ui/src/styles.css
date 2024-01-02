@@ -23,3 +23,9 @@ min-height: 300px;
   align-items: flex-start;
   margin-bottom: 1rem;
 }
+
+.success-snackbar {
+  color: #fff;
+  background-color: #4caf50;
+  padding: 10px;
+}

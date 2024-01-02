@@ -23,7 +23,7 @@ trait EmotionRecordService {
 
   def insert(emotionRecord: EmotionRecord): Future[Option[Long]]
 
-  def update(emotionRecord: EmotionRecord): Future[Int]
+  def update(emotionRecord: EmotionRecord): Future[EmotionRecord]
 
   def delete(id: Long, userId: Long): Future[Boolean]
 
@@ -181,12 +181,18 @@ class EmotionRecordServiceImpl @Inject()(
     }))
   }
 
-  override def update(emotionRecord: EmotionRecord): Future[Int] = {
-    Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
+  override def update(emotionRecord: EmotionRecord): Future[EmotionRecord] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
       val count = emotionRecordDao.update(emotionRecord)
-      logger.info(s"Updated emotion record: ${emotionRecord.id}, userId ${emotionRecord.userId}, count: $count")
-      count
-    }))
+      if (count > 0) {
+        logger.info(s"Updated emotion record: ${emotionRecord.id}, userId ${emotionRecord.userId}, count: $count")
+        Future.successful(emotionRecordDao.findByIdForUser(emotionRecord.id, emotionRecord.userId).getOrElse(
+          throw new Exception(s"Failed to find emotion record after update: $emotionRecord")))
+      } else {
+        logger.error(s"Failed to update emotion record: $emotionRecord")
+        Future.failed(new Exception(s"Failed to update emotion record: $emotionRecord"))
+      }
+    })
   }
 
   override def delete(id: Long, userId: Long): Future[Boolean] = {

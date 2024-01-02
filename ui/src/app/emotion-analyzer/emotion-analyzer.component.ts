@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren} from '@angular/core';
+import {Component, EventEmitter, Inject, Input, OnInit, Output, QueryList, ViewChildren} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { EmotionService } from '../services/emotion.service';
 import {
@@ -18,6 +18,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {EmotionCacheService} from "../services/emotion-cache.service";
 import {NoteService} from "../services/note.service";
 import {DateService} from "../services/date.service";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-emotion-analyzer',
@@ -26,7 +27,8 @@ import {DateService} from "../services/date.service";
 })
 export class EmotionAnalyzerComponent implements OnInit {
 
-  @Input()  emotionForm: FormGroup;
+  emotionRecord: EmotionRecord | undefined;
+  emotionForm: FormGroup;
 
   emotionTypes: string[] = [];
 
@@ -36,10 +38,7 @@ export class EmotionAnalyzerComponent implements OnInit {
   @ViewChildren('subEmotionOptions') subEmotionOptions!: QueryList<MatOption>;
   @ViewChildren('triggerOptions') triggerOptions!: QueryList<MatOption>;
 
-  private emotionTypesSubscription!: Subscription;
-  private emotionSelectSubscription!: Subscription;
   private subEmotionSelectSubscription!: Subscription;
-  private triggerSubscription!: Subscription;
   private emotionDetected: EmotionDetectionResult | undefined;
 
   isLoadingEmotionCache: boolean = true;
@@ -56,11 +55,13 @@ export class EmotionAnalyzerComponent implements OnInit {
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
               private authService: AuthService,
               private emotionStateService: EmotionStateService,
-              private router: Router,
               private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
               private noteService: NoteService,
-              private dateService: DateService) {
+              private dateService: DateService,
+              public dialogRef: MatDialogRef<EmotionAnalyzerComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: any
+              ) {
     this.emotionForm = this.fb.group({
       emotionType: [''],
       intensity: [0],
@@ -68,7 +69,6 @@ export class EmotionAnalyzerComponent implements OnInit {
       trigger: [''],
       subEmotion: [''],
       emotionDate: [new Date()],
-      isPublic: [false],
       emotionNote: [''],
       tags: [[]],
       todos: [[]],
@@ -77,6 +77,8 @@ export class EmotionAnalyzerComponent implements OnInit {
       suggestion: [''],
       emotionTime: [''],
     });
+    this.emotionRecord = data.emotionRecord;
+    this.copyFromInputEmotionRecordToForm();
   }
 
   ngOnInit(): void {
@@ -88,7 +90,17 @@ export class EmotionAnalyzerComponent implements OnInit {
         this.updateEmotionCache();
       }
     });
-    this.emotionForm.controls['intensity'].setValue(1);
+    this.copyToFormFromInputEmotionRecord();
+
+    console.log('Emotion record in EmotionAnalyzerComponent: ', this.emotionRecord);
+  }
+
+  private copyToFormFromInputEmotionRecord() {
+    this.emotionForm.controls['intensity'].setValue(this.emotionRecord?.intensity);
+    this.emotionForm.controls['emotionType'].setValue(this.emotionRecord?.emotionType);
+    this.emotionForm.controls['emotion'].setValue(this.emotionRecord?.emotion);
+    this.emotionForm.controls['subEmotion'].setValue(this.emotionRecord?.subEmotions[0]?.subEmotionId);
+    this.emotionForm.controls['trigger'].setValue(this.emotionRecord?.triggers[0]?.triggerId);
   }
 
   private updateEmotionCache() {
@@ -109,58 +121,41 @@ export class EmotionAnalyzerComponent implements OnInit {
     });
   }
 
-  convertEmotionFromDataToEmotionRecord(emotionFromData: any): EmotionRecord {
-    const decodedToken = this.authService.fetchDecodedToken();
-    let emotion: any = null;
-    if (emotionFromData.emotion?.emotion?.id) {
-      emotion = {};
-      emotion.id = emotionFromData.emotion.emotion.id;
-    }
+  convertEmotionFromDataToEmotionRecord(emotionFromData: any, inputEmotionRecord: EmotionRecord): EmotionRecord {
     const subEmotions: any[] = [];
     if (emotionFromData.subEmotion?.subEmotionId) {
       subEmotions.push({subEmotionId: emotionFromData.subEmotion.subEmotionId});
     }
+
     const triggers: any[] = [];
     if (emotionFromData.trigger?.triggerId) {
       triggers.push({triggerId: emotionFromData.trigger.triggerId});
     }
-    const notes: any[] = [];
-    if (emotionFromData.emotionNote) {
-      const note: Note = {
-        text: emotionFromData.emotionNote,
-        title: emotionFromData.textTitle,
-        description: emotionFromData.description,
-        suggestion: emotionFromData.suggestion,
-        todos: emotionFromData.todos
-      }
-      notes.push(note);
-    }
-
-    const tags: Tag[] = [];
-    if (emotionFromData.tags) {
-      emotionFromData.tags.forEach((tag: Tag) => {
-        tags.push(tag);
-      });
-    }
 
     return {
-      userId: decodedToken.userId,
-      emotionType: emotionFromData.emotionType ?? "Unknown",
+      id: inputEmotionRecord.id,
+      emotionType: emotionFromData.emotionType,
+      userId: inputEmotionRecord.userId,
+      emotion: {
+        id: emotionFromData.emotion.id,
+      },
       intensity: emotionFromData.intensity,
-      emotion: emotion as Emotion,
-      subEmotions: subEmotions as SubEmotion[],
-      triggers: triggers as Trigger[],
-      notes: notes as Note[],
-      tags: tags as Tag[],
-      created: this.dateService.formatDateToIsoString(emotionFromData.emotionDate)
-    };
+      subEmotions: subEmotions,
+      triggers: triggers,
+      notes: [{
+        id: inputEmotionRecord.notes[0]?.id,
+        text: emotionFromData.emotionNote,
+      }],
+      tags: emotionFromData.tags,
+    }
   }
 
   async onSubmit(): Promise<void> {
     console.log('Submitting emotion record: ', this.isSavingEmotionRecord);
     if (this.emotionForm.valid) {
       const emotionFromData = this.emotionForm.value;
-      const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData);
+      const emotionRecord = this.convertEmotionFromDataToEmotionRecord(emotionFromData,
+        this.emotionRecord!);
       console.log(`Emotion record to be updated: ${JSON.stringify(emotionRecord)}`);
       try {
         this.isSavingEmotionRecord = true;
@@ -170,6 +165,11 @@ export class EmotionAnalyzerComponent implements OnInit {
               console.log('Emotion record updated successfully', response);
               this.emotionStateService.updateNewEmotion(response);
               this.isSavingEmotionRecord = false;
+              this.isSavingEmotionRecord = false;
+              this.snackBar.open('Updated the note with emotion details', 'Close', {
+                duration: 5000,
+                panelClass: ['error-snackbar']
+              });
             },
             error: (error) => {
               console.error('Error updating emotion record', error);
@@ -323,5 +323,25 @@ export class EmotionAnalyzerComponent implements OnInit {
         });
       }
     });
+  }
+
+
+  ngOnDestroy(): void {
+    if (this.subEmotionSelectSubscription) {
+      this.subEmotionSelectSubscription.unsubscribe();
+    }
+  }
+
+  private copyFromInputEmotionRecordToForm() {
+    this.emotionForm.controls['emotionType'].setValue(this.emotionRecord?.emotionType);
+    this.emotionForm.controls['emotion'].setValue(this.emotionRecord?.emotion);
+    if(this.emotionRecord?.subEmotions[0] != null) {
+      this.emotionForm.controls['subEmotion'].setValue(this.emotionRecord?.subEmotions[0].subEmotionId);
+    }
+    if(this.emotionRecord?.triggers[0] != null) {
+      this.emotionForm.controls['trigger'].setValue(this.emotionRecord?.triggers[0].triggerId);
+    }
+    this.emotionForm.controls['intensity'].setValue(this.emotionRecord?.intensity);
+
   }
 }
