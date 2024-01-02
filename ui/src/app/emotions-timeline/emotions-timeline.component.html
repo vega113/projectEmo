@@ -1,68 +1,59 @@
-<button mat-raised-button type="button" color="primary" (click)='alert("hello world")'>
-  Add New Note
-</button>
-<mat-accordion>
-  <mat-expansion-panel expanded>
-    <mat-expansion-panel-header>
-      Timeline
-    </mat-expansion-panel-header>
-    <div *ngIf="isLoading" class="page-loading">
-      <mat-spinner diameter="48"></mat-spinner>
-      <h2>Loading...</h2>
-    </div>
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header > Date </th>
-        <td mat-cell *matCellDef="let record"> {{record.created | date: 'medium'}} </td>
-      </ng-container>
+<div *ngIf="isLoading" class="page-loading">
+  <mat-spinner diameter="48"></mat-spinner>
+  <h2>Loading...</h2>
+</div>
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+  <ng-container matColumnDef="date">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date</th>
+    <td mat-cell *matCellDef="let record"> {{ record.created | date: 'medium' }}</td>
+  </ng-container>
 
-      <ng-container matColumnDef="intensity">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Intensity </th>
-        <td mat-cell *matCellDef="let record">
-          <mat-progress-bar mode="determinate" [value]="record.intensity * 20"
-                            [color]="record.emotionType === 'Positive' ? 'primary' : record.emotionType === 'Neutral'||
+  <ng-container matColumnDef="intensity">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Intensity</th>
+    <td mat-cell *matCellDef="let record">
+      <mat-progress-bar mode="determinate" [value]="record.intensity * 20"
+                        [color]="record.emotionType === 'Positive' ? 'primary' : record.emotionType === 'Neutral'||
                              record.emotionType === 'Unknown'? 'accent' : 'warn'"
-                            [title]="'Intensity: ' + record.intensity">
-          </mat-progress-bar>
-        </td>
-      </ng-container>
+                        [title]="'Intensity: ' + record.intensity">
+      </mat-progress-bar>
+    </td>
+  </ng-container>
 
-      <ng-container matColumnDef="subEmotion">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Sub-Emotion </th>
-        <td mat-cell *matCellDef="let record"> {{record.subEmotions[0]?.subEmotionName}} </td>
-      </ng-container>
+  <ng-container matColumnDef="subEmotion">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Sub-Emotion</th>
+    <td mat-cell *matCellDef="let record"> {{ record.subEmotions[0]?.subEmotionName }}</td>
+  </ng-container>
 
-      <ng-container matColumnDef="noteTitle">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Note Title </th>
-        <td mat-cell *matCellDef="let record"> {{record.notes && record.notes.length > 0 ? record.notes[0].title : ''}} </td>
-      </ng-container>
+  <ng-container matColumnDef="noteTitle">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Note Title</th>
+    <td mat-cell *matCellDef="let record"> {{ record.notes && record.notes.length > 0 ? record.notes[0].title : '' }}
+    </td>
+  </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions </th>
-        <td mat-cell *matCellDef="let record">
-          <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
-            <mat-icon>more_vert</mat-icon>
-          </button>
-          <mat-menu #menu="matMenu">
-            <button mat-menu-item (click)="onDelete(record)">
-              <mat-icon>delete</mat-icon>
-              <span>Delete</span>
-            </button>
-          </mat-menu>
-        </td>
-      </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef> Actions</th>
+    <td mat-cell *matCellDef="let record">
+      <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="onDelete(record)">
+          <mat-icon>delete</mat-icon>
+          <span>Delete</span>
+        </button>
+      </mat-menu>
+    </td>
+  </ng-container>
 
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-          (click)="onRowClicked(row)"
-          (mouseover)="row.hover = true"
-          (mouseleave)="row.hover = false"
-          [ngClass]="{'hovered-row': row.hover}">
-      </tr>
-    </table>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+      (click)="onRowClicked(row)"
+      (mouseover)="row.hover = true"
+      (mouseleave)="row.hover = false"
+      [ngClass]="{'hovered-row': row.hover}">
+  </tr>
+</table>
 
-    <mat-paginator [pageSizeOptions]="[10, 20, 50, 200]"></mat-paginator>
+<mat-paginator [pageSizeOptions]="[10, 20, 50, 200]"></mat-paginator>
 
-  </mat-expansion-panel>
-</mat-accordion>
