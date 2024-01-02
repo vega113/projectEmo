@@ -93,8 +93,9 @@ textarea {
   min-height: 150px; /* You can set this to be as tall as you'd like */
 }
 
-.button-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.note-from {
+  display: block;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+
 }
