@@ -1,4 +1,4 @@
-import {Component, Inject, Input, OnInit, Output, QueryList, ViewChildren} from '@angular/core';
+import {Component, Inject, OnInit, QueryList, ViewChildren} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { EmotionService } from '../services/emotion.service';
 import {

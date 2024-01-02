@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
 import { EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
