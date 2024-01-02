@@ -1,23 +1,19 @@
-import {Component, EventEmitter, Inject, Input, OnInit, Output, QueryList, ViewChildren} from '@angular/core';
+import {Component, Inject, Input, OnInit, Output, QueryList, ViewChildren} from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { EmotionService } from '../services/emotion.service';
 import {
-  Emotion,
   EmotionData,
   EmotionDetectionResult, EmotionFromNoteResult, EmotionRecord, EmotionTypesWithEmotions,
-  EmotionWithSubEmotions, Note, SubEmotion,
-  SubEmotionWrapper, Tag,
+  EmotionWithSubEmotions,
+  SubEmotionWrapper,
   Trigger
 } from "../models/emotion.model";
 import {MatOption, ThemePalette} from "@angular/material/core";
 import {from, Subscription} from "rxjs";
-import {AuthService} from "../services/auth.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import {Router} from "@angular/router";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {EmotionCacheService} from "../services/emotion-cache.service";
 import {NoteService} from "../services/note.service";
-import {DateService} from "../services/date.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 
 @Component({
@@ -53,12 +49,10 @@ export class EmotionAnalyzerComponent implements OnInit {
 
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
-              private authService: AuthService,
               private emotionStateService: EmotionStateService,
               private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
               private noteService: NoteService,
-              private dateService: DateService,
               public dialogRef: MatDialogRef<EmotionAnalyzerComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any
               ) {
@@ -68,7 +62,7 @@ export class EmotionAnalyzerComponent implements OnInit {
       emotion: [''],
       trigger: [''],
       subEmotion: [''],
-      emotionDate: [new Date()],
+      emotionDate: [''],
       emotionNote: [''],
       tags: [[]],
       todos: [[]],
@@ -122,30 +116,19 @@ export class EmotionAnalyzerComponent implements OnInit {
   }
 
   convertEmotionFromDataToEmotionRecord(emotionFromData: any, inputEmotionRecord: EmotionRecord): EmotionRecord {
-    const subEmotions: any[] = [];
-    if (emotionFromData.subEmotion?.subEmotionId) {
-      subEmotions.push({subEmotionId: emotionFromData.subEmotion.subEmotionId});
-    }
-
-    const triggers: any[] = [];
-    if (emotionFromData.trigger?.triggerId) {
-      triggers.push({triggerId: emotionFromData.trigger.triggerId});
-    }
-
     return {
       id: inputEmotionRecord.id,
       emotionType: emotionFromData.emotionType,
       userId: inputEmotionRecord.userId,
       emotion: {
-        id: emotionFromData.emotion.id,
+        id: emotionFromData.emotion.emotion.id,
       },
       intensity: emotionFromData.intensity,
-      subEmotions: subEmotions,
-      triggers: triggers,
-      notes: [{
-        id: inputEmotionRecord.notes[0]?.id,
-        text: emotionFromData.emotionNote,
-      }],
+      subEmotions: [],
+      subEmotionId: emotionFromData.subEmotion?.subEmotionId,
+      triggers: [],
+      triggerId: emotionFromData.trigger?.triggerId,
+      notes: [],
       tags: emotionFromData.tags,
     }
   }
@@ -166,6 +149,7 @@ export class EmotionAnalyzerComponent implements OnInit {
               this.emotionStateService.updateNewEmotion(response);
               this.isSavingEmotionRecord = false;
               this.isSavingEmotionRecord = false;
+              this.dialogRef.close();
               this.snackBar.open('Updated the note with emotion details', 'Close', {
                 duration: 5000,
                 panelClass: ['error-snackbar']
@@ -342,6 +326,10 @@ export class EmotionAnalyzerComponent implements OnInit {
       this.emotionForm.controls['trigger'].setValue(this.emotionRecord?.triggers[0].triggerId);
     }
     this.emotionForm.controls['intensity'].setValue(this.emotionRecord?.intensity);
+  }
 
+  onCancel(): void {
+    this.emotionForm.reset();
+    this.dialogRef.close();
   }
 }

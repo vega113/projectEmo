@@ -1,62 +1,65 @@
-<form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
-<mat-panel-title>
-  Manual Emotion Input
-</mat-panel-title>
-  <mat-form-field>
-    <mat-label>Emotion Category</mat-label>
-    <mat-select formControlName="emotionType">
-      <mat-option #emotionTypeOptions *ngFor="let emotionType of makeEmotionTypesList()"
-                  [value]="emotionType">{{ emotionType }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+<div class="emotion-analyzer">
+  <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
+    <mat-panel-title>
+      Manual Emotion Input
+    </mat-panel-title>
+    <mat-form-field>
+      <mat-label>Emotion Category</mat-label>
+      <mat-select formControlName="emotionType">
+        <mat-option #emotionTypeOptions *ngFor="let emotionType of makeEmotionTypesList()"
+                    [value]="emotionType">{{ emotionType }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <div class="intensity-container">
-    <label class="intensity-label">Emotion Intensity</label>
-    <mat-slider
-      discrete
-      showTickMarks
-      min="0"
-      max="5"
-      step="1"
-      [color]="emotionForm.get('emotionType') ? getSliderColor(emotionForm.get('emotionType')?.value) : undefined"
-    >
-      <input matSliderThumb formControlName="intensity">
-    </mat-slider>
-  </div>
-  <mat-form-field>
-    <mat-label>Main Emotion</mat-label>
+    <div class="intensity-container">
+      <label class="intensity-label">Emotion Intensity</label>
+      <mat-slider
+        discrete
+        showTickMarks
+        min="0"
+        max="5"
+        step="1"
+        [color]="emotionForm.get('emotionType') ? getSliderColor(emotionForm.get('emotionType')?.value) : undefined"
+      >
+        <input matSliderThumb formControlName="intensity">
+      </mat-slider>
+    </div>
+    <mat-form-field>
+      <mat-label>Main Emotion</mat-label>
 
-    <mat-select formControlName="emotion">
-      <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
-                  [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+      <mat-select formControlName="emotion">
+        <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
+                    [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Associated Emotion</mat-label>
-    <mat-select formControlName="subEmotion">
-      <mat-option #subEmotionOptions *ngFor="let subEmotion of makeSubEmotionsList()"
-                  [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+    <mat-form-field>
+      <mat-label>Associated Emotion</mat-label>
+      <mat-select formControlName="subEmotion">
+        <mat-option #subEmotionOptions *ngFor="let subEmotion of makeSubEmotionsList()"
+                    [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Reason</mat-label>
-    <mat-select formControlName="trigger">
-      <mat-option #triggerOptions *ngFor="let trigger of makeTriggersList()"
-                  [value]="trigger">{{ trigger.description }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <mat-action-row>
-    <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid || isSavingEmotionRecord">
-      <div class="button-content">
-        <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>
-        <span>Save</span>
-      </div>
-    </button>
-  </mat-action-row>
-</form>
+    <mat-form-field>
+      <mat-label>Reason</mat-label>
+      <mat-select formControlName="trigger">
+        <mat-option #triggerOptions *ngFor="let trigger of makeTriggersList()"
+                    [value]="trigger">{{ trigger.description }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-action-row>
+      <button mat-button color="primary" type="submit" [disabled]="emotionForm.invalid || isSavingEmotionRecord">
+        <div class="button-content">
+          <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>
+          <span>Save</span>
+        </div>
+      </button>
+      <button mat-button color="warn" type="button" (click)="onCancel()">Cancel</button>
+    </mat-action-row>
+  </form>
+</div>
