@@ -29,7 +29,7 @@
       <mat-label>Main Emotion</mat-label>
 
       <mat-select formControlName="emotion">
-        <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionsList()"
+        <mat-option #emotionOptions *ngFor="let emotionWithSubEmotion of makeEmotionList()"
                     [value]="emotionWithSubEmotion">{{ emotionWithSubEmotion.emotion.emotionName }}
         </mat-option>
       </mat-select>
@@ -37,7 +37,7 @@
 
     <mat-form-field>
       <mat-label>Associated Emotion</mat-label>
-      <mat-select formControlName="subEmotion">
+      <mat-select formControlName="subEmotion" name="">
         <mat-option #subEmotionOptions *ngFor="let subEmotion of makeSubEmotionsList()"
                     [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}
         </mat-option>
@@ -59,7 +59,7 @@
           <span>Save</span>
         </div>
       </button>
-      <button mat-button color="warn" type="button" (click)="onCancel()">Cancel</button>
+      <button mat-button color="primary" type="button" (click)="onCancel()">Cancel</button>
     </mat-action-row>
   </form>
 </div>

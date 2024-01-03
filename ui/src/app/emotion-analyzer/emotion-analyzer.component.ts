@@ -1,4 +1,5 @@
 import {
+  AfterViewChecked,
   AfterViewInit,
   Component,
   Inject,
@@ -30,7 +31,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
   templateUrl: './emotion-analyzer.component.html',
   styleUrls: ['./emotion-analyzer.component.css']
 })
-export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
+export class EmotionAnalyzerComponent implements OnInit {
 
   emotionRecord: EmotionRecord | undefined;
   emotionForm: FormGroup;
@@ -84,9 +85,9 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
     this.emotionRecord = data.emotionRecord;
   }
 
-  ngAfterViewInit(): void {
+  refreshEmotionCache() {
     this.makeEmotionTypesList();
-    this.makeEmotionsList();
+    this.makeEmotionList();
     this.makeSubEmotionsList();
     this.makeTriggersList();
   }
@@ -96,13 +97,14 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
       if (cachedEmotionData) {
         this.emotionCache = cachedEmotionData;
         this.isLoadingEmotionCache = false;
+        console.log('Emotion cache in EmotionAnalyzerComponent: ', this.emotionCache);
+        this.copyFromInputEmotionRecordToForm();
       } else {
+        console.log('Emotion cache not found in EmotionAnalyzerComponent');
         this.updateEmotionCache();
       }
-      this.copyFromInputEmotionRecordToForm();
       console.log('Emotion record in EmotionAnalyzerComponent: ', this.emotionRecord);
     });
-
   }
 
   private updateEmotionCache() {
@@ -117,8 +119,10 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
         this.snackBar.open('Failed to fetch emotion cache', 'Close', {});
       },
       complete: () => {
+        this.copyFromInputEmotionRecordToForm()
         console.log('Emotion cache fetch completed');
         this.isLoadingEmotionCache = false;
+
       }
     });
   }
@@ -189,7 +193,7 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  makeEmotionsList(): EmotionWithSubEmotions[] {
+  makeEmotionList(): EmotionWithSubEmotions[] {
     if (this.emotionCache && this.emotionTypesWithEmotions) {
       const selectedEmotionType = this.emotionForm.get('emotionType')?.value;
       const emotionTypeObject = this.emotionTypesWithEmotions.find(emotionTypeObject => emotionTypeObject.emotionType === selectedEmotionType);
@@ -200,6 +204,7 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
         return [];
       }
     } else {
+      console.log('Emotion cache not found', this.emotionCache);
       return [];
     }
   }
@@ -225,6 +230,7 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
     }
   }
 
+
   handleNoteSubmission(emotionFromResult: EmotionFromNoteResult) {
     console.log('Emotion detected from note', emotionFromResult);
 
@@ -237,17 +243,35 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
 
       this.emotionForm.controls['emotionType'].setValue(this.emotionDetected.emotionType);
       this.emotionForm.controls['intensity'].setValue(this.emotionDetected.intensity);
-      this.emotionForm.controls['emotion'].setValue(this.makeEmotionsList().
-      find(emotion => emotion.emotion.id === this.emotionDetected?.mainEmotionId));
+
+
+
+      this.setFormControlValue(
+        this.makeEmotionList(),
+        'emotion',
+        (emotion: EmotionWithSubEmotions) => emotion.emotion.id,
+        this.emotionDetected?.mainEmotionId
+      )
+
+      // Promise.resolve().then(() =>  this.setFormControlValue(
+      //   this.makeSubEmotionsList(),
+      //   'subEmotion',
+      //   (subEmotion: SubEmotionWrapper) => subEmotion.subEmotion.subEmotionId,
+      //   this.emotionDetected?.subEmotionId
+      // ));
+
+
 
       this.emotionTypeOptions?.changes?.subscribe((options: QueryList<MatOption>) => {
-        console.log("subEmotionOptions changed", options);
+        console.log("emotionTypeOptions changed", options);
         this.emotionOptions.find(option =>
         {
           console.log('option', option);
           return option.value.emotion.id === this.emotionDetected?.mainEmotionId;
         })?.select();
+
       });
+
 
 
       this.subEmotionSelectSubscription = this.subEmotionOptions?.changes.subscribe((options: QueryList<MatOption>) => {
@@ -265,18 +289,37 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
           console.warn(`Associated emotion ${subEmotionId} not found in the list of sub emotions: ${subEmotionsFromOptions}.`);
         }
         this.subEmotionSelectSubscription.unsubscribe();
+
       });
 
-      if (this.emotionDetected?.triggers != null && this.emotionDetected?.triggers.length > 0) {
-        this.triggerOptions?.find(option =>
-          option.value.triggerName === this.emotionDetected?.triggers[0]?.triggerName)?.select();
-      }
 
-      // this.snackBar.open(this.emotionDetected?.description + "\n" + this.emotionDetected?.suggestion, 'Close', {
-      //   duration: 40000,
-      //   panelClass: ['emotion-snackbar']
-      // });
+      this.setFormControlValue(
+        this.makeTriggersList(),
+        'trigger',
+        (trigger: Trigger) => trigger.triggerId,
+        this.emotionDetected?.triggers[0]?.triggerId
+      )
     }
+  }
+
+
+  private setFormControlValue<T>(
+    items: T[],
+    controlName: string,
+    keyExtractor: (item: T) => any,
+    keyToCompare: any
+  ): void {
+    if(items == null) {
+      console.error(controlName + ", Items to select are null");
+      return;
+    }
+    const itemToSelect = items.find(item => keyExtractor(item) === keyToCompare);
+    if (itemToSelect == null) {
+      console.error(controlName + ", Item not found for key", keyToCompare);
+    } else {
+      console.log('Item found', itemToSelect);
+    }
+    this.emotionForm.controls[controlName].setValue(itemToSelect);
   }
 
   getSliderColor(emotionType: string): ThemePalette {
@@ -323,7 +366,7 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
       emotionDetection: {
         emotionType: this.emotionRecord?.emotionType!,
         intensity: this.emotionRecord?.intensity!,
-        mainEmotionId: this.emotionRecord?.emotion.id,
+        mainEmotionId: this.emotionRecord?.emotion?.id,
         subEmotionId: this.emotionRecord?.subEmotions[0]?.subEmotionId,
         triggers: this.emotionRecord?.triggers!,
         tags: [],
@@ -336,11 +379,48 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
         text: '',
       }
     }
-    this.handleNoteSubmission(existingDetectionResult);
+    this.refreshEmotionCache();
+    // this.handleNoteSubmission(existingDetectionResult);
+    this.setSelectOptionsForEditAccordingToExistingValues(existingDetectionResult);
   }
 
   onCancel(): void {
     this.emotionForm.reset();
     this.dialogRef.close();
   }
+
+  private setSelectOptionsForEditAccordingToExistingValues(emotionFromResult: EmotionFromNoteResult) {
+    // update the emotion type, intensity, emotion, sub emotion, trigger mat-select  html elements according
+    // to the existing values, so we can edit them
+
+    this.emotionCacheService.emotionCache$.subscribe((cachedEmotionData) => {
+      this.setFormControlValue(
+        this.emotionTypes,
+        'emotionType',
+        (emotionType: string) => emotionType,
+        emotionFromResult.emotionDetection?.emotionType
+      );
+      this.setFormControlValue(
+        this.makeEmotionList(),
+        'emotion',
+        (emotion: EmotionWithSubEmotions) => emotion.emotion.id,
+        emotionFromResult.emotionDetection?.mainEmotionId
+      );
+      this.emotionForm.get('emotion')?.valueChanges.subscribe(() => {
+        this.makeSubEmotionsList();
+      });
+
+      this.subEmotionOptions?.changes.subscribe(() => {
+        this.setFormControlValue(
+          this.makeSubEmotionsList(),
+          'subEmotion',
+          (subEmotion: SubEmotionWrapper) => subEmotion.subEmotion.subEmotionId,
+          emotionFromResult.emotionDetection?.subEmotionId
+        );
+      });
+
+    });
+  }
+
+
 }
