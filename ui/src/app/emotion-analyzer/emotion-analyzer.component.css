@@ -6,22 +6,25 @@
   padding: 20px;
 }
 
-.emotion-analyzer .form-group {
+.emotion-analyze-div {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
   margin-bottom: 20px;
 }
 
-.emotion-analyzer .form-group label {
-  margin-bottom: 10px;
+.emotion-analyze-div label {
+  margin-right: 10px;
 }
 
-.emotion-analyzer .form-group input {
-  padding: 10px;
-  font-size: 16px;
+.mat-action-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-.emotion-analyzer button {
+.mat-action-row button {
   padding: 10px 20px;
   font-size: 16px;
   border: none;

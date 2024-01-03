@@ -48,7 +48,7 @@ export class DisplayEmotionComponent {
   openAnalyzeManuallyDialog() {
     console.log('Open analyze manually dialog', this.emotion );
     const dialogRef = this.dialog.open(EmotionAnalyzerComponent, {
-      width: '15%', height: '55%', data: { emotionRecord: this.emotion }
+      width: '325px', height: '500px', data: { emotionRecord: this.emotion }
     });
 
     dialogRef.afterClosed().subscribe(result => {
