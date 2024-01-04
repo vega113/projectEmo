@@ -1,19 +1,16 @@
 import {
-  AfterViewChecked,
   AfterViewInit,
   Component,
   Inject,
-  OnChanges,
   OnInit,
   QueryList,
-  SimpleChanges,
   ViewChildren
 } from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {
   EmotionData,
-  EmotionDetectionResult, EmotionFromNoteResult, EmotionRecord, EmotionTypesWithEmotions,
+   EmotionFromNoteResult, EmotionRecord, EmotionTypesWithEmotions,
   EmotionWithSubEmotions,
   SubEmotionWrapper,
   Trigger
@@ -32,7 +29,7 @@ import {map, switchMap} from "rxjs/operators";
   templateUrl: './emotion-analyzer.component.html',
   styleUrls: ['./emotion-analyzer.component.css']
 })
-export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
+export class EmotionAnalyzerComponent implements OnInit {
 
   emotionRecord: EmotionRecord | undefined;
   emotionForm: FormGroup;
@@ -46,7 +43,6 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
   @ViewChildren('triggerOptions') triggerOptions!: QueryList<MatOption>;
 
   private subEmotionSelectSubscription!: Subscription;
-  private emotionDetected: EmotionDetectionResult | undefined;
 
   isLoadingEmotionCache: boolean = true;
 
@@ -58,9 +54,10 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
 
   isDetectingEmotionWithAI: boolean = false;
   isSavingEmotionRecord: boolean = false;
-  emotionTypes$: Observable<String[]>;
+  emotionTypes$: Observable<string[]>;
   mainEmotions$: Observable<EmotionWithSubEmotions[]> | undefined;
   subEmotions$: Observable<SubEmotionWrapper[]> | undefined;
+  triggers$: Observable<Trigger[]> | undefined;
 
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
@@ -92,14 +89,7 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
     this.emotionTypes$ = this.getEmotionTypes();
     this.mainEmotions$ = this.getMainEmotions();
     this.subEmotions$ = this.getSubEmotions();
-  }
-
-
-  refreshEmotionCache() {
-    this.makeEmotionTypesList();
-    this.makeEmotionList();
-    this.makeSubEmotionsList();
-    this.makeTriggersList();
+    this.triggers$ = this.getTriggers();
   }
 
   ngOnInit(): void {
@@ -117,37 +107,34 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
       console.log('Emotion record in EmotionAnalyzerComponent: ', this.emotionRecord);
     });
     this.dialogRef.afterOpened().subscribe(() => {
-        console.log('Dialog opened');
-
-        this.setFormControlValue(
-          this.makeEmotionTypesList(),
-          'emotionType',
-          (emotionType: string) => emotionType,
-          this.emotionRecord?.emotionType
-        );
-        this.setFormControlValue(
-          this.makeEmotionList(),
-          'emotion',
-          (emotion: EmotionWithSubEmotions) => emotion.emotion.id,
-          this.emotionRecord?.emotion?.id
-        );
-        this.copyFromInputEmotionRecordToForm();
-
-        this.setFormControlValue(
-          this.makeTriggersList(),
-          'trigger',
-          (trigger: Trigger) => trigger.triggerId,
-          this.emotionRecord?.triggers[0]?.triggerId
-        );
-
-        this.emotionForm.controls['intensity'].setValue(this.emotionRecord?.intensity);
-
+        this.populateEmotionAnalyzeDialog();
       }
     );
   }
 
-  ngAfterViewInit(): void {
+  private populateEmotionAnalyzeDialog() {
+    this.setFormControlValueForObservable(
+      this.emotionTypes$,
+      'emotionType',
+      (emotionType: string) => emotionType,
+      this.emotionRecord?.emotionType
+    );
+    this.setFormControlValueForObservable(
+      this.mainEmotions$,
+      'emotion',
+      (emotion: EmotionWithSubEmotions) => emotion.emotion.id,
+      this.emotionRecord?.emotion?.id
+    );
+    this.copyFromInputEmotionRecordToForm();
 
+    this.setFormControlValueForObservable(
+      this.triggers$,
+      'trigger',
+      (trigger: Trigger) => trigger.triggerId,
+      this.emotionRecord?.triggers[0]?.triggerId
+    );
+
+    this.emotionForm.controls['intensity'].setValue(this.emotionRecord?.intensity);
   }
 
   private updateEmotionCache() {
@@ -275,69 +262,23 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
 
   handleNoteSubmission(emotionFromResult: EmotionFromNoteResult) {
     console.log('Emotion detected from note', emotionFromResult);
+    this.emotionForm.get('createFromNote')?.setValue(false);
+    this.emotionStateService.updateNewEmotion({
+      id: this.emotionRecord?.id,
+      emotionType: emotionFromResult.emotionDetection?.emotionType!,
+      userId: this.emotionRecord?.userId,
+      emotion: {
+        id: emotionFromResult.emotionDetection?.mainEmotionId!,
+      },
+      intensity: emotionFromResult.emotionDetection?.intensity!,
+      subEmotions: [],
+      subEmotionId: emotionFromResult.emotionDetection?.subEmotionId!,
+      triggers: [],
+      triggerId: emotionFromResult.emotionDetection?.triggers[0]?.triggerId!,
+      notes: emotionFromResult.note ? [emotionFromResult.note] : [],
+      tags: emotionFromResult.emotionDetection?.tags!,
+    } as EmotionRecord);
 
-    this.emotionDetected = emotionFromResult.emotionDetection;
-
-    if (this.emotionDetected == null) {
-      this.emotionForm.get('createFromNote')?.setValue(false);
-    } else {
-      console.log('Updating emotion from result');
-
-      this.emotionForm.controls['emotionType'].setValue(this.emotionDetected.emotionType);
-      this.emotionForm.controls['intensity'].setValue(this.emotionDetected.intensity);
-
-
-      this.setFormControlValue(
-        this.makeEmotionList(),
-        'emotion',
-        (emotion: EmotionWithSubEmotions) => emotion.emotion.id,
-        this.emotionDetected?.mainEmotionId
-      )
-
-      // Promise.resolve().then(() =>  this.setFormControlValue(
-      //   this.makeSubEmotionsList(),
-      //   'subEmotion',
-      //   (subEmotion: SubEmotionWrapper) => subEmotion.subEmotion.subEmotionId,
-      //   this.emotionDetected?.subEmotionId
-      // ));
-
-
-      this.emotionTypeOptions?.changes?.subscribe((options: QueryList<MatOption>) => {
-        console.log("emotionTypeOptions changed", options);
-        this.emotionOptions.find(option => {
-          console.log('option', option);
-          return option.value.emotion.id === this.emotionDetected?.mainEmotionId;
-        })?.select();
-
-      });
-
-
-      this.subEmotionSelectSubscription = this.subEmotionOptions?.changes.subscribe((options: QueryList<MatOption>) => {
-        console.log("subEmotionOptions changed", options);
-        const subEmotionId = this.emotionDetected?.subEmotionId;
-
-        const optionToSelect = options.find(option =>
-          option.value.subEmotionName === subEmotionId);
-
-
-        if (optionToSelect) {
-          Promise.resolve().then(() => optionToSelect.select());
-        } else {
-          const subEmotionsFromOptions = options.map(option => option.value.subEmotionName).join(', ');
-          console.warn(`Associated emotion ${subEmotionId} not found in the list of sub emotions: ${subEmotionsFromOptions}.`);
-        }
-        this.subEmotionSelectSubscription.unsubscribe();
-
-      });
-
-
-      this.setFormControlValue(
-        this.makeTriggersList(),
-        'trigger',
-        (trigger: Trigger) => trigger.triggerId,
-        this.emotionDetected?.triggers[0]?.triggerId
-      )
-    }
   }
 
 
@@ -359,6 +300,28 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
     }
     this.emotionForm.controls[controlName].setValue(itemToSelect);
   }
+
+  private setFormControlValueForObservable<T>(
+    items: Observable<T[]> | undefined,
+    controlName: string,
+    keyExtractor: (item: T) => any,
+    keyToCompare: any
+  ): void {
+    if (items == null) {
+      console.error(controlName + ", Items to select are null");
+      return;
+    }
+    items.subscribe((items) => {
+      const itemToSelect = items.find(item => keyExtractor(item) === keyToCompare);
+      if (itemToSelect == null) {
+        console.error(controlName + ", Item not found for key", keyToCompare);
+      } else {
+        console.log('Item found', itemToSelect);
+      }
+      this.emotionForm.controls[controlName].setValue(itemToSelect);
+    });
+  }
+
 
   getSliderColor(emotionType: string): ThemePalette {
     switch (emotionType) {
@@ -480,10 +443,9 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
         }
       }
     );
-
   }
 
-  getEmotionTypes(): Observable<String[]> {
+  getEmotionTypes(): Observable<string[]> {
     return this.emotionCacheService.emotionCache$.pipe(
       map((cachedEmotionData) => {
           if (cachedEmotionData) {
@@ -521,6 +483,19 @@ export class EmotionAnalyzerComponent implements OnInit, AfterViewInit {
             return of(selectedEmotion.subEmotions);
           } else {
             return of([] as SubEmotionWrapper[]);
+          }
+        }
+      )
+    );
+  }
+
+  private getTriggers(): Observable<Trigger[]> | undefined {
+    return this.emotionForm.get('emotion')?.valueChanges.pipe(
+      switchMap((selectedEmotion) => {
+          if (selectedEmotion) {
+            return of(this.emotionCache?.triggers || []);
+          } else {
+            return of([] as Trigger[]);
           }
         }
       )

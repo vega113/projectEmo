@@ -39,7 +39,7 @@
 
         <mat-form-field>
           <mat-label>Associated Emotion</mat-label>
-          <mat-select formControlName="subEmotion" name="">
+          <mat-select formControlName="subEmotion">
             <mat-option #subEmotionOptions *ngFor="let subEmotion of subEmotions$ | async"
                         [value]="subEmotion.subEmotion">{{ subEmotion.subEmotion.subEmotionName }}
             </mat-option>
@@ -49,7 +49,7 @@
         <mat-form-field>
           <mat-label>Reason</mat-label>
           <mat-select formControlName="trigger">
-            <mat-option #triggerOptions *ngFor="let trigger of makeTriggersList()"
+            <mat-option #triggerOptions *ngFor="let trigger of triggers$ | async"
                         [value]="trigger">{{ trigger.description }}
             </mat-option>
           </mat-select>
