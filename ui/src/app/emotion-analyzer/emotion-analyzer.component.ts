@@ -51,7 +51,6 @@ export class EmotionAnalyzerComponent implements OnInit {
   emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
   emotionWithSubEmotions: EmotionWithSubEmotions[] | undefined;
 
-  isDetectingEmotionWithAI: boolean = false;
   isSavingEmotionRecord: boolean = false;
   emotionTypes$: Observable<string[]>;
   mainEmotions$: Observable<EmotionWithSubEmotions[]> | undefined;
@@ -216,27 +215,6 @@ export class EmotionAnalyzerComponent implements OnInit {
     }
   }
 
-  // TODO: Remove this method, detection is on display emotion
-  handleNoteSubmission(emotionFromResult: EmotionFromNoteResult) {
-    console.log('Emotion detected from note', emotionFromResult);
-    this.emotionForm.get('createFromNote')?.setValue(false);
-    this.emotionStateService.updateNewEmotion({
-      id: this.emotionRecord?.id,
-      emotionType: emotionFromResult.emotionDetection?.emotionType!,
-      userId: this.emotionRecord?.userId,
-      emotion: {
-        id: emotionFromResult.emotionDetection?.mainEmotionId!,
-      },
-      intensity: emotionFromResult.emotionDetection?.intensity!,
-      subEmotions: [],
-      subEmotionId: emotionFromResult.emotionDetection?.subEmotionId!,
-      triggers: [],
-      triggerId: emotionFromResult.emotionDetection?.triggers[0]?.triggerId!,
-      notes: emotionFromResult.note ? [emotionFromResult.note] : [],
-      tags: emotionFromResult.emotionDetection?.tags!,
-    } as EmotionRecord);
-  }
-
   private setFormControlValueForObservable<T>(
     items: Observable<T[]> | undefined,
     controlName: string,
@@ -258,29 +236,13 @@ export class EmotionAnalyzerComponent implements OnInit {
     });
   }
 
-
-  // TODO: Remove this method, detection is on display emotion
-  detectEmotions() {
-    this.isDetectingEmotionWithAI = true;
-    console.log('Detecting emotion for text: ', this.emotionForm.get("emotionNote")?.value);
-    this.noteService.detectEmotion(this.emotionForm.get("emotionNote")?.value).subscribe({
-      next: (response: EmotionFromNoteResult) => {
-        console.log('Emotion detected successfully', response);
-        this.handleNoteSubmission(response);
-        this.isDetectingEmotionWithAI = false;
-      },
-      error: (error) => {
-        console.error('Error detecting emotion', error);
-        this.isDetectingEmotionWithAI = false;
-        this.snackBar.open('Error detecting emotion', 'Close', {
-          duration: 5000,
-        });
-      }
-    });
-  }
-
   ngOnDestroy(): void {
     console.log('Destroying emotion-analyzer component');
+    this.subscriptions.forEach(subscription => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    });
   }
 
   private copyFromInputEmotionRecordToForm() {

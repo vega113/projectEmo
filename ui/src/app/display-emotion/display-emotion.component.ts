@@ -1,7 +1,7 @@
-import {Component, signal} from '@angular/core';
+import {Component, QueryList, signal} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import { EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
+import {EmotionFromNoteResult, EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {DateService} from "../services/date.service";
 import {MatChipInputEvent} from "@angular/material/chips";
@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import {MatDialog} from "@angular/material/dialog";
 import {EmotionAnalyzerComponent} from "../emotion-analyzer/emotion-analyzer.component";
 import {formatDate} from "@angular/common";
+import {MatOption} from "@angular/material/core";
+import {NoteService} from "../services/note.service";
 
 
 @Component({
@@ -23,6 +25,7 @@ export class DisplayEmotionComponent {
               private emotionStateService: EmotionStateService,
               private snackBar: MatSnackBar,
               public dateService: DateService,
+              private noteService: NoteService,
               private router: Router,
               public dialog: MatDialog) {
   }
@@ -45,6 +48,9 @@ export class DisplayEmotionComponent {
 
   separatorKeysCodes: number[] = [13, 188];
   addOnBlur: any = true;
+
+  isDetectingEmotionWithAI: boolean = false;
+
   openAnalyzeManuallyDialog() {
     console.log('Open analyze manually dialog', this.emotion );
     const dialogRef = this.dialog.open(EmotionAnalyzerComponent, {
@@ -131,8 +137,50 @@ export class DisplayEmotionComponent {
       });
   }
 
+
+
+  detectEmotions() {
+    this.isDetectingEmotionWithAI = true;
+    console.log('Detecting emotion for text: ', this.emotion?.notes![0].text);
+    if(this.emotion?.notes[0]?.text) {
+      this.noteService.detectEmotion(this.emotion?.notes![0].text).subscribe({
+        next: (response: EmotionFromNoteResult) => {
+          console.log('Emotion detected successfully', response);
+          if (response.emotionDetection?.textTitle != null) {
+            if (this.emotion && this.emotion.notes && this.emotion.notes[0]) {
+              this.emotion.notes[0].title = response.emotionDetection?.textTitle;
+              this.emotion.notes[0].suggestion = response.emotionDetection?.suggestion;
+              this.emotion.notes[0].description = response.emotionDetection?.description;
+              this.emotion.notes[0].todos = response.emotionDetection?.todos;
+              this.emotion.emotionType = response.emotionDetection?.emotionType;
+              this.emotion.intensity = response.emotionDetection?.intensity;
+              this.emotion.emotion.emotionName = response.emotionDetection?.mainEmotionId;
+              this.emotion.subEmotionId = response.emotionDetection?.subEmotionId;
+              this.emotion.tags = response.emotionDetection?.tags;
+              this.emotion.triggers = response.emotionDetection?.triggers;
+
+            }
+          }
+          this.isDetectingEmotionWithAI = false;
+        },
+        error: (error) => {
+          console.error('Error detecting emotion', error);
+          this.isDetectingEmotionWithAI = false;
+          this.snackBar.open('Error detecting emotion', 'Close', {
+            duration: 5000,
+          });
+        }
+      });
+    } else {
+      this.isDetectingEmotionWithAI = false;
+      this.snackBar.open('Error detecting emotion - empty note', 'Close', {
+        duration: 5000,
+      });
+    }
+  }
+
+
   protected readonly formatDate = formatDate;
-  analyzeNoteEmotionWithAi = signal<any | null>(null);
 
   formatDateFromDb() {
     return this.dateService.formatDateFromDb( this.emotion?.created!)

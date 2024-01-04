@@ -85,6 +85,7 @@ export class AuthService {
     if (token) {
       return new HttpHeaders({
         Authorization: `Bearer ${token}`,
+        IdempotencyKey: `${Math.random()}`,
       });
     } else {
       return new HttpHeaders();

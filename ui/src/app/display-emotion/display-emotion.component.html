@@ -71,7 +71,12 @@
 
             <mat-action-row>
               <button mat-raised-button color="primary" type="button" (click)="openAnalyzeManuallyDialog()">Analyze Manually</button>
-              <button mat-raised-button color="primary" type="button" (click)="analyzeNoteEmotionWithAi()">Analyze with AI</button>
+              <button mat-raised-button color="primary" type="button" (click)="detectEmotions()">
+                Analyze with AI
+                <div *ngIf="isDetectingEmotionWithAI" class="loading-screen">
+                  <mat-spinner diameter="24" color="accent" ></mat-spinner>
+                </div>
+              </button>
             </mat-action-row>
           </mat-expansion-panel>
 

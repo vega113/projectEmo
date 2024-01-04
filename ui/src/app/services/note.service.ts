@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import {EmotionDetectionResult, EmotionFromNoteResult, Note, NoteTemplate} from '../models/emotion.model';
 import {AuthService} from "./auth.service";
 import {environment} from "../../environments/environment";
-import {catchError, map} from "rxjs/operators";
+import {catchError, map, retry} from "rxjs/operators";
 import {ErrorService} from "./error.service"; // adjust the path as needed
 
 @Injectable({
@@ -18,7 +18,7 @@ export class NoteService {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.get<NoteTemplate[]>(environment.baseUrl + '/noteTemplate', { headers });
   }
-  
+
   deleteNote(id: number): Observable<boolean> {
     const headers = this.authService.getAuthorizationHeader();
     return this.http.put(environment.baseUrl + '/note/delete/' + id, {}, { headers, observe: 'response' })
@@ -42,9 +42,12 @@ export class NoteService {
     console.log('Detecting emotion for text url: ' + `${environment.baseUrl}/note/emotion/detect`);
     return this.http.post<EmotionDetectionResult>(
       `${environment.baseUrl}/note/emotion/detect`, note,
-      {headers}).pipe(catchError(resp => this.errorService.handleError(resp))).
-      pipe(map((emotionDetectionResult: EmotionDetectionResult) => {
+      {headers}).pipe(
+      retry({count: 3, delay: 3000}),
+      catchError(resp => this.errorService.handleError(resp)),
+      map((emotionDetectionResult: EmotionDetectionResult) => {
         return {emotionDetection: emotionDetectionResult, note: note} as EmotionFromNoteResult;
-      }));
+      })
+    );
   }
 }
