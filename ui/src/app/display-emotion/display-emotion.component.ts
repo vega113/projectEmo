@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
 import { EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
@@ -132,6 +132,7 @@ export class DisplayEmotionComponent {
   }
 
   protected readonly formatDate = formatDate;
+  analyzeNoteEmotionWithAi = signal<any | null>(null);
 
   formatDateFromDb() {
     return this.dateService.formatDateFromDb( this.emotion?.created!)
