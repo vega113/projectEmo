@@ -22,7 +22,8 @@
             min="0"
             max="5"
             step="1"
-            [color]="emotionForm.get('emotionType') ? getSliderColor(emotionForm.get('emotionType')?.value) : undefined"
+            [color]="emotionForm.get('emotionType') ? this.colorService.getSliderColorThemePalette(
+            emotionForm.get('emotionType')?.value) : undefined"
           >
             <input matSliderThumb formControlName="intensity">
           </mat-slider>

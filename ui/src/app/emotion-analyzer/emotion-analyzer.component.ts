@@ -14,7 +14,7 @@ import {
   SubEmotionWrapper,
   Trigger
 } from "../models/emotion.model";
-import {MatOption, ThemePalette} from "@angular/material/core";
+import {MatOption} from "@angular/material/core";
 import {from, Observable, of, Subscription} from "rxjs";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -22,6 +22,7 @@ import {EmotionCacheService} from "../services/emotion-cache.service";
 import {NoteService} from "../services/note.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {map, switchMap} from "rxjs/operators";
+import {ColorService} from "../services/color.service";
 
 @Component({
   selector: 'app-emotion-analyzer',
@@ -63,6 +64,7 @@ export class EmotionAnalyzerComponent implements OnInit {
               private snackBar: MatSnackBar,
               private emotionCacheService: EmotionCacheService,
               private noteService: NoteService,
+              protected colorService: ColorService,
               public dialogRef: MatDialogRef<EmotionAnalyzerComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any
   ) {
@@ -256,18 +258,6 @@ export class EmotionAnalyzerComponent implements OnInit {
     });
   }
 
-  getSliderColor(emotionType: string): ThemePalette {
-    switch (emotionType) {
-      case 'Positive':
-        return 'primary';
-      case 'Neutral':
-        return 'accent';
-      case 'Negative':
-        return 'warn';
-      default:
-        return undefined;
-    }
-  }
 
   // TODO: Remove this method, detection is on display emotion
   detectEmotions() {

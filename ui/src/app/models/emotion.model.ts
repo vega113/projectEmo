@@ -9,6 +9,7 @@ export interface User {
 export interface EmotionData {
   emotionTypes: EmotionTypesWithEmotions[];
   triggers: Trigger[];
+  colors: { [key: string]: string };
 }
 
 export interface EmotionTypesWithEmotions {
