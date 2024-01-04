@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   Component,
   Inject,
   OnInit,
@@ -10,7 +9,7 @@ import {FormBuilder, FormGroup} from '@angular/forms';
 import {EmotionService} from '../services/emotion.service';
 import {
   EmotionData,
-   EmotionFromNoteResult, EmotionRecord, EmotionTypesWithEmotions,
+  EmotionFromNoteResult, EmotionRecord, EmotionTypesWithEmotions,
   EmotionWithSubEmotions,
   SubEmotionWrapper,
   Trigger
@@ -36,17 +35,16 @@ export class EmotionAnalyzerComponent implements OnInit {
 
   emotionTypes: string[] = [];
 
+  private subscriptions: Subscription[] = []
+
 
   @ViewChildren('emotionTypeOptions') emotionTypeOptions!: QueryList<MatOption>;
   @ViewChildren('emotionOptions') emotionOptions!: QueryList<MatOption>;
   @ViewChildren('subEmotionOptions') subEmotionOptions!: QueryList<MatOption>;
   @ViewChildren('triggerOptions') triggerOptions!: QueryList<MatOption>;
 
-  private subEmotionSelectSubscription!: Subscription;
-
   isLoadingEmotionCache: boolean = true;
 
-  emotionCache: EmotionData | undefined;
   emotionCache$: Observable<EmotionData> | undefined;
 
   emotionTypesWithEmotions: EmotionTypesWithEmotions[] | undefined;
@@ -93,23 +91,26 @@ export class EmotionAnalyzerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.emotionCacheService.emotionCache$.subscribe((cachedEmotionData) => {
-      if (cachedEmotionData) {
-        this.emotionCache = cachedEmotionData;
-        this.emotionCache$ = of(cachedEmotionData);
-        this.isLoadingEmotionCache = false;
-        console.log('Emotion cache in EmotionAnalyzerComponent: ', this.emotionCache);
+    const emotionCacheSubscription = this.emotionCacheService.emotionCache$.subscribe(
+      (cachedEmotionData) => {
+        if (cachedEmotionData) {
+          this.emotionCache$ = of(cachedEmotionData);
+          this.isLoadingEmotionCache = false;
+          console.log('Emotion cache in EmotionAnalyzerComponent: ', cachedEmotionData);
 
-      } else {
-        console.log('Emotion cache not found in EmotionAnalyzerComponent');
-        this.updateEmotionCache();
-      }
-      console.log('Emotion record in EmotionAnalyzerComponent: ', this.emotionRecord);
-    });
-    this.dialogRef.afterOpened().subscribe(() => {
+        } else {
+          console.log('Emotion cache not found in EmotionAnalyzerComponent');
+          this.updateEmotionCache();
+        }
+        console.log('Emotion record in EmotionAnalyzerComponent: ', this.emotionRecord);
+      });
+    this.subscriptions.push(emotionCacheSubscription);
+
+    const afterOpenedSubscription = this.dialogRef.afterOpened().subscribe(() => {
         this.populateEmotionAnalyzeDialog();
       }
     );
+    this.subscriptions.push(afterOpenedSubscription);
   }
 
   private populateEmotionAnalyzeDialog() {
@@ -138,9 +139,8 @@ export class EmotionAnalyzerComponent implements OnInit {
   }
 
   private updateEmotionCache() {
-    this.emotionService.getEmotionCache().subscribe({
+    const emotionCacheSubscription = this.emotionService.getEmotionCache().subscribe({
       next: (emotionCache) => {
-        this.emotionCache = emotionCache;
         this.emotionCacheService.updateEmotionCache(emotionCache);
       },
       error: (error) => {
@@ -151,9 +151,9 @@ export class EmotionAnalyzerComponent implements OnInit {
       complete: () => {
         console.log('Emotion cache fetch completed');
         this.isLoadingEmotionCache = false;
-
       }
     });
+    this.subscriptions.push(emotionCacheSubscription);
   }
 
   convertEmotionFromDataToEmotionRecord(emotionFromData: any, inputEmotionRecord: EmotionRecord): EmotionRecord {
@@ -183,7 +183,8 @@ export class EmotionAnalyzerComponent implements OnInit {
       console.log(`Emotion record to be updated: ${JSON.stringify(emotionRecord)}`);
       try {
         this.isSavingEmotionRecord = true;
-        from(this.emotionService.updateEmotionRecord(emotionRecord)).subscribe(
+        const updateEmotionRecordSubscription = from(this.emotionService.updateEmotionRecord(emotionRecord)).
+        subscribe(
           {
             next: (response) => {
               console.log('Emotion record updated successfully', response);
@@ -206,60 +207,14 @@ export class EmotionAnalyzerComponent implements OnInit {
             }
           }
         )
+        this.subscriptions.push(updateEmotionRecordSubscription);
       } catch (error) {
         console.error(error);
       }
     }
   }
 
-  makeEmotionTypesList(): string[] {
-    if (this.emotionCache && this.emotionCache.emotionTypes) {
-      this.emotionTypesWithEmotions = this.emotionCache.emotionTypes;
-      this.emotionTypes = this.emotionCache.emotionTypes.map(emotionTypeObject => emotionTypeObject.emotionType);
-      return this.emotionTypes
-    } else {
-      return [];
-    }
-  }
-
-  makeEmotionList(): EmotionWithSubEmotions[] {
-    if (this.emotionCache && this.emotionTypesWithEmotions) {
-      const selectedEmotionType = this.emotionForm.get('emotionType')?.value;
-      const emotionTypeObject = this.emotionTypesWithEmotions.find(emotionTypeObject => emotionTypeObject.emotionType === selectedEmotionType);
-      if (emotionTypeObject) {
-        this.emotionWithSubEmotions = emotionTypeObject.emotions;
-        return emotionTypeObject.emotions;
-      } else {
-        return [];
-      }
-    } else {
-      console.log('Emotion cache not found', this.emotionCache);
-      return [];
-    }
-  }
-
-  makeSubEmotionsList(): SubEmotionWrapper[] {
-    if (this.emotionCache) {
-      const selectedEmotionObject = this.emotionForm.get('emotion')?.value as EmotionWithSubEmotions;
-      if (selectedEmotionObject) {
-        return selectedEmotionObject.subEmotions;
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
-  }
-
-  makeTriggersList(): Trigger[] {
-    if (this.emotionCache) {
-      return this.emotionCache.triggers;
-    } else {
-      return [];
-    }
-  }
-
-
+  // TODO: Remove this method, detection is on display emotion
   handleNoteSubmission(emotionFromResult: EmotionFromNoteResult) {
     console.log('Emotion detected from note', emotionFromResult);
     this.emotionForm.get('createFromNote')?.setValue(false);
@@ -278,27 +233,6 @@ export class EmotionAnalyzerComponent implements OnInit {
       notes: emotionFromResult.note ? [emotionFromResult.note] : [],
       tags: emotionFromResult.emotionDetection?.tags!,
     } as EmotionRecord);
-
-  }
-
-
-  private setFormControlValue<T>(
-    items: T[],
-    controlName: string,
-    keyExtractor: (item: T) => any,
-    keyToCompare: any
-  ): void {
-    if (items == null) {
-      console.error(controlName + ", Items to select are null");
-      return;
-    }
-    const itemToSelect = items.find(item => keyExtractor(item) === keyToCompare);
-    if (itemToSelect == null) {
-      console.error(controlName + ", Item not found for key", keyToCompare);
-    } else {
-      console.log('Item found', itemToSelect);
-    }
-    this.emotionForm.controls[controlName].setValue(itemToSelect);
   }
 
   private setFormControlValueForObservable<T>(
@@ -322,7 +256,6 @@ export class EmotionAnalyzerComponent implements OnInit {
     });
   }
 
-
   getSliderColor(emotionType: string): ThemePalette {
     switch (emotionType) {
       case 'Positive':
@@ -336,6 +269,7 @@ export class EmotionAnalyzerComponent implements OnInit {
     }
   }
 
+  // TODO: Remove this method, detection is on display emotion
   detectEmotions() {
     this.isDetectingEmotionWithAI = true;
     console.log('Detecting emotion for text: ', this.emotionForm.get("emotionNote")?.value);
@@ -355,11 +289,8 @@ export class EmotionAnalyzerComponent implements OnInit {
     });
   }
 
-
   ngOnDestroy(): void {
-    if (this.subEmotionSelectSubscription) {
-      this.subEmotionSelectSubscription.unsubscribe();
-    }
+    console.log('Destroying emotion-analyzer component');
   }
 
   private copyFromInputEmotionRecordToForm() {
@@ -492,11 +423,15 @@ export class EmotionAnalyzerComponent implements OnInit {
   private getTriggers(): Observable<Trigger[]> | undefined {
     return this.emotionForm.get('emotion')?.valueChanges.pipe(
       switchMap((selectedEmotion) => {
-          if (selectedEmotion) {
-            return of(this.emotionCache?.triggers || []);
-          } else {
-            return of([] as Trigger[]);
-          }
+          return this.emotionCacheService.emotionCache$.pipe(
+            map((cachedEmotionData) => {
+              if (cachedEmotionData && selectedEmotion) {
+                return cachedEmotionData.triggers;
+              } else {
+                return [];
+              }
+            })
+          );
         }
       )
     );
