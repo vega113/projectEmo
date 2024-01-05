@@ -8,6 +8,7 @@ import play.api.libs.json.{Format, Json}
 
 import scala.annotation.unused
 import scala.language.postfixOps
+import Macro.ColumnNaming
 
 object model {
 
@@ -165,9 +166,6 @@ object model {
   case class LineChartData(recordsCount: Int, intensitySum: Int)
 
 
-
-
-
   case class EmotionDetectionResult(
                                      emotionType: String,
                                      intensity: Int,
@@ -187,8 +185,9 @@ object model {
                                   )
 
 
-  case class AiDbObj(id: Option[String], response: String, userId: Long, originalText: Option[String],
-                     tag: Option[String], elapsedTime: Option[Double], created: Option[LocalDateTime])
+  case class AiDbObj(id: Option[Long], response: String, userId: Long, originalText: Option[String],
+                     tag: Option[String], elapsedTime: Option[Double], created: Option[LocalDateTime],
+                     idempotenceKey: Option[String] = None)
 
 
   object User {
@@ -273,6 +272,7 @@ object model {
           Trigger(triggerId, triggerName, parentId, createdByUser, description, created)
       }
     }
+
     def fromName(name: String): Trigger = Trigger(None, Some(name), None, None, None)
 
   }
@@ -459,7 +459,7 @@ object model {
   object ChatGptApiResponse {
     implicit val chatGptApiResponseFormat: Format[AiDbObj] = Json.format[AiDbObj]
     implicit val parser: RowParser[AiDbObj] = {
-      get[Option[String]]("id") ~
+      get[Option[Long]]("id") ~
         str("response") ~
         get[Long]("user_id") ~
         get[Option[String]]("original_text") ~
@@ -471,35 +471,35 @@ object model {
       }
     }
   }
-}
 
 
-case class AiAssistant(
-                        id: Option[Int],
-                        externalId: String,
-                        name: String,
-                        description: Option[String],
-                        isDefault: Boolean,
-                        created: LocalDateTime,
-                        lastUpdated: Option[LocalDateTime],
-                        createdAtProvider: Long,
-                        assistantType: Option[String]
-                      )
+  case class AiAssistant(
+                          id: Option[Int],
+                          externalId: String,
+                          name: String,
+                          description: Option[String],
+                          isDefault: Boolean,
+                          created: LocalDateTime,
+                          lastUpdated: Option[LocalDateTime],
+                          createdAtProvider: Long,
+                          assistantType: Option[String]
+                        )
 
-object AiAssistant {
-  implicit val aiAssistantFormat: Format[AiAssistant] = Json.format[AiAssistant]
-  implicit val parser: RowParser[AiAssistant] = {
-    get[Option[Int]]("id") ~
-      str("external_id") ~
-      str("name") ~
-      get[Option[String]]("description") ~
-      bool("is_default") ~
-      get[LocalDateTime]("created") ~
-      get[Option[LocalDateTime]]("last_updated") ~
-      get[Long]("created_at_provider") ~
-      get[Option[String]]("assistant_type") map {
-      case id ~ externalId ~ name ~ description ~ isDefault ~ created ~ lastUpdated ~ createdAtProvider ~ assistantType =>
-        AiAssistant(id, externalId, name, description, isDefault, created, lastUpdated, createdAtProvider, assistantType)
+  object AiAssistant {
+    implicit val aiAssistantFormat: Format[AiAssistant] = Json.format[AiAssistant]
+    implicit val parser: RowParser[AiAssistant] = {
+      get[Option[Int]]("id") ~
+        str("external_id") ~
+        str("name") ~
+        get[Option[String]]("description") ~
+        bool("is_default") ~
+        get[LocalDateTime]("created") ~
+        get[Option[LocalDateTime]]("last_updated") ~
+        get[Long]("created_at_provider") ~
+        get[Option[String]]("assistant_type") map {
+        case id ~ externalId ~ name ~ description ~ isDefault ~ created ~ lastUpdated ~ createdAtProvider ~ assistantType =>
+          AiAssistant(id, externalId, name, description, isDefault, created, lastUpdated, createdAtProvider, assistantType)
+      }
     }
   }
 
@@ -533,5 +533,17 @@ object AiAssistant {
           UserInfo(id, userId, bio, aiAssistantId, threadId, created, lastUpdated, tokensUsedTotal, tokensUsedLastMonth, tokensAvailable)
       }
     }
+  }
+
+  case class RequestsInFlight(
+                               id: Long,
+                               requestId: String,
+                               isCompleted: Boolean,
+                               created: LocalDateTime
+                             )
+
+  object RequestsInFlight {
+    implicit val requestsInFlightFormat: Format[RequestsInFlight] = Json.format[RequestsInFlight]
+    implicit val parser: RowParser[RequestsInFlight] = Macro.namedParser[RequestsInFlight](ColumnNaming.SnakeCase)
   }
 }

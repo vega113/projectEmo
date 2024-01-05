@@ -137,7 +137,9 @@ export class DisplayEmotionComponent {
       });
   }
 
+handleEmotionDetected(emotion: string) {
 
+}
 
   detectEmotions() {
     this.isDetectingEmotionWithAI = true;
@@ -147,19 +149,8 @@ export class DisplayEmotionComponent {
         next: (response: EmotionFromNoteResult) => {
           console.log('Emotion detected successfully', response);
           if (response.emotionDetection?.textTitle != null) {
-            if (this.emotion && this.emotion.notes && this.emotion.notes[0]) {
-              this.emotion.notes[0].title = response.emotionDetection?.textTitle;
-              this.emotion.notes[0].suggestion = response.emotionDetection?.suggestion;
-              this.emotion.notes[0].description = response.emotionDetection?.description;
-              this.emotion.notes[0].todos = response.emotionDetection?.todos;
-              this.emotion.emotionType = response.emotionDetection?.emotionType;
-              this.emotion.intensity = response.emotionDetection?.intensity;
-              this.emotion.emotion.emotionName = response.emotionDetection?.mainEmotionId;
-              this.emotion.subEmotionId = response.emotionDetection?.subEmotionId;
-              this.emotion.tags = response.emotionDetection?.tags;
-              this.emotion.triggers = response.emotionDetection?.triggers;
-
-            }
+            this.updateUiWithEmotionRecordWithDetectedEmotionData(response);
+            this.emotionStateService.updateNewEmotion(this.emotion!);
           }
           this.isDetectingEmotionWithAI = false;
         },
@@ -179,6 +170,28 @@ export class DisplayEmotionComponent {
     }
   }
 
+  private updateUiWithEmotionRecordWithDetectedEmotionData(response: EmotionFromNoteResult) {
+    if (this.emotion && this.emotion.notes && this.emotion.notes[0]) {
+      this.emotion.notes[0].title = response.emotionDetection?.textTitle;
+      this.emotion.notes[0].suggestion = response.emotionDetection?.suggestion;
+      this.emotion.notes[0].description = response.emotionDetection?.description;
+      this.emotion.notes[0].todos = response.emotionDetection?.todos;
+      this.emotion.emotionType = response.emotionDetection?.emotionType || "unknown";
+      this.emotion.intensity = response.emotionDetection?.intensity || 0;
+      if (this.emotion.emotion != null) {
+        this.emotion.emotion.emotionName = response.emotionDetection?.mainEmotionId;
+        this.emotion.emotion.id = response.emotionDetection?.mainEmotionId;
+      } else {
+        this.emotion.emotion = {
+          emotionName: response.emotionDetection?.mainEmotionId,
+          id: response.emotionDetection?.mainEmotionId
+        };
+      }
+      this.emotion.subEmotionId = response.emotionDetection?.subEmotionId;
+      this.emotion.tags = response.emotionDetection?.tags || [];
+      this.emotion.triggers = response.emotionDetection?.triggers || [];
+    }
+  }
 
   protected readonly formatDate = formatDate;
 

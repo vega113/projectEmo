@@ -6,7 +6,7 @@ import net.logstash.logback.argument.StructuredArguments._
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import service.ai.EmotionDetectionService
+import service.ai.{EmotionDetectionService, EmotionDetectionServiceWithIdempotency}
 import service.model.DetectEmotionRequest
 import service.{NoteService, NoteTodoService}
 
@@ -16,7 +16,7 @@ import scala.concurrent.Future
 
 class NoteController @Inject()(cc: ControllerComponents,
                                noteService: NoteService,
-                               emotionDetectionService: EmotionDetectionService,
+                               emotionDetectionService: EmotionDetectionServiceWithIdempotency,
                                noteTodoService: NoteTodoService,
                                authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc){
@@ -43,11 +43,16 @@ class NoteController @Inject()(cc: ControllerComponents,
       },
       note => {
         token.headers.get("X-IdempotencyKey")
-        val v1EmotionFuture = emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId))
-        v1EmotionFuture.map { resp =>
-          Ok(Json.toJson(resp))
+        val v1EmotionFuture = emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId),
+          token.headers.get("X-IdempotencyKey").getOrElse(""))
+        v1EmotionFuture.map {
+          case Some(emotionDetectionResult) =>
+            Ok(Json.toJson(emotionDetectionResult))
+          case None =>
+            Accepted
         }.recover {
           case e: Exception =>
+            logger.error("Failed to detect emotion", e)
             InternalServerError(Json.obj("message" -> "Failed to detect emotion"))
         }
       }

@@ -86,7 +86,7 @@ export class AuthService {
     if (token) {
       return new HttpHeaders({
         Authorization: `Bearer ${token}`,
-        IdempotencyKey: uuidv4(),
+        "X-IdempotencyKey": uuidv4(),
       });
     } else {
       return new HttpHeaders();

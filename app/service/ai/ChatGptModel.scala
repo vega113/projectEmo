@@ -1,8 +1,7 @@
 package service.ai
 
-import dao.AiAssistant
+import dao.model.AiAssistant
 import play.api.libs.json.{Format, Json}
-import service.ai.ChatGptModel.{ChatGptMessageResponse, Content, TextContent}
 import service.model.{AiMessage, AiThread, Tool}
 
 import java.time.LocalDateTime

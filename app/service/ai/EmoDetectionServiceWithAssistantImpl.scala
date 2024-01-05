@@ -19,7 +19,6 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
   private lazy val logger = play.api.Logger(getClass)
 
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
-    val startTime = System.nanoTime()
     logger.info(s"V2 Detecting emotion for request: $request")
     val responseFuture: Future[EmotionDetectionResult] = for {
       aiAssistant <- aiAssistantService.fetchAssistantForUser(request.userId, assistantType)
@@ -37,14 +36,6 @@ class EmoDetectionServiceWithAssistantImpl @Inject()(
         logger.info(s"V2 Successfully detected emotion for request, userId: ${request.userId}")
       case scala.util.Failure(e) =>
         logger.error(s"V2 Failed to detect emotion for request, userId: ${request.userId}", e)
-    }
-    responseFuture.andThen {
-      case Success(x) =>
-        val endTime = System.nanoTime()
-        val elapsedTime = (endTime - startTime) / 1e9d
-        logger.info(s"V2 Total elapsed time for detectEmotion: $elapsedTime seconds")
-        aiDbService.saveAiResponse(request.userId, EmotionDetectionResult.emotionDetectionResultFormat.writes(x),
-          Option(request.text), Option("emo detection v2"), Option(elapsedTime))
     }
     responseFuture
   }

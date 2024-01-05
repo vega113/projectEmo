@@ -1,32 +1,78 @@
 package service.ai
 
 import com.google.inject.ImplementedBy
-import dao.model.EmotionDetectionResult
+import dao.model.{EmotionDetectionResult, RequestsInFlight}
+import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, Json}
-import play.api.libs.ws.WSClient
-import play.api.{Configuration, Logger}
+import service.RequestsInFlightService
 import service.model._
-import service.serviceModel.ChatGptApiResponse
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try}
+import scala.util.Success
 
-@ImplementedBy(classOf[CompositeEmotionDetectionServiceImpl])
 trait EmotionDetectionService {
   def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult]
 }
 
-class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: EmotionDetectionService,
-                                                     @Named("ChatGptAssistant") v2: EmotionDetectionService
-                                                    )(implicit ec: ExecutionContext) extends EmotionDetectionService {
-  override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
-    val v1EmotionFuture = v1.detectEmotion(request)
-    val v2EmotionFuture = v2.detectEmotion(request)
+@ImplementedBy(classOf[CompositeEmotionDetectionServiceImpl])
+trait EmotionDetectionServiceWithIdempotency {
+  def detectEmotion(request: DetectEmotionRequest, idempotencyKey: String): Future[Option[EmotionDetectionResult]]
+}
 
-    Future.firstCompletedOf(Seq(v1EmotionFuture, v2EmotionFuture)).map { resp =>
-      resp
+
+class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: EmotionDetectionService,
+                                                     @Named("ChatGptAssistant") v2: EmotionDetectionService,
+                                                     requestsInFlightService: RequestsInFlightService,
+                                                     aiService: AiDbService
+                                                    )(implicit ec: ExecutionContext) extends EmotionDetectionServiceWithIdempotency {
+  private final val logger: Logger = play.api.Logger(getClass)
+
+  override def detectEmotion(request: DetectEmotionRequest, idempotencyKey: String): Future[Option[EmotionDetectionResult]] = {
+    val startTime = System.nanoTime()
+
+    def saveResponseToDb(emotionFuture: Future[EmotionDetectionResult], responseType: String, idempotencyKey: String) = {
+      emotionFuture.andThen {
+        case Success(x) =>
+          val endTime = System.nanoTime()
+          val elapsedTime = (endTime - startTime) / 1e9d
+          aiService.saveAiResponse(request.userId, EmotionDetectionResult.emotionDetectionResultFormat.writes(x),
+            Option(request.text),
+            Option(s"emo detection $responseType"), Option(elapsedTime), Some(idempotencyKey))
+          logger.info(s"Total elapsed time for detectEmotion $responseType: $elapsedTime seconds")
+          requestsInFlightService.markRequestComplete(idempotencyKey)
+      }
+    }
+
+    requestsInFlightService.fetchOrCreateRequestInFlight(idempotencyKey).flatMap {
+      case Some(requestsInFlight) =>
+        if (requestsInFlight.isCompleted) {
+          logger.info(s"Request with idempotencyKey: $idempotencyKey is already completed, fetching from db")
+          fetchCompletedEmotionDetectionResult(requestsInFlight).map(Some(_))
+        } else {
+          logger.info(s"Request with idempotencyKey: $idempotencyKey is not completed, try to run emotion detection again later")
+          Future.successful(None)
+        }
+      case None =>
+        logger.info(s"Request with idempotencyKey: $idempotencyKey is not completed, running emotion detection")
+        val v1EmotionFuture: Future[EmotionDetectionResult] = v1.detectEmotion(request)
+        val v2EmotionFuture: Future[EmotionDetectionResult] = v2.detectEmotion(request)
+
+        saveResponseToDb(v1EmotionFuture, "V1", idempotencyKey)
+        saveResponseToDb(v2EmotionFuture, "V2", idempotencyKey)
+
+        Future.successful(None)
+    }
+  }
+
+  private def fetchCompletedEmotionDetectionResult(requestsInFlight: RequestsInFlight) = {
+    aiService.fetchAiResponseByRequestId(requestsInFlight.requestId).map { aiResponse =>
+      EmotionDetectionResult.emotionDetectionResultFormat.reads(Json.parse(aiResponse.response)) match {
+        case JsSuccess(value, _) => value
+        case JsError(errors) =>
+          logger.error(s"Failed to parse emotion detection result from db: $errors")
+          throw new Exception(s"Failed to parse emotion detection result from db: $errors")
+      }
     }
   }
 }

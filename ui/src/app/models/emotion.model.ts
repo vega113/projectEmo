@@ -213,11 +213,13 @@ export interface EmotionDetectionResult {
   textTitle?: string;
   description: string;
   suggestion: string;
+  status?: number;
 }
 
 export interface EmotionFromNoteResult {
   emotionDetection?: EmotionDetectionResult;
   note: Note;
+  status?: number;
 }
 
 export interface NoteTodoUpdate {

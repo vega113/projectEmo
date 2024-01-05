@@ -13,13 +13,12 @@ import scala.concurrent.duration.Duration
 import scala.util.{Success, Try}
 
 @Named("ChatGpt")
-class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configuration, aiService: AiDbService)(implicit ec: ExecutionContext) extends EmotionDetectionService {
+class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configuration)(implicit ec: ExecutionContext) extends EmotionDetectionService {
 
   private final val logger: Logger = play.api.Logger(getClass)
   private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Serenity\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"Other\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
 
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
-    val startTime = System.nanoTime()
     val responseFuture =  if(request.text.startsWith("FAKE")) {
       Future.successful(Json.parse(fakeEmoDetectionResult).as[EmotionDetectionResult])
     } else {
@@ -30,20 +29,12 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
       }
     }
     responseFuture.onComplete {
-      case scala.util.Success(_) =>
+      case scala.util.Success(x) =>
         logger.info(s"V1 Successfully detected emotion for request, userId: ${request.userId}")
       case scala.util.Failure(e) =>
         logger.error(s"V1 Failed to detect emotion for request, userId: ${request.userId}", e)
     }
-    responseFuture.andThen {
-      case Success(x) =>
-        val endTime = System.nanoTime()
-        val elapsedTime = (endTime - startTime) / 1e9d
-        aiService.saveAiResponse(request.userId, EmotionDetectionResult.emotionDetectionResultFormat.writes(x),
-          Option(request.text),
-          Option("emo detection v1"), Option(elapsedTime))
-        logger.info(s"Total elapsed time for detectEmotion V1: $elapsedTime seconds")
-    }
+    responseFuture
   }
 
   /**

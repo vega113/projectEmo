@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
+import {delay, EMPTY, expand, filter, Observable, of, timer} from 'rxjs';
 import {EmotionDetectionResult, EmotionFromNoteResult, Note, NoteTemplate} from '../models/emotion.model';
 import {AuthService} from "./auth.service";
 import {environment} from "../../environments/environment";
-import {catchError, map, retry} from "rxjs/operators";
+import {catchError, map, retry, switchMap, take, tap} from "rxjs/operators";
 import {ErrorService} from "./error.service"; // adjust the path as needed
 
 @Injectable({
@@ -36,18 +36,32 @@ export class NoteService {
   }
 
   detectEmotion(text: string): Observable<EmotionFromNoteResult> {
-    const headers = this.authService.getAuthorizationHeader();
-    const note: Note = {text: text};
-
     console.log('Detecting emotion for text url: ' + `${environment.baseUrl}/note/emotion/detect`);
-    return this.http.post<EmotionDetectionResult>(
-      `${environment.baseUrl}/note/emotion/detect`, note,
-      {headers}).pipe(
-      retry({count: 3, delay: 3000}),
-      catchError(resp => this.errorService.handleError(resp)),
-      map((emotionDetectionResult: EmotionDetectionResult) => {
-        return {emotionDetection: emotionDetectionResult, note: note} as EmotionFromNoteResult;
+    const note = {text: text} as Note;
+    const headers = this.authService.getAuthorizationHeader();
+    return this.handleDetectEmotionWithRetry(note, headers).pipe(
+      map((response: HttpResponse<EmotionDetectionResult>) => {
+        return {emotionDetection: response.body, note: note} as EmotionFromNoteResult;
       })
+    );
+  }
+
+  private handleDetectEmotionWithRetry(note: Note, headers: HttpHeaders): Observable<HttpResponse<EmotionDetectionResult>> {
+    return timer(0, 3000).pipe(
+      take(20), // limit the number of retries to 20
+      switchMap(() => this.http.post<EmotionDetectionResult>(
+        `${environment.baseUrl}/note/emotion/detect`, note,
+        {headers, observe: 'response'})),
+      tap(response => {
+        if (response.status === 202) {
+          console.log('Emotion detection still in progress, retrying...');
+        } else if (response.status === 200) {
+          console.log('Emotion detection completed');
+        }
+      }),
+      filter(response => response.status === 200),
+      take(1), // stop retrying after the first successful response
+      catchError(resp => this.errorService.handleError(resp))
     );
   }
 }

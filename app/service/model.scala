@@ -4,7 +4,6 @@ import anorm.{Macro, RowParser}
 import dao.model.{NoteTodo, Tag, Trigger}
 import play.api.libs.json.{Format, Json}
 import Macro.ColumnNaming
-import dao.AiAssistant
 
 import java.time.LocalDateTime
 
