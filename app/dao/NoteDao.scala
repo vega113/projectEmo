@@ -47,10 +47,10 @@ class NoteDao @Inject()(dateTimeService: DateTimeService, noteTodoDao: NoteTodoD
   def insert(note: Note)(implicit connection: Connection): Option[Long] = {
     val noteId: Option[Long] = SQL(
       """
-          INSERT INTO notes (title, text, description, suggestion, emotion_record_id)
-          VALUES ({title}, {text}, {description}, {suggestion}, {emotionRecordId})""").
+          INSERT INTO notes (title, text, description, suggestion, emotion_record_id, user_id)
+          VALUES ({title}, {text}, {description}, {suggestion}, {emotionRecordId}, {userId})""").
       on("title" -> note.title, "text" -> note.text, "description" -> note.description, "suggestion" -> note.suggestion,
-      "emotionRecordId" -> note.emotionRecordId).
+      "emotionRecordId" -> note.emotionRecordId, "userId" -> note.userId).
       executeInsert()
     noteId
   }
@@ -59,18 +59,19 @@ class NoteDao @Inject()(dateTimeService: DateTimeService, noteTodoDao: NoteTodoD
     SQL(
       """
       UPDATE notes
-      SET title = {title}, content = {content}, last_updated = {lastUpdated},
+      SET title = {title}, text = {text}, last_updated = {lastUpdated},
        is_deleted = {isDeleted}, description = {description}, suggestion = {suggestion}
       WHERE id = {id} and user_id = {userId}
-    """).on("note_id" -> note.id,
+    """).on("id" -> note.id,
         "title" -> note.title,
         "text" -> note.text,
         "description" -> note.description,
         "suggestion" -> note.suggestion,
         "lastUpdated" -> dateTimeService.now(),
         "isDeleted" -> note.isDeleted,
-        "created" -> dateTimeService.now())
-      .executeUpdate()
+        "created" -> dateTimeService.now(),
+        "userId" -> note.userId).
+      executeUpdate()
   }
 
 

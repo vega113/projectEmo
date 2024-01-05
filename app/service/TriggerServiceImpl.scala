@@ -18,6 +18,8 @@ trait TriggerService {
   def insert(emotionRecordId: Long, triggers: List[Trigger]): Future[Boolean]
 
   def linkTriggerToEmotionRecord(triggerId: Long, emotionRecordId: Long): Future[Boolean]
+
+  def findByName(triggerName: String): Future[Trigger]
 }
 class TriggerServiceImpl @Inject()(
                                     triggerDao: TriggerDao,
@@ -58,4 +60,10 @@ class TriggerServiceImpl @Inject()(
         Future.successful(true)
       })
     }
+
+  override def findByName(triggerName: String): Future[Trigger] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(triggerDao.findByName(triggerName))
+    })
+  }
 }

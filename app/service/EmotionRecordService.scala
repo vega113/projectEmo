@@ -36,6 +36,9 @@ trait EmotionRecordService {
   def emotionRecordsToDoughnutEmotionTypeTriggerChartData(records: List[EmotionRecord]): DoughnutEmotionTypesTriggersChartData
   def generateLineChartTrendDataSetForEmotionTypesTriggers(days: List[EmotionRecordDay]): LineChartTrendDataSet
 
+  def updateWithEmotionDetectionResult(userId: Long, emotionRecordId: Long,
+                                       emotionDetectionResult: EmotionDetectionResult): Future[Boolean]
+
 
 }
 
@@ -218,6 +221,42 @@ class EmotionRecordServiceImpl @Inject()(
         userId, startDateTime.toString, endDateTime.toString)
       records
     }))
+  }
+
+  def updateWithEmotionDetectionResult(userId: Long, emotionRecordId: Long, emotionDetectionResult: EmotionDetectionResult): Future[Boolean] = {
+    val triggerNameOpt = emotionDetectionResult.triggers match {
+      case Some(triggers) if triggers.nonEmpty =>
+        triggers.head.triggerName
+      case _ => None
+    }
+
+    val triggerIdOptFut: Option[Future[Option[Long]]] =  triggerNameOpt.map(triggerService.findByName(_).map(_.triggerId))
+    convertOptionOfFutureOfOptionOfLongToFutureOfOptionOfLong(triggerIdOptFut).flatMap(triggerIdOpt => {
+      val emotionRecord = EmotionRecord(
+        id = Some(emotionRecordId),
+        emotionType = emotionDetectionResult.emotionType,
+        intensity = emotionDetectionResult.intensity,
+        userId = Some(userId),
+        created = None,
+        lastUpdated = None,
+        notes = List(),
+        tags = emotionDetectionResult.tags.getOrElse(List()),
+        triggers = List(),
+        subEmotions = List(),
+        emotion = None,
+        subEmotionId = emotionDetectionResult.subEmotionId,
+        triggerId = triggerIdOpt
+      )
+      update(emotionRecord).map(_ => true)
+    })
+  }
+
+  private def convertOptionOfFutureOfOptionOfLongToFutureOfOptionOfLong(triggerIdOptFut: Option[Future[Option[Long]]]):
+    Future[Option[Long]] = {
+    triggerIdOptFut match {
+      case Some(fut) => fut
+      case None => Future.successful(None)
+    }
   }
 
   private def computeColor(name: String): Option[String] = {

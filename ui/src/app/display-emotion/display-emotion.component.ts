@@ -143,9 +143,11 @@ handleEmotionDetected(emotion: string) {
 
   detectEmotions() {
     this.isDetectingEmotionWithAI = true;
-    console.log('Detecting emotion for text: ', this.emotion?.notes![0].text);
+    console.log('Detecting emotion for note: ', this.emotion?.notes![0]);
     if(this.emotion?.notes[0]?.text) {
-      this.noteService.detectEmotion(this.emotion?.notes![0].text).subscribe({
+      const note = this.emotion?.notes![0];
+      note.emotionRecordId = this.emotion?.id;
+      this.noteService.detectEmotion(note).subscribe({
         next: (response: EmotionFromNoteResult) => {
           console.log('Emotion detected successfully', response);
           if (response.emotionDetection?.textTitle != null) {

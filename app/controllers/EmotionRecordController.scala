@@ -45,7 +45,6 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def insert(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
-
     logger.info("Inserting emotion record for user {} {}",
       value("userId", token.user.userId), value("record", token.body))
 
@@ -54,9 +53,10 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       emotionRecord => {
         if (!validateRequestUserId(emotionRecord.userId, token.user.userId)) {
           logger.warn(s"Invalid user id. body id: {} token id: {}", emotionRecord.userId, token.user.userId)
-          Future.successful(BadRequest(Json.obj("message" -> s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
+          Future.successful(BadRequest(Json.obj("message" ->
+            s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
         } else {
-          emotionRecordService.insert(emotionRecord).flatMap {
+          emotionRecordService.insert(emotionRecord.copy(userId = Some(token.user.userId))).flatMap {
             case Some(id) =>
               logger.info(s"Inserted emotion record for user: ${token.user.userId} recordId: $id")
               fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {delay, EMPTY, expand, filter, Observable, of, timer} from 'rxjs';
+import {delay, EMPTY, expand, filter, Observable, of, throwIfEmpty, timer} from 'rxjs';
 import {EmotionDetectionResult, EmotionFromNoteResult, Note, NoteTemplate} from '../models/emotion.model';
 import {AuthService} from "./auth.service";
 import {environment} from "../../environments/environment";
@@ -35,9 +35,8 @@ export class NoteService {
       );
   }
 
-  detectEmotion(text: string): Observable<EmotionFromNoteResult> {
+  detectEmotion(note: Note): Observable<EmotionFromNoteResult> {
     console.log('Detecting emotion for text url: ' + `${environment.baseUrl}/note/emotion/detect`);
-    const note = {text: text} as Note;
     const headers = this.authService.getAuthorizationHeader();
     return this.handleDetectEmotionWithRetry(note, headers).pipe(
       map((response: HttpResponse<EmotionDetectionResult>) => {
@@ -61,6 +60,7 @@ export class NoteService {
       }),
       filter(response => response.status === 200),
       take(1), // stop retrying after the first successful response
+      throwIfEmpty(() => new Error('Exhausted number of retries without success')),
       catchError(resp => this.errorService.handleError(resp))
     );
   }

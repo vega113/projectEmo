@@ -56,10 +56,10 @@ class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: Emoti
       case None =>
         logger.info(s"Request with idempotencyKey: $idempotencyKey is not completed, running emotion detection")
         val v1EmotionFuture: Future[EmotionDetectionResult] = v1.detectEmotion(request)
-        val v2EmotionFuture: Future[EmotionDetectionResult] = v2.detectEmotion(request)
+//        val v2EmotionFuture: Future[EmotionDetectionResult] = v2.detectEmotion(request)
 
         saveResponseToDb(v1EmotionFuture, "V1", idempotencyKey)
-        saveResponseToDb(v2EmotionFuture, "V2", idempotencyKey)
+//        saveResponseToDb(v2EmotionFuture, "V2", idempotencyKey)
 
         Future.successful(None)
     }

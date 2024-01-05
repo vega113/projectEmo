@@ -117,6 +117,7 @@ export interface Note {
   suggestion?: string;
   todos?: NoteTodo[];
   created?: string;
+  emotionRecordId?: number;
 }
 
 export interface Tag {

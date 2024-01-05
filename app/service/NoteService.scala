@@ -19,6 +19,8 @@ trait NoteService {
 
   def insert(note: Note): Future[Option[Long]]
 
+  def update(note: Note): Future[Boolean]
+
   def insert(notes: List[Note]): Future[Option[Long]]
 
   def findAllNoteTemplates(): Future[List[NoteTemplate]]
@@ -174,5 +176,13 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
       case Some(id) => id
       case None => throw new Exception("Id is None")
     }
+  }
+
+  override def update(note: Note): Future[Boolean] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      val updatedCount = noteDao.update(note)
+      logger.info("Updated note {}", value("note", note))
+      Future.successful(updatedCount > 0)
+    })
   }
 }

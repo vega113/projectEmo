@@ -1,14 +1,14 @@
 package controllers
 
-import auth.AuthenticatedAction
-import dao.model.Note
+import auth.{AuthenticatedAction, model}
+import dao.model.{EmotionDetectionResult, Note}
 import net.logstash.logback.argument.StructuredArguments._
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsError, JsValue, Json}
 import play.api.mvc.{AbstractController, Action, AnyContent, ControllerComponents}
-import service.ai.{EmotionDetectionService, EmotionDetectionServiceWithIdempotency}
+import service.ai.EmotionDetectionServiceWithIdempotency
 import service.model.DetectEmotionRequest
-import service.{NoteService, NoteTodoService}
+import service.{EmotionRecordService, NoteService, NoteTodoService}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -18,6 +18,7 @@ class NoteController @Inject()(cc: ControllerComponents,
                                noteService: NoteService,
                                emotionDetectionService: EmotionDetectionServiceWithIdempotency,
                                noteTodoService: NoteTodoService,
+                               emotionRecordService: EmotionRecordService,
                                authenticatedAction: AuthenticatedAction)
   extends AbstractController(cc){
 
@@ -45,6 +46,14 @@ class NoteController @Inject()(cc: ControllerComponents,
         token.headers.get("X-IdempotencyKey")
         val v1EmotionFuture = emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId),
           token.headers.get("X-IdempotencyKey").getOrElse(""))
+
+        v1EmotionFuture.onComplete {
+          case scala.util.Success(Some(emotionDetectionResult)) =>
+            logger.info("Successfully detected emotion {}", value("emotionDetectionResult", emotionDetectionResult))
+            updateNoteAndEmotionRecordInDbWithDetectionResult(token.user.userId, note, emotionDetectionResult)
+          case _ => ()
+        }
+
         v1EmotionFuture.map {
           case Some(emotionDetectionResult) =>
             Ok(Json.toJson(emotionDetectionResult))
@@ -59,6 +68,17 @@ class NoteController @Inject()(cc: ControllerComponents,
     )
   }
 
+  private def updateNoteAndEmotionRecordInDbWithDetectionResult(userId: Long, note: Note, emotionDetectionResult: EmotionDetectionResult): Unit = {
+    note.emotionRecordId match {
+      case Some(emotionRecordId) =>
+        emotionRecordService.updateWithEmotionDetectionResult(userId, emotionRecordId, emotionDetectionResult)
+      case None =>
+        logger.error("Missing emotionRecordId")
+    }
+    note.id.foreach(_ => noteService.update(copyEmotionDetectionResultToNote(note.copy(userId = Some(userId)),
+      emotionDetectionResult)))
+  }
+
   def acceptTodo(noteTodoId: Long):Action[AnyContent] =
     Action andThen authenticatedAction async { implicit token =>
       noteTodoService.acceptNoteTodo(token.user.userId, noteTodoId).flatMap {
@@ -69,5 +89,15 @@ class NoteController @Inject()(cc: ControllerComponents,
           logger.error("Failed to accept note todo {}", value("noteTodoId", noteTodoId))
           Future.successful(BadRequest(Json.obj("message" -> s"Invalid note todo id: $noteTodoId")))
       }
+  }
+
+  private def copyEmotionDetectionResultToNote(note: Note, emotionDetectionResult: EmotionDetectionResult) = {
+    note.
+      copy(
+        suggestion = emotionDetectionResult.suggestion,
+        description = emotionDetectionResult.description,
+        todos = emotionDetectionResult.todos,
+        title = emotionDetectionResult.textTitle
+      )
   }
 }
