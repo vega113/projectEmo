@@ -34,7 +34,7 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
     databaseExecutionContext.withConnection({ implicit connection =>
       val todoId: Long = noteTodoDao.insert(todo) match {
         case Some(id) =>
-          logger.info(s"Inserted note todo {} {}:", value("noteId", todo.noteId), value("todo", todo))
+          logger.info(s"Inserted note todo {} {}:", value("noteId", todo.noteId), value("todo", todo.copy(id = Some(id))))
           id
         case None =>
           val errorMsg = s"Failed to insert note todo: {}"

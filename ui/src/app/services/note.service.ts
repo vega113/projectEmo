@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {delay, EMPTY, expand, filter, Observable, of, throwIfEmpty, timer} from 'rxjs';
-import {EmotionDetectionResult, EmotionFromNoteResult, Note, NoteTemplate} from '../models/emotion.model';
+import {filter, Observable, throwIfEmpty, timer} from 'rxjs';
+import {
+  EmotionFromNoteResult,
+  EmotionRecord,
+  Note,
+  NoteTemplate
+} from '../models/emotion.model';
 import {AuthService} from "./auth.service";
 import {environment} from "../../environments/environment";
-import {catchError, map, retry, switchMap, take, tap} from "rxjs/operators";
+import {catchError, map, switchMap, take, tap} from "rxjs/operators";
 import {ErrorService} from "./error.service"; // adjust the path as needed
 
 @Injectable({
@@ -39,16 +44,16 @@ export class NoteService {
     console.log('Detecting emotion for text url: ' + `${environment.baseUrl}/note/emotion/detect`);
     const headers = this.authService.getAuthorizationHeader();
     return this.handleDetectEmotionWithRetry(note, headers).pipe(
-      map((response: HttpResponse<EmotionDetectionResult>) => {
-        return {emotionDetection: response.body, note: note} as EmotionFromNoteResult;
+      map((response: HttpResponse<EmotionRecord>) => {
+        return {emotionRecord: response.body, note: note} as EmotionFromNoteResult;
       })
     );
   }
 
-  private handleDetectEmotionWithRetry(note: Note, headers: HttpHeaders): Observable<HttpResponse<EmotionDetectionResult>> {
+  private handleDetectEmotionWithRetry(note: Note, headers: HttpHeaders): Observable<HttpResponse<EmotionRecord>> {
     return timer(0, 3000).pipe(
       take(20), // limit the number of retries to 20
-      switchMap(() => this.http.post<EmotionDetectionResult>(
+      switchMap(() => this.http.post<EmotionRecord>(
         `${environment.baseUrl}/note/emotion/detect`, note,
         {headers, observe: 'response'})),
       tap(response => {

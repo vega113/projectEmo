@@ -28,6 +28,9 @@ trait NoteService {
   def delete(userId: Long, id: Long): Future[Boolean]
 
   def extractTags(text: String): Set[Tag]
+
+  def addTodosFromAi(todosOpt: Option[List[model.NoteTodo]], userId: Option[Long],
+    emotionRecordId: Option[Long], noteId: Option[Long]): Future[List[Option[Long]]]
 }
 
 class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
@@ -84,7 +87,7 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
             case Failure(ex) => logger.error("Failed to insert note todos for note id {}", value("noteId",
               noteId), ex)
           }
-          addTodosFromAi(noteWithUpdatedIdAndAiTodos.todos).onComplete {
+          addTodosFromAi(noteWithUpdatedIdAndAiTodos.todos, note.userId, note.emotionRecordId, note.id).onComplete {
             case Success(_) => logger.info("Inserted ai todos for note id {}", value("noteId", noteId))
             case Failure(ex) => logger.error("Failed to insert ai todos for note id {}", value("noteId",
               noteId), ex)
@@ -143,10 +146,12 @@ class NoteServiceImpl @Inject() (noteDao: NoteDao, tagDao: TagDao,
     sequence(extractedTodos.map(todo => todoService.insert(todo)))
   }
 
-  private def addTodosFromAi(todosOpt: Option[List[model.NoteTodo]]): Future[List[Option[Long]]] = {
+  override def addTodosFromAi(todosOpt: Option[List[model.NoteTodo]], userId: Option[Long],
+                     emotionRecordId: Option[Long], noteId: Option[Long]): Future[List[Option[Long]]] = {
     todosOpt match {
       case Some(todos) =>
-        sequence(todos.map(todo => todoService.insert(todo.copy(isAi = Some(true), isAccepted = Some(false)))))
+        sequence(todos.map(todo => todoService.insert(todo.copy(isAi = Some(true), isAccepted = Some(false),
+          userId = userId, emotionRecordId = emotionRecordId, noteId = noteId))))
       case None => Future.successful(List())
     }
   }

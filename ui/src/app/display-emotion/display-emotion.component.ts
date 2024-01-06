@@ -1,4 +1,4 @@
-import {Component, QueryList, signal} from '@angular/core';
+import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
 import {EmotionFromNoteResult, EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
@@ -8,8 +8,6 @@ import {MatChipInputEvent} from "@angular/material/chips";
 import { Router } from '@angular/router';
 import {MatDialog} from "@angular/material/dialog";
 import {EmotionAnalyzerComponent} from "../emotion-analyzer/emotion-analyzer.component";
-import {formatDate} from "@angular/common";
-import {MatOption} from "@angular/material/core";
 import {NoteService} from "../services/note.service";
 
 
@@ -137,10 +135,6 @@ export class DisplayEmotionComponent {
       });
   }
 
-handleEmotionDetected(emotion: string) {
-
-}
-
   detectEmotions() {
     this.isDetectingEmotionWithAI = true;
     console.log('Detecting emotion for note: ', this.emotion?.notes![0]);
@@ -150,8 +144,8 @@ handleEmotionDetected(emotion: string) {
       this.noteService.detectEmotion(note).subscribe({
         next: (response: EmotionFromNoteResult) => {
           console.log('Emotion detected successfully', response);
-          if (response.emotionDetection?.textTitle != null) {
-            this.updateUiWithEmotionRecordWithDetectedEmotionData(response);
+          if (response != null && response.emotionRecord != null) {
+            this.emotion = response.emotionRecord;
             this.emotionStateService.updateNewEmotion(this.emotion!);
           }
           this.isDetectingEmotionWithAI = false;
@@ -171,31 +165,6 @@ handleEmotionDetected(emotion: string) {
       });
     }
   }
-
-  private updateUiWithEmotionRecordWithDetectedEmotionData(response: EmotionFromNoteResult) {
-    if (this.emotion && this.emotion.notes && this.emotion.notes[0]) {
-      this.emotion.notes[0].title = response.emotionDetection?.textTitle;
-      this.emotion.notes[0].suggestion = response.emotionDetection?.suggestion;
-      this.emotion.notes[0].description = response.emotionDetection?.description;
-      this.emotion.notes[0].todos = response.emotionDetection?.todos;
-      this.emotion.emotionType = response.emotionDetection?.emotionType || "unknown";
-      this.emotion.intensity = response.emotionDetection?.intensity || 0;
-      if (this.emotion.emotion != null) {
-        this.emotion.emotion.emotionName = response.emotionDetection?.mainEmotionId;
-        this.emotion.emotion.id = response.emotionDetection?.mainEmotionId;
-      } else {
-        this.emotion.emotion = {
-          emotionName: response.emotionDetection?.mainEmotionId,
-          id: response.emotionDetection?.mainEmotionId
-        };
-      }
-      this.emotion.subEmotionId = response.emotionDetection?.subEmotionId;
-      this.emotion.tags = response.emotionDetection?.tags || [];
-      this.emotion.triggers = response.emotionDetection?.triggers || [];
-    }
-  }
-
-  protected readonly formatDate = formatDate;
 
   formatDateFromDb() {
     return this.dateService.formatDateFromDb( this.emotion?.created!)

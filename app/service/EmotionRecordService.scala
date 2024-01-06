@@ -39,7 +39,6 @@ trait EmotionRecordService {
   def updateWithEmotionDetectionResult(userId: Long, emotionRecordId: Long,
                                        emotionDetectionResult: EmotionDetectionResult): Future[Boolean]
 
-
 }
 
 class EmotionRecordServiceImpl @Inject()(
@@ -93,7 +92,6 @@ class EmotionRecordServiceImpl @Inject()(
       emotionRecordDao.findByIdForUser(recordId, userId)
     }))
   }
-
 
   override def findAllByUserId(userId: Long): Future[List[EmotionRecord]] = {
     logger.info(s"Fetching all emotion records for user: $userId")

@@ -219,6 +219,7 @@ export interface EmotionDetectionResult {
 
 export interface EmotionFromNoteResult {
   emotionDetection?: EmotionDetectionResult;
+  emotionRecord?: EmotionRecord;
   note: Note;
   status?: number;
 }

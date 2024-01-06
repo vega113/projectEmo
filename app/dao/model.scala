@@ -315,8 +315,8 @@ object model {
             None,
             isDeleted,
             lastUpdated,
-            emotionRecordId,
             userId,
+            emotionRecordId,
             created
           )
       }
