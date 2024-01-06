@@ -34,6 +34,7 @@ trait EmotionRecordService {
   def emotionRecordsToSunburstChartData(records: List[EmotionRecord]): List[SunburstData]
 
   def emotionRecordsToDoughnutEmotionTypeTriggerChartData(records: List[EmotionRecord]): DoughnutEmotionTypesTriggersChartData
+
   def generateLineChartTrendDataSetForEmotionTypesTriggers(days: List[EmotionRecordDay]): LineChartTrendDataSet
 
   def updateWithEmotionDetectionResult(userId: Long, emotionRecordId: Long,
@@ -51,6 +52,7 @@ class EmotionRecordServiceImpl @Inject()(
                                         ) extends EmotionRecordService {
 
   private val logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
+
   def emotionRecordsToDoughnutTriggerChartData(records: List[EmotionRecord]): List[DoughnutChartData] = {
     val recordsByTrigger: Map[String, List[EmotionRecord]] = records.groupBy(record => {
       record.triggers match {
@@ -68,7 +70,7 @@ class EmotionRecordServiceImpl @Inject()(
     })
   }
 
-  def emotionRecordsToDoughnutEmotionTypeChartData(records: List[EmotionRecord]):List[DoughnutChartData] = {
+  def emotionRecordsToDoughnutEmotionTypeChartData(records: List[EmotionRecord]): List[DoughnutChartData] = {
     val recordsByType: Map[String, List[EmotionRecord]] = records.groupBy(_.emotionType)
     val chartData = recordsByType.map { case (emotionType, recordsForType) =>
       val intensitySum = recordsForType.map(_.intensity).sum
@@ -87,7 +89,7 @@ class EmotionRecordServiceImpl @Inject()(
     })
   }
 
-  override def findByIdForUser(recordId: Long, userId: Long): Future[Option[EmotionRecord]]= {
+  override def findByIdForUser(recordId: Long, userId: Long): Future[Option[EmotionRecord]] = {
     Future.successful(databaseExecutionContext.withConnection({ implicit connection =>
       emotionRecordDao.findByIdForUser(recordId, userId)
     }))
@@ -119,7 +121,7 @@ class EmotionRecordServiceImpl @Inject()(
 
   def generateLineChartTrendDataSetForEmotionTypesTriggers(days: List[EmotionRecordDay]): LineChartTrendDataSet = {
     val emotionTypes: List[String] = EmotionType.toList
-    val triggerTypes:List[String] = TriggerType.toList
+    val triggerTypes: List[String] = TriggerType.toList
     LineChartTrendDataSet(
       rows = generateLineChartTrendDataRowsForEmotionTypesTriggers(days),
       emotionTypes = emotionTypes,
@@ -128,6 +130,7 @@ class EmotionRecordServiceImpl @Inject()(
     )
 
   }
+
   private[service] def generateLineChartTrendDataRowsForEmotionTypesTriggers(days: List[EmotionRecordDay]): List[LineChartTrendDataRow] = {
     def extractData[T](records: List[EmotionRecord], groupByCriteria: EmotionRecord => T): Map[T, LineChartData] = {
       records.groupBy(groupByCriteria).map(entry => {
@@ -183,17 +186,63 @@ class EmotionRecordServiceImpl @Inject()(
   }
 
   override def update(emotionRecord: EmotionRecord): Future[EmotionRecord] = {
-    databaseExecutionContext.withConnection({ implicit connection =>
-      val count = emotionRecordDao.update(emotionRecord)
-      if (count > 0) {
-        logger.info(s"Updated emotion record: ${emotionRecord.id}, userId ${emotionRecord.userId}, count: $count")
-        Future.successful(emotionRecordDao.findByIdForUser(emotionRecord.id, emotionRecord.userId).getOrElse(
-          throw new Exception(s"Failed to find emotion record after update: $emotionRecord")))
-      } else {
-        logger.error(s"Failed to update emotion record: $emotionRecord")
-        Future.failed(new Exception(s"Failed to update emotion record: $emotionRecord"))
+    for {
+      fixedEmotionId <- fixMainEmotionIdBySubEmotionId(emotionRecord.subEmotionId)
+      fixedEmotionType <- fixEmotionTypeByMainEmotion(fixedEmotionId)
+      result <- {
+        val emotionRecordFixed = emotionRecord.copy(emotionType = fixedEmotionType.getOrElse("Unknown"),
+          emotionId = fixedEmotionId)
+        databaseExecutionContext.withConnection({ implicit connection =>
+          val count = emotionRecordDao.update(emotionRecordFixed)
+          if (count > 0) {
+            logger.info(s"Updated emotion record: ${emotionRecord.id}, userId ${emotionRecord.userId}, count: $count")
+            Future.successful(emotionRecordDao.findByIdForUser(emotionRecord.id, emotionRecord.userId).getOrElse(
+              throw new Exception(s"Failed to find emotion record after update: $emotionRecord")))
+          } else {
+            logger.error(s"Failed to update emotion record: $emotionRecord")
+            Future.failed(new Exception(s"Failed to update emotion record: $emotionRecord"))
+          }
+        })
       }
-    })
+    } yield result
+  }
+
+  private def fixMainEmotionIdBySubEmotionId(subEmotionId: Option[String]): Future[Option[String]] = {
+    subEmotionId match {
+      case Some(subEmotionId) =>
+        databaseExecutionContext.withConnection({ implicit connection =>
+          val mainEmotionIdOpt = emotionRecordDao.findMainEmotionIdBySubEmotionId(subEmotionId)
+          mainEmotionIdOpt match {
+            case Some(mainEmotionId) =>
+              logger.info(s"Found main emotion id for sub emotion id: $subEmotionId, main emotion id: $mainEmotionId")
+              Future.successful(Some(mainEmotionId))
+            case None =>
+              logger.error(s"Failed to find main emotion id for sub emotion id: $subEmotionId")
+              Future.failed(new Exception(s"Failed to find main emotion id for sub emotion id: $subEmotionId"))
+          }
+        })
+      case None =>
+        Future.successful(None)
+    }
+  }
+
+  private def fixEmotionTypeByMainEmotion(mainEmotionIdOpt: Option[String]): Future[Option[String]] = {
+    mainEmotionIdOpt match {
+      case Some(mainEmotionId) =>
+        databaseExecutionContext.withConnection({ implicit connection =>
+          val emotionTypeOpt = emotionRecordDao.findEmotionTypeByMainEmotionId(mainEmotionId)
+          emotionTypeOpt match {
+            case Some(emotionType) =>
+              logger.info(s"Found emotion type for main emotion id: $emotionType, main emotion id: $mainEmotionId")
+              Future.successful(Some(emotionType))
+            case None =>
+              logger.error(s"Failed to find emotion type for mainEmotionId: $mainEmotionId")
+              Future.failed(new Exception(s"Failed to find emotion type  for mainEmotionId: $mainEmotionId"))
+          }
+        })
+      case None =>
+        Future.successful(None)
+    }
   }
 
   override def delete(id: Long, userId: Long): Future[Boolean] = {
@@ -228,12 +277,14 @@ class EmotionRecordServiceImpl @Inject()(
       case _ => None
     }
 
-    val triggerIdOptFut: Option[Future[Option[Long]]] =  triggerNameOpt.map(triggerService.findByName(_).map(_.triggerId))
+    val triggerIdOptFut: Option[Future[Option[Long]]] = triggerNameOpt.map(triggerService.findByName(_).map(_.triggerId))
+
     convertOptionOfFutureOfOptionOfLongToFutureOfOptionOfLong(triggerIdOptFut).flatMap(triggerIdOpt => {
       val emotionRecord = EmotionRecord(
         id = Some(emotionRecordId),
         emotionType = emotionDetectionResult.emotionType,
         intensity = emotionDetectionResult.intensity,
+        emotionId = emotionDetectionResult.mainEmotionId,
         userId = Some(userId),
         created = None,
         lastUpdated = None,
@@ -245,12 +296,18 @@ class EmotionRecordServiceImpl @Inject()(
         subEmotionId = emotionDetectionResult.subEmotionId,
         triggerId = triggerIdOpt
       )
-      update(emotionRecord).map(_ => true)
+      val updatedRecord = update(emotionRecord)
+      updatedRecord.recover({
+        case e: Exception =>
+          logger.error("Failed to update emotion record with results of detection", e)
+          throw e
+      })
+      updatedRecord.map(_ => true)
     })
   }
 
   private def convertOptionOfFutureOfOptionOfLongToFutureOfOptionOfLong(triggerIdOptFut: Option[Future[Option[Long]]]):
-    Future[Option[Long]] = {
+  Future[Option[Long]] = {
     triggerIdOptFut match {
       case Some(fut) => fut
       case None => Future.successful(None)

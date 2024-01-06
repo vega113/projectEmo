@@ -45,17 +45,11 @@ class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: Emoti
     }
 
     requestsInFlightService.fetchOrCreateRequestInFlight(idempotencyKey).flatMap {
-      case Some(requestsInFlight) =>
-        if (requestsInFlight.isCompleted) {
-          logger.info(s"Request with idempotencyKey: $idempotencyKey is already completed, fetching from db")
-          fetchCompletedEmotionDetectionResult(requestsInFlight).map(Some(_))
-        } else {
-          logger.info(
-            s"Request with idempotencyKey: $idempotencyKey is not completed, try to run emotion detection again later")
-          Future.successful(None)
-        }
-      case None =>
-        logger.info(s"Request with idempotencyKey: $idempotencyKey does not exist, running emotion detection")
+      case Some(requestsInFlight) if requestsInFlight.isCompleted =>
+        logger.info(s"Request with idempotencyKey: $idempotencyKey is already completed, fetching from db")
+        fetchCompletedEmotionDetectionResult(requestsInFlight).map(Some(_))
+      case _ =>
+        logger.info(s"Request with idempotencyKey: $idempotencyKey does not exist or is not completed, running emotion detection")
         val v1EmotionFuture: Future[EmotionDetectionResult] = v1.detectEmotion(request)
         saveResponseToDb(v1EmotionFuture, "V1", idempotencyKey)
         Future.successful(None)

@@ -139,6 +139,8 @@ class AiDao {
         |SELECT *
         |FROM ai_responses
         |WHERE idempotence_key = {requestId}
+        |ORDER BY created ASC
+        |LIMIT 1
         |""".stripMargin
     ).on(
       "requestId" -> requestId

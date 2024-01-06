@@ -124,7 +124,8 @@ export class EmotionAnalyzerComponent implements OnInit {
     this.setFormControlValueForObservable(
       this.mainEmotions$,
       'emotion',
-      (emotion: EmotionWithSubEmotions) => emotion.emotion.id,
+      (emotion: EmotionWithSubEmotions) => emotion.emotion.id ??
+        emotion.subEmotions[0].subEmotion.parentEmotionId,
       this.emotionRecord?.emotion?.id
     );
     this.copyFromInputEmotionRecordToForm();
@@ -281,7 +282,7 @@ export class EmotionAnalyzerComponent implements OnInit {
         Promise.resolve().then(() => itemToSelect.select());
         console.log('Emotion type selected', itemToSelect);
       } else {
-        console.warn(`Associated emotion ${emotionFromResult.emotionDetection?.emotionType} not found in the list of emotions.`);
+        console.warn(`Associated emotion type ${emotionFromResult.emotionDetection?.emotionType} not found in the list of emotion types.`);
       }
     });
 
@@ -294,7 +295,7 @@ export class EmotionAnalyzerComponent implements OnInit {
           Promise.resolve().then(() => itemToSelect.select());
           console.log('Emotion selected', itemToSelect);
         } else {
-          console.warn(`Associated emotion ${emotionFromResult.emotionDetection?.mainEmotionId} not found in the list of emotions.`);
+          console.warn(`Associated emotion id ${emotionFromResult.emotionDetection?.mainEmotionId} not found in the list of emotions.`);
         }
       }
     );
@@ -308,7 +309,7 @@ export class EmotionAnalyzerComponent implements OnInit {
           Promise.resolve().then(() => itemToSelect.select());
           console.log('Sub emotion selected', itemToSelect);
         } else {
-          console.warn(`Associated emotion ${emotionFromResult.emotionDetection?.subEmotionId} not found in the list of emotions.`);
+          console.warn(`Associated sub-emotion id ${emotionFromResult.emotionDetection?.subEmotionId} not found in the list of sub-emotions.`);
         }
       }
     );

@@ -41,6 +41,7 @@ object model {
                             id: Option[Long],
                             emotionType: String,
                             userId: Option[Long],
+                            emotionId : Option[String],
                             emotion: Option[Emotion],
                             subEmotionId: Option[String],
                             triggerId: Option[Long],
@@ -251,7 +252,7 @@ object model {
         get[Option[LocalDateTime]]("created") ~
         get[Option[LocalDateTime]]("last_updated") map {
         case id ~ emotionType ~ userId ~ emotionId ~ intensity ~ subEmotionId ~ triggerId ~ created ~ lastUpdated =>
-          EmotionRecord(id, emotionType, userId, Some(Emotion(emotionId, None, None, None)), subEmotionId, triggerId,
+          EmotionRecord(id, emotionType, userId, emotionId, Some(Emotion(emotionId, None, None, None)), subEmotionId, triggerId,
             intensity.getOrElse(0), List.empty, List.empty, List.empty,
             List.empty, None, lastUpdated, created)
       }

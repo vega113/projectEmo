@@ -43,15 +43,18 @@ class NoteController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       note => {
+        logger.info(s"Detecting emotion for note ${note.id}")
         token.headers.get("X-IdempotencyKey")
         val v1EmotionFuture = emotionDetectionService.detectEmotion(DetectEmotionRequest(note.text, token.user.userId),
           token.headers.get("X-IdempotencyKey").getOrElse(""))
         val futResp = v1EmotionFuture.flatMap {
           case Some(emotionDetectionResult) =>
+            logger.info(s"End of Detecting emotion for note ${note.id}")
             updateNoteAndEmotionRecordInDbWithDetectionResult(token.user.userId, note, emotionDetectionResult).map { emotionRecord =>
               Ok(Json.toJson(emotionRecord))
             }
           case None =>
+            logger.info(s"End of Detecting emotion for note ${note.id}")
             Future.successful(Accepted(Json.obj("message" -> "Emotion detection result not available")))
         }
 
