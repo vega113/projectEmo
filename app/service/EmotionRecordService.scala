@@ -282,7 +282,7 @@ class EmotionRecordServiceImpl @Inject()(
     convertOptionOfFutureOfOptionOfLongToFutureOfOptionOfLong(triggerIdOptFut).flatMap(triggerIdOpt => {
       val emotionRecord = EmotionRecord(
         id = Some(emotionRecordId),
-        emotionType = emotionDetectionResult.emotionType,
+        emotionType = emotionDetectionResult.emotionType.getOrElse("Unknown"),
         intensity = emotionDetectionResult.intensity,
         emotionId = emotionDetectionResult.mainEmotionId,
         userId = Some(userId),

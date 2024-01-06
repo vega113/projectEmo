@@ -61,7 +61,15 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
                 case JsSuccess(result, _) =>
                   logger.info(s"Deserialization successful: $result")
                   val content = result.choices.head.message.content
-                  Json.parse(content).as[EmotionDetectionResult]
+                  Try {
+                    Json.parse(content).as[EmotionDetectionResult]
+                  } match {
+                    case scala.util.Success(value) =>
+                      value
+                    case scala.util.Failure(e) =>
+                      logger.error(s"Failed to parse emotion detection result: $content", e)
+                      throw new Exception(s"Failed to parse emotion detection result: $content")
+                  }
                 case JsError(errors) =>
                   logger.error(s"Deserialization failed: $errors, response: ${response.json}")
                   throw new Exception(s"Deserialization failed: $errors")

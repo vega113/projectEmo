@@ -168,7 +168,7 @@ object model {
 
 
   case class EmotionDetectionResult(
-                                     emotionType: String,
+                                     emotionType: Option[String],
                                      intensity: Int,
                                      mainEmotionId: Option[String],
                                      subEmotionId: Option[String],

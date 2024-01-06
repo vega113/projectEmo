@@ -8,7 +8,7 @@ object TestObjectsFactory {
     val triggers = List(Trigger(Option(1), Some("Person"), Some(1), Some(1), Some("Listening to music")))
     val notes = List(Note(Some(1), Some("Note 1"), "Note 1 description", None))
     val tags = List(Tag(Some(1), "Tag 1", None))
-    EmotionRecord(Option(1), "Positive", Option(1L), Some(Emotion(Some("Joy"), Option("Joy"), Some("Positive"), Some("description"))),
+    EmotionRecord(Option(1), "Positive", Option(1L), emotionId = Some("Joy"), Some(Emotion(Some("Joy"), Option("Joy"), Some("Positive"), Some("description"))),
       subEmotionId = Some("Amusement"),
       triggerId = Some(1),
       5, subEmotions, triggers, notes, tags, None)

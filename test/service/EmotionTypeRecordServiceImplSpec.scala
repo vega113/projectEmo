@@ -12,8 +12,11 @@ import java.sql.Connection
 import java.time.{LocalDate, LocalDateTime}
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import scala.language.implicitConversions
 
 class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
+
+
   trait TestData {
     val mockEmotionRecordDao: EmotionRecordDao = mock[EmotionRecordDao]
     val mockEmotionDataService: EmotionDataService = mock[EmotionDataService]
@@ -54,6 +57,7 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
     val records: List[EmotionRecord] = List(
       EmotionRecord(
         id = Some(1),
+        emotionId = Some("Joy"),
         emotionType = "Positive",
         userId = Some(1),
         emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
@@ -68,6 +72,7 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
       ),
       EmotionRecord(
         id = Some(2),
+        emotionId = Some("Joy"),
         emotionType = "Positive",
         userId = Some(1),
         emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
@@ -82,6 +87,7 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
       ),
       EmotionRecord(
         id = Some(3),
+        emotionId = Some("Joy"),
         emotionType = "Positive",
         userId = Some(1),
         emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
@@ -95,7 +101,8 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
         created = createMockDate2()
       ),
       EmotionRecord(
-        id = Some(4),
+        id = Some(4),emotionId = Some("Other"),
+
         emotionType = "Neutral",
         userId = Some(1),
         emotion = Some(Emotion(Some("Other"), Some("Other"), Some("Neutral"), Some("description"))),
@@ -110,6 +117,7 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
       ),
       EmotionRecord(
         id = Some(4),
+        emotionId = Some("Anger"),
         emotionType = "Negative",
         userId = Some(1),
         emotion = Some(Emotion(Some("Anger"), Some("Anger"), Some("Negative"), Some("description"))),
@@ -124,6 +132,7 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
       ),
       EmotionRecord(
         id = Some(4),
+        emotionId = None,
         emotionType = "Negative",
         userId = Some(1),
         emotion = None,
@@ -185,6 +194,7 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
     // add more emotion records to the list one for each trigger type
     val recordsWithMoreTriggers: List[EmotionRecord] = records ++ List(EmotionRecord(
       id = Some(1),
+      emotionId = Some("Joy"),
       emotionType = "Positive",
       userId = Some(1),
       emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
@@ -220,6 +230,7 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
     // add more emotion records to the list one for each trigger type
     val recordsWithMoreTriggers: List[EmotionRecord] = records ++ List(EmotionRecord(
       id = Some(1),
+      emotionId = Some("Joy"),
       emotionType = "Positive",
       userId = Some(1),
       emotion = Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
@@ -258,28 +269,28 @@ class EmotionTypeRecordServiceImplSpec extends PlaySpec with MockitoSugar {
 
 
     private val actual: List[EmotionRecord] = Await.result(emotionRecordServiceImpl.findAllByUserId(1) , Duration("5s"))
-    actual mustEqual List(EmotionRecord(Some(3), "Positive", Some(1),
+    actual mustEqual List(EmotionRecord(Some(3), "Positive", Some(1), emotionId = Some("Joy"),
       Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
       subEmotionId = Some("Excitement"),
       triggerId = Some(1),
       3, List(SubEmotion(Some("Excitement"), Some("Excitement"), Some("description"), Some("Joy"))), List(Trigger(Some(1), Some("People"), Some(1), Some(1), Some("description"), None)), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))),
-      EmotionRecord(Some(4), "Neutral", Some(1), Some(Emotion(Some("Other"), Some("Other"), Some("Neutral"), Some("description"))),
+      EmotionRecord(Some(4), "Neutral", Some(1), emotionId = Some("Other"), Some(Emotion(Some("Other"), Some("Other"), Some("Neutral"), Some("description"))),
         subEmotionId = Some("Indifference"),
         triggerId = Some(1),
         3, List(SubEmotion(Some("Indifference"), Some("Indifference"), Some("description"), Some("Other"))), List(Trigger(Some(1), Some("Other"), Some(1), Some(1), Some("description"), None)), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))),
-      EmotionRecord(Some(4), "Negative", Some(1), Some(Emotion(Some("Anger"), Some("Anger"), Some("Negative"), Some("description"))),
+      EmotionRecord(Some(4), "Negative", Some(1), emotionId = Some("Anger"), Some(Emotion(Some("Anger"), Some("Anger"), Some("Negative"), Some("description"))),
         subEmotionId = Some("Annoyance"),
         triggerId = Some(1),
         3, List(SubEmotion(Some("Annoyance"), Some("Annoyance"), Some("description"), Some("Anger"))), List(Trigger(Some(1), Some("Other"), Some(1), Some(1), Some("description"), None)), List(Note(None, Some("Note title"), "Note text", Some("description"), None, None, None, None, None, None)), List(Tag(Some(1), "Tag name", None)), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))),
-      EmotionRecord(Some(4), "Negative", Some(1), None,
+      EmotionRecord(Some(4), "Negative", Some(1), emotionId = Some("Joy"), None,
         subEmotionId = None,
         triggerId = Some(1),
         3, List(), List(Trigger(Some(1), Some("People"), Some(1), Some(1), Some("description"), None)), List(Note(None, Some("Note title"), "Note text", Some("description"), None, None, None, None, None, None)), List(Tag(Some(1), "Tag name", None)), None, None, Some(LocalDateTime.parse("2021-01-02T00:00"))),
-      EmotionRecord(Some(1), "Positive", Some(1), Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
+      EmotionRecord(Some(1), "Positive", Some(1), emotionId = Some("Joy"), Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
         subEmotionId = Some("Amusement"),
         triggerId = Some(1),
         2, List(SubEmotion(Some("Amusement"), Some("Amusement"), Some("description"), Some("Joy"))), List(), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-01T00:00"))),
-      EmotionRecord(Some(2), "Positive", Some(1), Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
+      EmotionRecord(Some(2), "Positive", Some(1), emotionId = Some("Joy"), Some(Emotion(Some("Joy"), Some("Joy"), Some("Positive"), Some("description"))),
         subEmotionId = Some("Amusement"),
         triggerId = Some(1),
         4, List(SubEmotion(Some("Amusement"), Some("Amusement"), Some("description"), Some("Joy"))), List(Trigger(Some(1), Some("Situations"), Some(1), Some(1), Some("description"), None)), List(), List(), None, None, Some(LocalDateTime.parse("2021-01-01T00:00"))))
