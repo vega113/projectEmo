@@ -4,32 +4,34 @@
 </div>
 <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
   <ng-container matColumnDef="date">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header > Date </th>
-    <td mat-cell *matCellDef="let record"> {{record.created | date: 'medium'}} </td>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Date</th>
+    <td mat-cell *matCellDef="let record"> {{ record.created | date: 'medium' }}</td>
   </ng-container>
 
   <ng-container matColumnDef="intensity">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header> Intensity </th>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Intensity</th>
     <td mat-cell *matCellDef="let record">
       <mat-progress-bar mode="determinate" [value]="record.intensity * 20"
-                        [color]="record.emotionType === 'Positive' ? 'primary' : record.emotionType === 'Neutral' ? 'accent' : 'warn'"
+                        [color]="record.emotionType === 'Positive' ? 'primary' : record.emotionType === 'Neutral'||
+                             record.emotionType === 'Unknown'? 'accent' : 'warn'"
                         [title]="'Intensity: ' + record.intensity">
       </mat-progress-bar>
     </td>
   </ng-container>
 
   <ng-container matColumnDef="subEmotion">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header> Sub-Emotion </th>
-    <td mat-cell *matCellDef="let record"> {{record.subEmotions[0]?.subEmotionName}} </td>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Sub-Emotion</th>
+    <td mat-cell *matCellDef="let record"> {{ record.subEmotions[0]?.subEmotionName }}</td>
   </ng-container>
 
   <ng-container matColumnDef="noteTitle">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header> Note Title </th>
-    <td mat-cell *matCellDef="let record"> {{record.notes && record.notes.length > 0 ? record.notes[0].title : ''}} </td>
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Note Title</th>
+    <td mat-cell *matCellDef="let record"> {{ record.notes && record.notes.length > 0 ? record.notes[0].title : '' }}
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef> Actions </th>
+    <th mat-header-cell *matHeaderCellDef> Actions</th>
     <td mat-cell *matCellDef="let record">
       <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
         <mat-icon>more_vert</mat-icon>
@@ -53,4 +55,5 @@
   </tr>
 </table>
 
-<mat-paginator [pageSizeOptions]="[10, 20, 50, 200]" showFirstLastButtons></mat-paginator>
+<mat-paginator [pageSizeOptions]="[10, 20, 50, 200]"></mat-paginator>
+

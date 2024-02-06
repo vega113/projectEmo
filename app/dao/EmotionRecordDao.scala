@@ -75,10 +75,10 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
     """).on(
       "userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
       "emotionType" -> emotionRecord.emotionType,
-      "emotionId" -> emotionRecord.emotion.flatMap(_.id),
+      "emotionId" -> emotionRecord.emotion.flatMap(_.id).orElse(emotionRecord.emotionId),
       "intensity" -> emotionRecord.intensity,
       "created" -> emotionRecord.created,
-      "isDeleted" -> emotionRecord.isDeleted.getOrElse(false), // Assuming isDeleted is an Option[Boolean]
+      "isDeleted" -> emotionRecord.isDeleted.getOrElse(false),
       "subEmotionId" -> emotionRecord.subEmotionId,
       "triggerId" -> emotionRecord.triggerId
     ).executeInsert()
@@ -90,17 +90,20 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
     val updatedCount = SQL(
       """
     UPDATE emotion_records
-    SET emotion_type = {emotionType}, emotion_id = {emotionId}, user_id = {userId}, intensity = {intensity},
-    is_deleted = {isDeleted}, last_updated = {lastUpdated}
+    SET emotion_type = {emotionType}, emotion_id = {emotionId}, intensity = {intensity},
+     trigger_id = {triggerId}, sub_emotion_id = {subEmotionId}, last_updated = {lastUpdated},
+      is_deleted = {isDeleted}
     WHERE id = {id}
   """).on("id" -> emotionRecord.id.getOrElse(throw new RuntimeException("Id is required.")),
         "userId" -> emotionRecord.userId.getOrElse(throw new RuntimeException("User id is required.")),
         "emotionType" -> emotionRecord.emotionType,
-        "emotionId" -> emotionRecord.emotion.flatMap(_.id),
+        "emotionId" -> emotionRecord.emotion.flatMap(_.id).orElse(emotionRecord.emotionId),
         "intensity" -> emotionRecord.intensity,
-        "isDeleted" -> emotionRecord.isDeleted,
-        "lastUpdated" -> dateTimeService.now(),
-        "created" -> emotionRecord.created)
+      "subEmotionId" -> emotionRecord.subEmotionId,
+      "triggerId" -> emotionRecord.triggerId,
+      "isDeleted" -> emotionRecord.isDeleted.getOrElse(false),
+      "lastUpdated" -> dateTimeService.now()
+      )
       .executeUpdate()
     updatedCount
   }
@@ -110,5 +113,17 @@ class EmotionRecordDao @Inject()(emotionRecordSubEmotionDao: EmotionRecordSubEmo
       on("id" -> id, "userId" -> userId).
       executeUpdate()
     deleted > 0
+  }
+
+  def findMainEmotionIdBySubEmotionId(subEmotionId: String)(implicit connection: Connection): Option[String] = {
+    SQL("SELECT parent_emotion_id FROM sub_emotions WHERE sub_emotion_id = {subEmotionId}").
+      on("subEmotionId" -> subEmotionId).
+      as(SqlParser.str("parent_emotion_id").singleOpt)
+  }
+
+  def findEmotionTypeByMainEmotionId(mainEmotionId: String)(implicit connection: Connection): Option[String] = {
+    SQL("SELECT emotion_type FROM emotions WHERE emotion_id = {mainEmotionId}").
+      on("mainEmotionId" -> mainEmotionId).
+      as(SqlParser.str("emotion_type").singleOpt)
   }
 }

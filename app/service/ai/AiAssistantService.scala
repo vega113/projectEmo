@@ -2,10 +2,8 @@ package service.ai
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.RestartSettings
-import akka.stream.scaladsl.Source
 import com.google.inject.{ImplementedBy, Inject}
-import dao.AiAssistant
+import dao.model.AiAssistant
 import play.api.Configuration
 import service.UserInfoService
 import service.ai.ChatGptModel._
@@ -160,12 +158,9 @@ class ChatGptAiAssistantServiceImpl @Inject()(aiDbService: AiDbService, userInfo
   }
 
   import akka.actor.ActorSystem
-  import akka.stream.scaladsl.{RestartSource, Sink}
-  import scala.concurrent.duration._
-
-  import akka.actor.ActorSystem
-  import akka.stream.scaladsl.{RestartSource, Sink, Source}
   import akka.stream.RestartSettings
+  import akka.stream.scaladsl.{RestartSource, Sink, Source}
+
   import scala.concurrent.duration._
 
   override def pollThreadRunUntilComplete(externalThreadId: String, threadRunId: String): Future[ChatGptThreadRunResponse] = {

@@ -9,6 +9,7 @@ export interface User {
 export interface EmotionData {
   emotionTypes: EmotionTypesWithEmotions[];
   triggers: Trigger[];
+  colors: { [key: string]: string };
 }
 
 export interface EmotionTypesWithEmotions {
@@ -56,7 +57,9 @@ export interface EmotionRecord {
   emotion: Emotion,
   intensity: number;
   subEmotions: SubEmotion[];
+  subEmotionId?: string;
   triggers: Trigger[];
+  triggerId?: number;
   notes: Note[];
   tags: Tag[];
   isAi?: boolean;
@@ -114,6 +117,7 @@ export interface Note {
   suggestion?: string;
   todos?: NoteTodo[];
   created?: string;
+  emotionRecordId?: number;
 }
 
 export interface Tag {
@@ -210,11 +214,14 @@ export interface EmotionDetectionResult {
   textTitle?: string;
   description: string;
   suggestion: string;
+  status?: number;
 }
 
 export interface EmotionFromNoteResult {
   emotionDetection?: EmotionDetectionResult;
+  emotionRecord?: EmotionRecord;
   note: Note;
+  status?: number;
 }
 
 export interface NoteTodoUpdate {

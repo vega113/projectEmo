@@ -1,11 +1,12 @@
 package dao.ai
 
 import anorm.SQL
-import dao.AiAssistant
-import dao.model.AiDbObj
+import dao.model
+import dao.model.{AiAssistant, AiDbObj, ChatGptApiResponse}
 import service.model.AiThread
 
 import java.sql.Connection
+import scala.util.Try
 
 class AiDao {
   def insertAiThread(aiThread: AiThread)(implicit connection: Connection): Option[Long] = {
@@ -123,12 +124,26 @@ class AiDao {
   def insert(response: AiDbObj)(implicit connection: Connection): Option[Long] = {
     SQL(
       """
-        |INSERT INTO ai_responses (response, user_id, original_text, tag, elapsed_time)
-        |VALUES ({response}, {userId}, {originalText}, {tag}, {elapsedTime})
+        |INSERT INTO ai_responses (response, user_id, original_text, tag, elapsed_time, idempotence_key)
+        |VALUES ({response}, {userId}, {originalText}, {tag}, {elapsedTime}, {idempotenceKey})
         |""".stripMargin)
       .on(
         "response" -> response.response, "userId" -> response.userId, "originalText" -> response.originalText,
-        "tag" -> response.tag, "elapsedTime" -> response.elapsedTime
+        "tag" -> response.tag, "elapsedTime" -> response.elapsedTime, "idempotenceKey" -> response.idempotenceKey
       ).executeInsert()
+  }
+
+  def fetchAiResponseByRequestId(requestId: String)(implicit connection: Connection): AiDbObj = {
+    SQL(
+      """
+        |SELECT *
+        |FROM ai_responses
+        |WHERE idempotence_key = {requestId}
+        |ORDER BY created ASC
+        |LIMIT 1
+        |""".stripMargin
+    ).on(
+      "requestId" -> requestId
+    ).as(ChatGptApiResponse.parser.single)
   }
 }

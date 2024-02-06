@@ -6,6 +6,7 @@ import {BehaviorSubject, Observable, of, throwError} from 'rxjs';
 import {JwtHelperService} from "@auth0/angular-jwt";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {environment} from "../../environments/environment";
+import { v4 as uuidv4 } from 'uuid';
 
 
 @Injectable({
@@ -85,6 +86,7 @@ export class AuthService {
     if (token) {
       return new HttpHeaders({
         Authorization: `Bearer ${token}`,
+        "X-IdempotencyKey": uuidv4(),
       });
     } else {
       return new HttpHeaders();

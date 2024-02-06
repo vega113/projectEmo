@@ -1,7 +1,7 @@
 package dao
 
 import anorm.SQL
-import dao.AiAssistant.UserInfo
+import dao.model.UserInfo
 
 import java.sql.Connection
 

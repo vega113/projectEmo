@@ -30,12 +30,12 @@
             </span>
           </div>
           <div>
-            <strong>Created:</strong> {{  this.dateService.formatDateFromDb( emotion.created!) }}
+            <strong>Created:</strong> {{  this.formatDateFromDb() }}
           </div>
         </mat-card-content>
       </mat-card>
 
-      <mat-form-field class="example-chip-list">
+      <mat-form-field *ngIf="emotion.tags[0]" class="example-chip-list">
         <mat-label>Note Tags</mat-label>
         <mat-chip-grid #chipGrid>
           <mat-chip-row *ngFor="let tag of emotion.tags"
@@ -68,6 +68,16 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
             {{noteElem.text}}
+
+            <mat-action-row>
+              <button mat-raised-button color="primary" type="button" (click)="openAnalyzeManuallyDialog()">Analyze Manually</button>
+              <button mat-raised-button color="primary" type="button" (click)="detectEmotions()" [disabled]="isDetectingEmotionWithAI">
+                Analyze with AI
+                <div *ngIf="isDetectingEmotionWithAI" class="loading-screen">
+                  <mat-spinner diameter="24" color="accent" ></mat-spinner>
+                </div>
+              </button>
+            </mat-action-row>
           </mat-expansion-panel>
 
           <mat-expansion-panel *ngIf="noteElem.description">

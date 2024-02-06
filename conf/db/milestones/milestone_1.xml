@@ -752,4 +752,45 @@
             <where>trigger_name='Ideas'</where>
         </update>
     </changeSet>
+
+    <changeSet id="create_requests_in_flight_table" author="vega">
+        <createTable tableName="requests_in_flight">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="request_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_completed" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="datetime" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="index_requests_in_flight_request_id" author="vega">
+        <createIndex indexName="idx_request_id" tableName="requests_in_flight">
+            <column name="request_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="add_idempotence_key_to_ai_responses_table" author="vega">
+        <addColumn tableName="ai_responses">
+            <column name="idempotence_key" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="index_ai_responses_idempotence_key" author="vega">
+        <createIndex indexName="idx_idempotence_key" tableName="ai_responses">
+            <column name="idempotence_key"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

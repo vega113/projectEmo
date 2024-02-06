@@ -1,7 +1,7 @@
 package service
 
 import com.google.inject.{ImplementedBy, Inject}
-import dao.AiAssistant.UserInfo
+import dao.model.UserInfo
 import dao.{DatabaseExecutionContext, UserInfoDao}
 
 import scala.concurrent.ExecutionContext.Implicits.global

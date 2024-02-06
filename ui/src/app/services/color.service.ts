@@ -1,4 +1,5 @@
 import {Injectable} from "@angular/core";
+import {ThemePalette} from "@angular/material/core";
 
 @Injectable({
   providedIn: 'root'
@@ -26,5 +27,18 @@ export class ColorService {
       color = greyColor;
     }
     return color;
+  }
+
+  getSliderColorThemePalette(emotionType: string): ThemePalette {
+    switch (emotionType) {
+      case 'Positive':
+        return 'primary';
+      case 'Neutral':
+        return 'accent';
+      case 'Negative':
+        return 'warn';
+      default:
+        return undefined;
+    }
   }
 }

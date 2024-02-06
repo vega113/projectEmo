@@ -1,7 +1,7 @@
 package service.ai
 
 import com.google.inject.ImplementedBy
-import dao.AiAssistant
+import dao.model.AiAssistant
 import play.api.Configuration
 import play.api.libs.json.Json
 import service.ai.ChatGptModel._
@@ -10,7 +10,6 @@ import service.model.EmoCreateAssistantRequest
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 import scala.language.postfixOps
 
 @ImplementedBy(classOf[AiAdminServiceImpl])

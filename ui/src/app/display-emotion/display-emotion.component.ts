@@ -1,11 +1,14 @@
 import {Component} from '@angular/core';
 import {EmotionService} from "../services/emotion.service";
 import {EmotionStateService} from "../services/emotion-state.service";
-import { EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
+import {EmotionFromNoteResult, EmotionRecord, NoteTemplate, SuggestedAction, Tag} from '../models/emotion.model';
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {DateService} from "../services/date.service";
 import {MatChipInputEvent} from "@angular/material/chips";
 import { Router } from '@angular/router';
+import {MatDialog} from "@angular/material/dialog";
+import {EmotionAnalyzerComponent} from "../emotion-analyzer/emotion-analyzer.component";
+import {NoteService} from "../services/note.service";
 
 
 @Component({
@@ -20,7 +23,9 @@ export class DisplayEmotionComponent {
               private emotionStateService: EmotionStateService,
               private snackBar: MatSnackBar,
               public dateService: DateService,
-              private router: Router) {
+              private noteService: NoteService,
+              private router: Router,
+              public dialog: MatDialog) {
   }
 
   noteTemplates: NoteTemplate[] | null = null;
@@ -41,6 +46,22 @@ export class DisplayEmotionComponent {
 
   separatorKeysCodes: number[] = [13, 188];
   addOnBlur: any = true;
+
+  isDetectingEmotionWithAI: boolean = false;
+
+  openAnalyzeManuallyDialog() {
+    console.log('Open analyze manually dialog', this.emotion );
+    const dialogRef = this.dialog.open(EmotionAnalyzerComponent, {
+      width: '325px', height: '585px', data: { emotionRecord: this.emotion }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        alert(`The dialog was closed with result: ${result}`);
+        dialogRef.close();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -112,5 +133,40 @@ export class DisplayEmotionComponent {
           });
         }
       });
+  }
+
+  detectEmotions() {
+    this.isDetectingEmotionWithAI = true;
+    console.log('Detecting emotion for note: ', this.emotion?.notes![0]);
+    if(this.emotion?.notes[0]?.text) {
+      const note = this.emotion?.notes![0];
+      note.emotionRecordId = this.emotion?.id;
+      this.noteService.detectEmotion(note).subscribe({
+        next: (response: EmotionFromNoteResult) => {
+          console.log('Emotion detected successfully', response);
+          if (response != null && response.emotionRecord != null) {
+            this.emotion = response.emotionRecord;
+            this.emotionStateService.updateNewEmotion(this.emotion!);
+          }
+          this.isDetectingEmotionWithAI = false;
+        },
+        error: (error) => {
+          console.error('Error detecting emotion', error);
+          this.isDetectingEmotionWithAI = false;
+          this.snackBar.open('Error detecting emotion', 'Close', {
+            duration: 5000,
+          });
+        }
+      });
+    } else {
+      this.isDetectingEmotionWithAI = false;
+      this.snackBar.open('Error detecting emotion - empty note', 'Close', {
+        duration: 5000,
+      });
+    }
+  }
+
+  formatDateFromDb() {
+    return this.dateService.formatDateFromDb( this.emotion?.created!)
   }
 }

@@ -1,0 +1,32 @@
+.emotion-analyzer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.emotion-analyze-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.emotion-analyze-div label {
+  margin-right: 10px;
+}
+
+.mat-action-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.mat-action-row button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}

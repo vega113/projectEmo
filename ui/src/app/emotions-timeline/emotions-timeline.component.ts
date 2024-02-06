@@ -76,12 +76,12 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
     }
 
     refresh(): Observable<EmotionRecord[]> {
-        const refresh = this.emotionService.fetchEmotionRecordsForCurrentUser()
-        refresh.subscribe((data) => {
+        const refreshedEmotionRecords$ = this.emotionService.fetchEmotionRecordsForCurrentUser()
+        refreshedEmotionRecords$.subscribe((data) => {
             this.dataSource.data = data;
             this.changeDetector.detectChanges();
         });
-        return refresh;
+        return refreshedEmotionRecords$;
     }
 
     onRowClicked(record: any): void {
@@ -148,4 +148,6 @@ export class EmotionsTimelineComponent implements OnInit, AfterViewInit {
             duration: this.snackBarDuration,
         });
     }
+
+    protected readonly alert = alert;
 }

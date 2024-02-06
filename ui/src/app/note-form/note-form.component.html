@@ -1,0 +1,22 @@
+<div class="note-from">
+  <form [formGroup]="emotionForm" (ngSubmit)="onSubmit()">
+    <div class="note-field-wrapper">
+      <app-custom-date-picker formControlName="emotionDate"></app-custom-date-picker>
+      <label for="note">Add a note (max {{ maxNoteLength }} chars):</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Note</mat-label>
+        <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength"
+                  [placeholder]="placeHolderText"></textarea>
+        <mat-hint align="end">{{ computeNoteLength() }}/{{ maxNoteLength }}
+        </mat-hint>
+      </mat-form-field>
+    </div>
+    <mat-action-row>
+      <button mat-raised-button color="primary" type="submit"
+              [disabled]="emotionForm.invalid || isSavingEmotionRecord">
+        <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>
+        <span>Save</span>
+      </button>
+    </mat-action-row>
+  </form>
+</div>

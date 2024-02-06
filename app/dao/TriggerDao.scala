@@ -60,4 +60,9 @@ class TriggerDao {
         |WHERE id = {emotionRecordId}
         |""".stripMargin).on("triggerId" -> triggerId, "emotionRecordId" -> emotionRecordId).executeUpdate()
   }
+
+  def findByName(name: String)(implicit connection: Connection): Trigger = {
+    SQL("SELECT * FROM triggers WHERE trigger_name = {triggerName}").on("triggerName" -> name).
+      as(Trigger.parser.single)
+  }
 }

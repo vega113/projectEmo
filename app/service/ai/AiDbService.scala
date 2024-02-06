@@ -1,9 +1,9 @@
 package service.ai
 
 import com.google.inject.ImplementedBy
-import dao.{AiAssistant, DatabaseExecutionContext}
+import dao.DatabaseExecutionContext
 import dao.ai.AiDao
-import dao.model.AiDbObj
+import dao.model.{AiAssistant, AiDbObj, EmotionDetectionResult}
 import play.api.libs.json.{JsValue, Json, Reads}
 import service.model.AiThread
 
@@ -21,6 +21,7 @@ trait AiDbService {
                      originalText: Option[String] = None,
                      tag: Option[String] = None,
                      elapsedTime: Option[Double] = None,
+                     idempotenceKey: Option[String] = None,
                     ): Future[Option[Long]]
   def saveAiAssistantAsync(aiAssistant: AiAssistant): Future[Option[Long]]
 
@@ -33,6 +34,8 @@ trait AiDbService {
   def fetchThreadById(id: Long): Future[Option[AiThread]]
 
   def fetchThreadByUserIdAndType(userId: Long, assistantType: String): Future[Option[AiThread]]
+
+  def fetchAiResponseByRequestId(requestId: String): Future[AiDbObj]
 }
 
 class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionContext, aiDao: AiDao) extends AiDbService {
@@ -50,9 +53,10 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
                               originalText: Option[String] = None,
                               tag: Option[String] = None,
                               elapsedTime: Option[Double] = None,
+                              idempotenceKey: Option[String] = None,
                              ): Future[Option[Long]] = {
     val idFut: Future[Option[Long]] = Future(insert(
-      AiDbObj(None, Json.stringify(response), userId, originalText, tag, elapsedTime, None))
+      AiDbObj(None, Json.stringify(response), userId, originalText, tag, elapsedTime, None, idempotenceKey))
     )
     idFut.onComplete {
       case scala.util.Success(_) => logger.info(s"Successfully saved AI response for user: $userId")
@@ -106,6 +110,12 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
   override def saveAiThread(aiThread: AiThread): Future[Option[Long]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful(aiDao.insertAiThread(aiThread))
+    })
+  }
+
+  override def fetchAiResponseByRequestId(requestId: String): Future[AiDbObj] = {
+    databaseExecutionContext.withConnection({ implicit connection =>
+      Future.successful(aiDao.fetchAiResponseByRequestId(requestId))
     })
   }
 }

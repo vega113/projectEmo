@@ -45,7 +45,6 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
   }
 
   def insert(): Action[JsValue] = Action(parse.json) andThen authenticatedAction async { implicit token =>
-
     logger.info("Inserting emotion record for user {} {}",
       value("userId", token.user.userId), value("record", token.body))
 
@@ -54,9 +53,10 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       emotionRecord => {
         if (!validateRequestUserId(emotionRecord.userId, token.user.userId)) {
           logger.warn(s"Invalid user id. body id: {} token id: {}", emotionRecord.userId, token.user.userId)
-          Future.successful(BadRequest(Json.obj("message" -> s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
+          Future.successful(BadRequest(Json.obj("message" ->
+            s"Invalid user id. body id: ${emotionRecord.userId} token id: ${token.user.userId}")))
         } else {
-          emotionRecordService.insert(emotionRecord).flatMap {
+          emotionRecordService.insert(emotionRecord.copy(userId = Some(token.user.userId))).flatMap {
             case Some(id) =>
               logger.info(s"Inserted emotion record for user: ${token.user.userId} recordId: $id")
               fetchRecord(id, token.user.userId).map(record => Ok(Json.toJson(record)))
@@ -92,10 +92,9 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
         Future.successful(BadRequest(Json.obj("message" -> JsError.toJson(errors))))
       },
       emotionRecord => {
-        emotionRecordService.update(emotionRecord.copy(userId = Option(token.user.userId))).map {
-          case 1 => Ok(Json.toJson(emotionRecord))
-          case _ => NotFound
-        }
+        for {
+          updated <- emotionRecordService.update(emotionRecord)
+        } yield Ok(Json.toJson(updated))
       }
     )
   }
@@ -128,7 +127,7 @@ class EmotionRecordController @Inject()(cc: ControllerComponents,
       logger.info(s"entering findRecordsByDayByUserIdForMonth monthStart: $monthStart, monthEnd: $monthEnd")
       Try((ZonedDateTime.parse(monthStart), ZonedDateTime.parse(monthEnd))) match {
         case Success((from, to)) => emotionRecordService.fetchRecordsForMonthByDate(token.userId,
-          from.toInstant, to.toInstant).map(emotionRecordService.groupRecordsByDate).
+            from.toInstant, to.toInstant).map(emotionRecordService.groupRecordsByDate).
           map(emotionRecordService.generateLineChartTrendDataSetForEmotionTypesTriggers).
           map(emotionRecords => Ok(Json.toJson(emotionRecords)))
         case Failure(_) =>
