@@ -20,3 +20,5 @@ package-lock.json
 /results/usersimulation-*/
 /public/favicon.ico
 /conf/version.txt
+/.bloop/
+/project/.bloop/
