@@ -81,8 +81,10 @@ libraryDependencies ++= Seq(
   "io.gatling"            % "gatling-test-framework"    % "3.9.5"
 )
 
-libraryDependencies += "org.mockito" % "mockito-core" % "5.2.0" % "test"
-libraryDependencies += "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test"
+libraryDependencies += "org.mockito" %% "mockito-scala" % "1.17.31" % Test
+libraryDependencies += "org.scalatestplus" %% "scalatestplus-mockito" % "1.0.0-M2" % Test
+
+libraryDependencies += "de.leanovate.play-mockws" %% "play-mockws-2-8" % "3.0.1" % Test
 
 
 

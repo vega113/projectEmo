@@ -111,7 +111,7 @@ object model {
   case class NoteTodo(
                        id: Option[Long],
                        title: String,
-                       description: String,
+                       description: Option[String] = None,
                        isAccepted: Option[Boolean] = Some(false),
                        isAi: Option[Boolean] = Some(true),
                        userId: Option[Long] = None,
@@ -368,7 +368,7 @@ object model {
     implicit val parser: RowParser[NoteTodo] = {
       get[Option[Long]]("id") ~
         str("title") ~
-        str("description") ~
+        get[Option[String]]("description") ~
         get[Option[Boolean]]("is_accepted") ~
         get[Option[Boolean]]("is_ai") ~
         get[Option[Long]]("user_id") ~

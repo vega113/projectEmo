@@ -2,7 +2,7 @@ package service.ai
 
 import dao.model.EmotionDetectionResult
 import play.api.{Configuration, Logger}
-import play.api.libs.json.{JsError, JsSuccess, Json}
+import play.api.libs.json.{JsError, JsObject, JsSuccess, Json}
 import play.api.libs.ws.WSClient
 import service.model.DetectEmotionRequest
 import service.serviceModel.ChatGptApiResponse
@@ -28,19 +28,13 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
           Future.failed(e)
       }
     }
-    responseFuture.onComplete {
-      case scala.util.Success(x) =>
-        logger.info(s"V1 Successfully detected emotion for request, userId: ${request.userId}")
-      case scala.util.Failure(e) =>
-        logger.error(s"V1 Failed to detect emotion for request, userId: ${request.userId}", e)
-    }
     responseFuture
   }
 
   /**
    * Makes an API call to detect emotion based on the given request.
    */
-  private def makeApiCall(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
+  private[ai] def makeApiCall(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
     val headers = createHeaders
 
     val payload = createPayload(request)
@@ -59,8 +53,9 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
             Try {
               response.json.validate[ChatGptApiResponse] match {
                 case JsSuccess(result, _) =>
-                  logger.info(s"Deserialization successful: $result")
-                  val content = result.choices.head.message.content
+                  logger.info(s"Deserialization successful: ${response.json}")
+                  val origContent = result.choices.head.message.content
+                  val content: String = discardStringPrefixAndExtractJustTheJson(origContent)
                   Try {
                     Json.parse(content).as[EmotionDetectionResult]
                   } match {
@@ -83,7 +78,23 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
       }
   }
 
-  private def createPayload(request: DetectEmotionRequest) = {
+  private def discardStringPrefixAndExtractJustTheJson(origContent: String): String = {
+    // origContent starts with some text and then the actual JSON. We need to discard the text and extract just the JSON.
+    // Find the index of the first '{' character
+    val firstBraceIndex = origContent.indexOf('{')
+    val lastBraceIndex = origContent.lastIndexOf('}')
+    // Extract the JSON from the first '{' character to the end of the string
+    origContent.substring(firstBraceIndex, lastBraceIndex + 1)
+    // we also need to remove the end of line character at the end of the string
+      .replace("\n", "")
+    // we also need to unescape the double quotes
+      .replace("\\\"", "\"")
+    // we also need to replacer non standard quotes like “ and ”
+      .replace("“", "\"")
+      .replace("”", "\"")
+  }
+
+  private[ai] def createPayload(request: DetectEmotionRequest): JsObject = {
     Json.obj(
       "model" -> config.get[String]("openai.model"),
       "messages" -> Json.arr(

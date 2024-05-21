@@ -56,7 +56,7 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
 
     def createUserTodoFromNoteTodo(todo: NoteTodo, noteTodoId: Long)(implicit connection: Connection): Boolean = {
 
-      val userNoteTodo = UserTodo(None, Option(userId), todo.title, Option(todo.description), None,
+      val userNoteTodo = UserTodo(None, Option(userId), todo.title, todo.description, None,
         isDone = false,
         isArchived = false, isDeleted = false, isAi = todo.isAi, isRead = Some(false), Some(noteTodoId), None, None)
       userTodoDao.insert(userNoteTodo.copy(userId = Option(userId))) match {
@@ -90,7 +90,7 @@ class NoteTodoServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionC
   }
 override def extractTodos(note: Note): List[NoteTodo] = {
   val todoRegex = "(?s)(?<=\\[\\[).+?(?=]])".r
-  todoRegex.findAllIn(note.text).toList.map(todo => NoteTodo(None, titleService.makeTitle(todo), todo, isAccepted = Some(false),
+  todoRegex.findAllIn(note.text).toList.map(todo => NoteTodo(None, titleService.makeTitle(todo), Option(todo), isAccepted = Some(false),
     isAi = Some(false), noteId = note.id, userId = note.userId, emotionRecordId = note.emotionRecordId
   )).filter(_.description.nonEmpty)
 }

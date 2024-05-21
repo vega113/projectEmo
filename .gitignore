@@ -13,8 +13,11 @@ db_dump
 /node_modules
 package-lock.json
 /public/styles.css
+/public/vendor.js
+/public/vendor.js.map
 /application.log
 /public/runtime.js
+/public/runtime.js.map
 /gatling.log
 /public/index.html
 /results/usersimulation-*/

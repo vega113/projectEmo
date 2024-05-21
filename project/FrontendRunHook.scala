@@ -43,6 +43,9 @@ object FrontendRunHook {
           process = Option(
             Process(run, base / "ui").run
           )
+        } else {
+          println("Running in PROD, not starting UI process")
+
         }
       }
 
