@@ -2,6 +2,9 @@ target
 project/boot
 /.bsp
 /.idea
+/.metals
+/.bloop
+/.vscode
 /logs
 /RUNNING_PID
 db_dump
