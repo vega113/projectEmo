@@ -19,7 +19,7 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
   private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Serenity\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"Other\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
 
   override def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult] = {
-    val responseFuture =  if(request.text.startsWith("FAKE")) {
+    val responseFuture = if (request.text.startsWith("FAKE")) {
       Future.successful(Json.parse(fakeEmoDetectionResult).as[EmotionDetectionResult])
     } else {
       makeApiCall(request).recoverWith {
@@ -41,7 +41,7 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
     val timeoutDuration = config.get[Duration]("openai.timeout")
     logger.info(s"Making API call with payload: $payload, timeout: $timeoutDuration")
 
-    val url =  config.get[String]("openai.baseUrl") + "/v1/chat/completions"
+    val url = config.get[String]("openai.baseUrl") + "/v1/chat/completions"
     // Make the API call
     ws.url(url)
       .withRequestTimeout(timeoutDuration)
@@ -85,13 +85,16 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
     val lastBraceIndex = origContent.lastIndexOf('}')
     // Extract the JSON from the first '{' character to the end of the string
     origContent.substring(firstBraceIndex, lastBraceIndex + 1)
-    // we also need to remove the end of line character at the end of the string
+      // we also need to remove the end of line character at the end of the string
       .replace("\n", "")
-    // we also need to unescape the double quotes
+      // we also need to unescape the double quotes
       .replace("\\\"", "\"")
-    // we also need to replacer non standard quotes like “ and ”
+      // we also need to replacer non standard quotes like “ and ”
       .replace("“", "\"")
       .replace("”", "\"")
+      // we also need to replacer non standard quotes like ` and ´
+      .replace("`", "'")
+      .replace("´", "'")
   }
 
   private[ai] def createPayload(request: DetectEmotionRequest): JsObject = {
