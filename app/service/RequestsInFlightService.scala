@@ -42,7 +42,6 @@ class RequestsInFlightServiceImpl @Inject()(databaseExecutionContext: DatabaseEx
   }
 
   override def markRequestComplete(idempotencyKey: String): Future[Unit] = {
-    logger.info(s"Marking request complete: idempotencyKey: $idempotencyKey")
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful{
         requestsInFlightDao.markRequestComplete(idempotencyKey) match {

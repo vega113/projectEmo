@@ -632,7 +632,7 @@
         </createTable>
     </changeSet>
     <changeSet id ="insert_ai_assistants" author="vega">
-        <insert tableName="ç">
+        <insert tableName="ai_assistants">
             <column name="name" value="Emotions Expert v0.1 for EmoSig"/>
             <column name="description" value="You are an expert in recognizing and categorizing human emotions. You are also an expert in psychology and personal couching. You work for EmoSig company, which specializes in emotion tracking and providing clients with AI powered emotions feedback."/>
             <column name="is_default" valueBoolean="true"/>
@@ -791,6 +791,10 @@
         <createIndex indexName="idx_idempotence_key" tableName="ai_responses">
             <column name="idempotence_key"/>
         </createIndex>
+    </changeSet>
+
+    <changeSet id="update_note_todos_description_to_optional" author="vega">
+        <modifyDataType tableName="note_todos" columnName="description" newDataType="mediumtext"/>
     </changeSet>
 
 </databaseChangeLog>

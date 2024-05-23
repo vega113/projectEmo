@@ -49,7 +49,7 @@ class NoteController @Inject()(cc: ControllerComponents,
           token.headers.get("X-IdempotencyKey").getOrElse(""))
         val futResp = v1EmotionFuture.flatMap {
           case Some(emotionDetectionResult) =>
-            logger.info(s"End of Detecting emotion for note ${note.id}")
+            logger.info(s"End of Detecting emotion for note ${note.id.getOrElse("")}")
             updateNoteAndEmotionRecordInDbWithDetectionResult(token.user.userId, note, emotionDetectionResult).map { emotionRecord =>
               Ok(Json.toJson(emotionRecord))
             }
