@@ -1,5 +1,7 @@
 package service.ai
 
+import akka.actor.ActorSystem
+import akka.actor.TypedActor.context
 import com.google.inject.ImplementedBy
 import dao.model.{EmotionDetectionResult, RequestsInFlight}
 import play.api.Logger
@@ -10,6 +12,10 @@ import service.model._
 import javax.inject.{Inject, Named}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Success
+import akka.pattern.after
+
+import scala.collection.immutable.ArraySeq
+import scala.concurrent.duration._
 
 trait EmotionDetectionService {
   def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult]
@@ -24,7 +30,8 @@ trait EmotionDetectionServiceWithIdempotency {
 class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: EmotionDetectionService,
                                                      @Named("ChatGptAssistant") v2: EmotionDetectionService,
                                                      requestsInFlightService: RequestsInFlightService,
-                                                     aiService: AiDbService
+                                                     aiService: AiDbService,
+                                                     system: ActorSystem,
                                                     )(implicit ec: ExecutionContext) extends EmotionDetectionServiceWithIdempotency {
   private final val logger: Logger = play.api.Logger(getClass)
 
@@ -50,9 +57,14 @@ class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: Emoti
         fetchCompletedEmotionDetectionResult(requestsInFlight).map(Some(_))
       case _ =>
         logger.info(s"Request with idempotencyKey: $idempotencyKey does not exist or is not completed, running emotion detection")
-        val v1EmotionFuture: Future[EmotionDetectionResult] = v1.detectEmotion(request)
-        saveResponseToDb(v1EmotionFuture, "V1", idempotencyKey)
-        Future.successful(None)
+        val eventualResult = v1.detectEmotion(request)
+        val v1EmotionFuture: Future[Option[EmotionDetectionResult]] = eventualResult.map(Some(_))
+        val delayFuture: Future[Option[EmotionDetectionResult]] =
+          after(2.seconds, using = system.scheduler)(Future.successful(None))
+        val resultFuture: Future[Option[EmotionDetectionResult]] =
+          Future.firstCompletedOf(ArraySeq(v1EmotionFuture, delayFuture))
+        saveResponseToDb(eventualResult, "V1", idempotencyKey)
+        resultFuture
     }
   }
 

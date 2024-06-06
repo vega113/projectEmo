@@ -54,8 +54,9 @@ class NoteController @Inject()(cc: ControllerComponents,
               Ok(Json.toJson(emotionRecord))
             }
           case None =>
-            logger.info(s"End of Detecting emotion for note ${note.id}")
-            Future.successful(Accepted(Json.obj("message" -> "Emotion detection result not available")))
+            val errMsg = s"Response did not return in time, will wait for retry, note id: ${note.id}"
+            logger.info(errMsg)
+            Future.successful(Accepted(Json.obj("message" -> errMsg)))
         }
 
         futResp.recover {

@@ -54,7 +54,7 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
               response.json.validate[ChatGptApiResponse] match {
                 case JsSuccess(result, _) =>
                   logger.info(s"Deserialization successful: ${response.json}")
-                  val origContent = result.choices.head.message.content
+                  val origContent = result.choices.head.message.tool_calls.head.function.arguments
                   val content: String = discardStringPrefixAndExtractJustTheJson(origContent)
                   Try {
                     Json.parse(content).as[EmotionDetectionResult]
@@ -110,8 +110,92 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
           "content" -> request.text
         )
       ),
-      "max_tokens" -> 2000,
-      "temperature" -> 0.99
+      "max_tokens" -> 4096,
+      "temperature" -> 0.99,
+      "tools" -> Json.arr(
+        Json.obj(
+          "type" -> "function",
+          "function" -> Json.obj(
+            "name" -> "save_ai_emotion_response",
+            "description" -> "Save the AI emotion response",
+            "parameters" -> Json.obj(
+              "type" -> "object",
+              "properties" -> Json.obj(
+                "textTitle" -> Json.obj(
+                  "type" -> "string",
+                  "description" -> "The main idea of the text"
+                ),
+                "intensity" -> Json.obj(
+                  "type" -> "integer",
+                  "minimum" -> 0,
+                  "maximum" -> 5
+                ),
+                "subEmotionId" -> Json.obj(
+                  "type" -> "string",
+                  "enum" -> Json.arr("Aggressiveness", "Annoyance", "Bitterness", "Frustration", "Fury", "Hatred", "Hostility", "Indignation", "Insult", "Irritability", "Nervousness", "Offense", "Resentment", "Disinterest", "Indifference", "Lethargy", "Arrogance", "Aversion", "Contempt", "Disapproval", "Disdain", "Distaste", "Loathing", "Nausea", "Repugnance", "Revulsion", "Self-satisfaction", "Agitation", "Alertness", "Anxiety", "Apprehension", "Awkwardness", "Concern", "Dread", "Fright", "Horror", "Insecurity", "Panic", "Sense of threat", "Suspicion", "Trepidation", "Uneasiness", "Worry", "Covetousness", "Longing", "Abandonment", "Alienation", "Apathy", "Dejection", "Depression", "Despair", "Desperation", "Devastation", "Disappointment", "Disorder", "Gloom", "Grief", "Heaviness", "Helplessness", "Hopelessness", "Infringement", "Isolation", "Listlessness", "Loneliness", "Melancholy", "Oppression", "Pain", "Sorrow", "Vulnerability", "Weakness", "Weariness", "Chagrin", "Disgrace", "Dishonor", "Embarrassment", "Guilt", "Humiliation", "Regret", "Remorse", "Shyness", "Audacity", "Boredom", "Decline of strength", "Determination", "Discomfort", "Dreaminess", "Exhaustion", "Incoherence", "Lostness", "Rebellion", "Restraint", "Sense of deadlock", "Sentimentality", "Seriousness", "Stupidity", "Tiredness", "Amazement", "Astonishment", "Bewilderment", "Confusion", "Defeat", "Disarray", "Disbelief", "Disorientation", "Dizziness", "Eagerness", "Fascination", "Inquisitiveness", "Intrigue", "Perplexity", "Shock", "Startlement", "Uncertainty", "Upset", "Wonder", "Curiosity", "Engagement", "Focus", "Hope", "Impatience", "Amusement", "Bliss", "Charm", "Contentment", "Elation", "Enthusiasm", "Euphoria", "Excitement", "Gratitude", "Happiness", "Optimism", "Passion", "Pleasure", "Pride", "Satisfaction", "Serenity", "Trembling", "Triumph", "Adoration", "Affection", "Fondness", "Infatuation", "Warmth", "Admiration", "Attachment", "Awe", "Calmness", "Comfort", "Compassion", "Confidence", "Dependability", "Dependence", "Faith", "Friendliness", "Generosity", "Loyalty", "Peacefulness", "Relaxation", "Relief", "Respect", "Security", "Sympathy", "Tenderness")
+                ),
+                "description" -> Json.obj(
+                  "type" -> "string",
+                  "description" -> "Explain what the user feels and why. The description should provide empathy and understanding, address the user directly"
+                ),
+                "suggestion" -> Json.obj(
+                  "type" -> "string",
+                  "description" -> "Provide helpful general advice based on the emotion detected, include explanation and reasons that justify suggestion. You can provide and extansive response here, if this can help. Adress the user directly"
+                ),
+                "triggers" -> Json.obj(
+                  "type" -> "array",
+                  "minItems" -> 1,
+                  "items" -> Json.obj(
+                    "type" -> "object",
+                    "properties" -> Json.obj(
+                      "triggerName" -> Json.obj(
+                        "type" -> "string",
+                        "description" -> "The trigger that caused the emotion. If the trigger is not listed, select 'Other' and provide a brief description in the description field.",
+                        "enum" -> Json.arr("People", "Situations", "Places", "Ideas", "Other")
+                      )
+                    )
+                  )
+                ),
+                "tags" -> Json.obj(
+                  "type" -> "array",
+                  "minItems" -> 1,
+                  "items" -> Json.obj(
+                    "type" -> "object",
+                    "properties" -> Json.obj(
+                      "tagName" -> Json.obj(
+                        "type" -> "string"
+                      )
+                    )
+                  )
+                ),
+                "todos" -> Json.obj(
+                  "type" -> "array",
+                  "items" -> Json.obj(
+                    "type" -> "object",
+                    "properties" -> Json.obj(
+                      "title" -> Json.obj(
+                        "type" -> "string"
+                      ),
+                      "description" -> Json.obj(
+                        "type" -> "string"
+                      ),
+                      "type" -> Json.obj(
+                        "type" -> "string"
+                      )
+                    ),
+                    "required" -> Json.arr("title", "description", "type")
+                  )
+                )
+              ),
+              "required" -> Json.arr("textTitle", "intensity", "subEmotionId", "description", "suggestion", "triggers", "tags", "todos")
+            ),
+            "output" -> Json.obj(
+              "type" -> "void"
+            )
+          )
+        )
+      ),
+      "tool_choice" -> "required"
     )
   }
 
