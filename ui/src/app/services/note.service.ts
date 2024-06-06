@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {filter, Observable, throwIfEmpty, timer} from 'rxjs';
+import {delay, Observable, retry, of, mergeMap, timer, retryWhen} from 'rxjs';
 import {
   EmotionFromNoteResult,
   EmotionRecord,
@@ -9,8 +9,10 @@ import {
 } from '../models/emotion.model';
 import {AuthService} from "./auth.service";
 import {environment} from "../../environments/environment";
-import {catchError, map, switchMap, take, tap} from "rxjs/operators";
-import {ErrorService} from "./error.service"; // adjust the path as needed
+import {catchError, map } from "rxjs/operators";
+import {ErrorService} from "./error.service";
+import { throwError } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
@@ -51,22 +53,38 @@ export class NoteService {
   }
 
   private handleDetectEmotionWithRetry(note: Note, headers: HttpHeaders): Observable<HttpResponse<EmotionRecord>> {
-    return timer(0, 3000).pipe(
-      take(20), // limit the number of retries to 20
-      switchMap(() => this.http.post<EmotionRecord>(
-        `${environment.baseUrl}/note/emotion/detect`, note,
-        {headers, observe: 'response'})),
-      tap(response => {
+    const request$ = this.http.post<EmotionRecord>(
+      `${environment.baseUrl}/note/emotion/detect`, note,
+      { headers, observe: 'response' }
+    );
+
+    return request$.pipe(
+      mergeMap(response => {
         if (response.status === 202) {
-          console.log('Emotion detection still in progress, retrying...');
-        } else if (response.status === 200) {
-          console.log('Emotion detection completed');
+          // Retry after a delay of 3 seconds if the status is 202
+          return timer(3000).pipe(
+            mergeMap(() => throwError(() => new Error('Retrying due to status 202')))
+          );
+        }
+        // If the status is not 202, return the response as is
+        return of(response);
+      }),
+      retry({
+        count: 4,
+        delay: (error, retryCount) => {
+          if (error.message === 'Retrying due to status 202') {
+            // Delay before retrying
+            console.log('Retrying. Retry count: ' + retryCount);
+            return timer(500);
+          }
+          // If the error is different, do not retry
+          return throwError(() => error);
         }
       }),
-      filter(response => response.status === 200),
-      take(1), // stop retrying after the first successful response
-      throwIfEmpty(() => new Error('Exhausted number of retries without success')),
-      catchError(resp => this.errorService.handleError(resp))
+      catchError(resp => {
+        console.error('Server error, stopping retry.');
+        return this.errorService.handleError(resp);
+      })
     );
   }
 }
