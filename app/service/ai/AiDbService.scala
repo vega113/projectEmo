@@ -10,6 +10,7 @@ import service.model.AiThread
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.Try
 
 @ImplementedBy(classOf[AiDbServiceImpl])
 trait AiDbService {
@@ -43,10 +44,22 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
   private lazy val logger = play.api.Logger(getClass)
   private def insert(aiResponse: AiDbObj): Option[Long] = {
     logger.info( s"inserting AiResponse for userId: ${aiResponse.userId}")
-    databaseExecutionContext.withConnection({ implicit connection =>
-      aiDao.insert(aiResponse)
-    })
-    None
+    Try {
+      databaseExecutionContext.withConnection({ implicit connection =>
+        aiDao.insert(aiResponse)
+      })
+    } match {
+      case scala.util.Success(Some(id: Long)) =>
+        Option(id)
+      case _ => {
+        logger.error(s"Failed to insert AiResponse for userId: ${aiResponse.userId}")
+        None
+      }
+      case scala.util.Failure(e) => {
+        logger.error(s"Failed to insert AiResponse for userId: ${aiResponse.userId}", e)
+        None
+      }
+    }
   }
 
   override def saveAiResponse(userId: Long, response: JsValue,

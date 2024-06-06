@@ -1,16 +1,16 @@
 package service.ai
 
 import dao.model.EmotionDetectionResult
-import play.api.{Configuration, Logger}
 import play.api.libs.json.{JsError, JsObject, JsSuccess, Json}
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
 import service.model.DetectEmotionRequest
 import service.serviceModel.ChatGptApiResponse
 
 import javax.inject.{Inject, Named}
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
-import scala.util.{Success, Try}
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Named("ChatGpt")
 class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configuration)(implicit ec: ExecutionContext) extends EmotionDetectionService {
@@ -170,6 +170,9 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
                 ),
                 "todos" -> Json.obj(
                   "type" -> "array",
+                  "description" -> "List of todos that the user should do to remedy the situation or in order to find solution or improve. If there are no todos, provide an empty array. Make sure the todo to be concise and specific. Make sure the todos in the list are actionable and can be completed in a reasonable amount of time. Do not repeat similar todos.",
+                  "minItems" -> 0,
+                  "maxItems" -> 5,
                   "items" -> Json.obj(
                     "type" -> "object",
                     "properties" -> Json.obj(
