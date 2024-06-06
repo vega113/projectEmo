@@ -60,7 +60,7 @@ class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: Emoti
         val eventualResult = v1.detectEmotion(request)
         val v1EmotionFuture: Future[Option[EmotionDetectionResult]] = eventualResult.map(Some(_))
         val delayFuture: Future[Option[EmotionDetectionResult]] =
-          after(2.seconds, using = system.scheduler)(Future.successful(None))
+          after(28.seconds, using = system.scheduler)(Future.successful(None))
         val resultFuture: Future[Option[EmotionDetectionResult]] =
           Future.firstCompletedOf(ArraySeq(v1EmotionFuture, delayFuture))
         saveResponseToDb(eventualResult, "V1", idempotencyKey)
