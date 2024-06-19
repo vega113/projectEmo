@@ -4,7 +4,7 @@ import java.time.{LocalDate, LocalDateTime}
 import anorm.{~, _}
 import anorm.SqlParser._
 import auth.model.TokenData
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, OFormat}
 
 import scala.annotation.unused
 import scala.language.postfixOps
@@ -189,6 +189,8 @@ object model {
   case class AiDbObj(id: Option[Long], response: String, userId: Long, originalText: Option[String],
                      tag: Option[String], elapsedTime: Option[Double], created: Option[LocalDateTime],
                      idempotenceKey: Option[String] = None)
+
+  case class TranscribedText(text: String)
 
 
   object User {
@@ -546,5 +548,9 @@ object model {
   object RequestsInFlight {
     implicit val requestsInFlightFormat: Format[RequestsInFlight] = Json.format[RequestsInFlight]
     implicit val parser: RowParser[RequestsInFlight] = Macro.namedParser[RequestsInFlight](ColumnNaming.SnakeCase)
+  }
+
+  object TranscribedText {
+    implicit val transcribedText: OFormat[TranscribedText] = Json.format[TranscribedText]
   }
 }

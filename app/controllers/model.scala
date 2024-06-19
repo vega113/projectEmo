@@ -10,6 +10,8 @@ object model {
   case class SubEmotionWrapper(subEmotion: SubEmotion, suggestedActions: List[SuggestedAction])
   case class TagData(tagName: String, emotionRecordId: Long)
 
+
+
   object EmotionData {
     implicit val tagDataFormat: OFormat[TagData] = Json.format[TagData]
     implicit val subEmotionActionFormat: OFormat[SubEmotionWrapper] = Json.format[SubEmotionWrapper]

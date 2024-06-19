@@ -42,6 +42,9 @@ POST           /api/user/todo                                                   
 PUT            /api/user/todo                                                                   controllers.UserTodoController.edit()
 DELETE         /api/user/todo/:userTodoId                                                       controllers.UserTodoController.delete(userTodoId: Long)
 
+# Transcription routes
+POST           /api/transcribe                                                                  controllers.TranscriberController.transcribeAudioToText()
+
 # AI Admin routes
 POST           /api/ai/admin/assistant                                                          controllers.AiAdminController.createAssistant()
 DELETE         /api/ai/admin/assistant/:externalId                                              controllers.AiAdminController.deleteAssistantByExternal(externalId)

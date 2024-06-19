@@ -63,7 +63,7 @@ libraryDependencies += "org.liquibase" % "liquibase-core" % "4.20.0"
 libraryDependencies += "com.pauldijou" %% "jwt-core" % "5.0.0"
 libraryDependencies += "com.pauldijou" %% "jwt-play-json" % "5.0.0"
 
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.8"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.4.12"
 libraryDependencies += "org.fusesource.jansi" % "jansi" % "2.4.0"
 libraryDependencies += "com.google.inject" % "guice" % "5.1.0"
 
@@ -74,6 +74,8 @@ libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "7.
 dependencyOverrides += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0"
 
 libraryDependencies += "io.honeybadger" % "honeybadger-java" % "2.1.2"
+
+libraryDependencies += "io.github.sashirestela" % "simple-openai" % "3.5.0"
 
 
 libraryDependencies ++= Seq(

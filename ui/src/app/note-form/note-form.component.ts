@@ -8,6 +8,8 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {DateService} from "../services/date.service";
 import {from} from "rxjs";
 import {Emotion, EmotionRecord, Note, SubEmotion, Tag, Trigger} from "../models/emotion.model";
+import {MediaRecorderService} from '../services/media-recorder.service';
+
 
 @Component({
   selector: 'app-note-form',
@@ -19,9 +21,14 @@ export class NoteFormComponent {
   isSavingEmotionRecord: boolean = false;
   maxNoteLength = 2000; // TODO: Should be fetched from the backend
   placeHolderText: string = "Try to describe how this emotion is affecting your daily activities or your interactions with others. Include more context or personal thoughts to convey your emotions more clearly. Are there any noticeable patterns or recurring events? How do you wish to feel instead? What steps do you think you could take to influence your emotional state? Remember, you can also use #hashtags to categorize or highlight key points in your note. To add a todo, simply enclose it in double square brackets like this: [[<your todo here>]]. ";
+
   computeNoteLength(): number {
     return this.emotionForm.get('emotionNote')?.value?.length ?? 0;
   }
+
+
+  isRecording = false;
+  mediaRecorderService: MediaRecorderService;
 
 
   constructor(private fb: FormBuilder, private emotionService: EmotionService,
@@ -29,13 +36,15 @@ export class NoteFormComponent {
               private router: Router,
               private snackBar: MatSnackBar,
               private emotionStateService: EmotionStateService,
-              private dateService: DateService) {
+              private dateService: DateService,
+              mediaRecorderService: MediaRecorderService) {
     this.emotionForm = this.fb.group({
       emotionDate: [new Date()],
       emotionNote: [''],
       textTitle: [''],
       emotionTime: [''],
     });
+    this.mediaRecorderService = mediaRecorderService;
   }
 
   async onSubmit(): Promise<void> {
@@ -101,5 +110,28 @@ export class NoteFormComponent {
       tags: [] as Tag[],
       created: this.dateService.formatDateToIsoString(emotionFromData.emotionDate)
     };
+  }
+
+  startRecording() {
+    this.isRecording = true;
+    this.mediaRecorderService.startRecording();
+    console.log('Recording started');
+  }
+
+  stopRecording() {
+    this.isRecording = false;
+    this.mediaRecorderService.stopRecording().then(audioData => {
+      this.textToSpeech(audioData);
+      console.log('Recording stopped');
+    });
+  }
+
+
+  textToSpeech(audioData: Blob) {
+    this.mediaRecorderService.transcribeAudio(audioData).subscribe(transcription => {
+      console.log('Transcription: ', transcription);
+      const currentNote = this.emotionForm.get('emotionNote')?.value || '';
+      this.emotionForm.get('emotionNote')?.setValue(`${currentNote} ${transcription.text}`);
+    });
   }
 }

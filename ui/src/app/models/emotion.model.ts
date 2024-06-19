@@ -228,3 +228,7 @@ export interface NoteTodoUpdate {
   id: number;
   isAccepted: boolean;
 }
+
+export interface TranscribedText {
+  text: string;
+}

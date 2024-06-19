@@ -13,4 +13,5 @@ class Module extends AbstractModule with AkkaGuiceSupport {
     bind(classOf[EmotionDetectionService]).annotatedWith(named("ChatGptAssistant")).
       to(classOf[EmoDetectionServiceWithAssistantImpl])
   }
+
 }
