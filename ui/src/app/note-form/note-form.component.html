@@ -7,17 +7,12 @@
         <mat-label>Note</mat-label>
         <textarea id="note" matInput formControlName="emotionNote" rows="4" [maxlength]="maxNoteLength"
                   [placeholder]="placeHolderText"></textarea>
+        <app-voice-recorder (transcriptionReady)="onTranscriptionReady($event)"></app-voice-recorder>
         <mat-hint align="end">{{ computeNoteLength() }}/{{ maxNoteLength }}
         </mat-hint>
       </mat-form-field>
     </div>
     <mat-action-row>
-      <button mat-icon-button (click)="startRecording()" *ngIf="!isRecording">
-        <mat-icon>mic</mat-icon>
-      </button>
-      <button mat-icon-button (click)="stopRecording()" *ngIf="isRecording">
-        <mat-icon>mic_off</mat-icon>
-      </button>
       <button mat-raised-button color="primary" type="submit"
               [disabled]="emotionForm.invalid || isSavingEmotionRecord">
         <mat-spinner *ngIf="isSavingEmotionRecord" diameter="24"></mat-spinner>

@@ -1,0 +1,17 @@
+:host {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.voice-recorder {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.voice-recorder button {
+  margin-right: 1em;
+}

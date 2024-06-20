@@ -1,0 +1,7 @@
+<button mat-icon-button (click)="startRecording()" *ngIf="!isRecording && !isTranscribing">
+  <mat-icon>mic</mat-icon>
+</button>
+<button mat-icon-button (click)="stopRecording()" *ngIf="isRecording">
+  <mat-icon>mic_off</mat-icon>
+</button>
+<mat-spinner *ngIf="isTranscribing" diameter="24"></mat-spinner>

@@ -50,4 +50,10 @@ export class AddTodoDialogComponent {
     onCancel() {
         this.dialogRef.close(false);
     }
+
+  onTranscriptionReady(transcription: string, field: string) {
+    const current = this.todoForm.get(field)?.value || '';
+    this.todoForm.get(field)?.setValue(`${current} ${transcription}`);
+  }
+
 }
