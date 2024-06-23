@@ -29,3 +29,4 @@ package-lock.json
 /conf/version.txt
 /.bloop/
 /project/.bloop/
+ .DS_Store
