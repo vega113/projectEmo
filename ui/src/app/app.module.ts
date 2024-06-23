@@ -63,6 +63,7 @@ import { TodoTabComponent } from './todo-tab/todo-tab.component';
 import {FlexModule} from "@angular/flex-layout";
 import { NoteFormComponent } from './note-form/note-form.component';
 import { EmotionAnalyzerComponent } from './emotion-analyzer/emotion-analyzer.component';
+import {VoiceRecorderComponent} from "./voice/voice-recorder.component";
 
 export const MAT_DATE_FNS_FORMATS = {
   parse: {
@@ -99,6 +100,7 @@ export const MAT_DATE_FNS_FORMATS = {
     TodoTabComponent,
     NoteFormComponent,
     EmotionAnalyzerComponent,
+    VoiceRecorderComponent
   ],
     imports: [
         BrowserModule,

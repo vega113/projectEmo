@@ -4,17 +4,16 @@ import com.google.inject.ImplementedBy
 import dao.model.TranscribedText
 import io.github.sashirestela.openai.SimpleOpenAI
 import io.github.sashirestela.openai.domain.audio.TranscriptionRequest.TimestampGranularity
-import io.github.sashirestela.openai.domain.audio.{AudioResponseFormat, Transcription, TranscriptionRequest}
+import io.github.sashirestela.openai.domain.audio.{AudioResponseFormat, TranscriptionRequest}
 import play.api.Configuration
-
-import java.nio.file.{Path, Paths}
-import javax.inject.{Inject, Named}
 import util.RichCompletableFuture._
 
 import java.net.http.HttpClient
+import java.nio.file.Path
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[OpenAiWhisperServiceImpl])
 trait TranscriberService {

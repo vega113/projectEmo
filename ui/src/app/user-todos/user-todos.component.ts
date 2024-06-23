@@ -152,7 +152,7 @@ export class UserTodosComponent implements OnInit {
 
   openAddTodoDialog(): void {
     const dialogRef = this.dialog.open(AddTodoDialogComponent, {
-      width: '45%', height: '45%'
+      width: '48%', height: '55%'
     });
 
     dialogRef.afterClosed().subscribe(result => {
