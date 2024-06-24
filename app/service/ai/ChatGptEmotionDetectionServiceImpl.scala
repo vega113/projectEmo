@@ -1,6 +1,7 @@
 package service.ai
 
 import dao.model.EmotionDetectionResult
+import io.github.sashirestela.openai.common.function.{FunctionDef, FunctionExecutor}
 import play.api.libs.json.{JsError, JsObject, JsSuccess, Json}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}

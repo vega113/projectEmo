@@ -48,6 +48,8 @@ export class MediaRecorderService {
       .post<TranscribedText>(`${environment.baseUrl}/transcribe`, formData, {headers})
       .pipe(catchError(resp => {
         return this.errorService.handleError(resp);
-      }));
+      }
+
+      ));
   }
 }

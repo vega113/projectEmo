@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { MediaRecorderService } from '../services/media-recorder.service';
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-voice-recorder',
@@ -11,7 +12,7 @@ export class VoiceRecorderComponent {
   isRecording = false;
   isTranscribing = false;
 
-  constructor(private mediaRecorderService: MediaRecorderService) { }
+  constructor(private mediaRecorderService: MediaRecorderService, private snackBar: MatSnackBar) { }
 
   startRecording() {
     this.isRecording = true;
@@ -27,9 +28,19 @@ export class VoiceRecorderComponent {
   }
 
   textToSpeech(audioData: Blob) {
-    this.mediaRecorderService.transcribeAudio(audioData).subscribe(transcription => {
-      this.transcriptionReady.emit(transcription.text);
-      this.isTranscribing = false;
-    });
+    this.mediaRecorderService.transcribeAudio(audioData).subscribe(
+      transcription => {
+        this.transcriptionReady.emit(transcription.text);
+        this.isTranscribing = false;
+      },
+      error => {
+        console.error('An error occurred:', error);
+        this.isTranscribing = false;
+        this.snackBar.open('An error occurred while transcribing the audio', 'Close', {
+          panelClass: 'snackbar-error',
+          duration: 5000,
+        });
+      }
+    );
   }
 }
