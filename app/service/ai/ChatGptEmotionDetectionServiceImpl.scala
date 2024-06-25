@@ -5,7 +5,6 @@ import io.cequence.openaiscala.domain.settings.CreateChatCompletionSettings
 import io.cequence.openaiscala.domain.{FunctionCallSpec, FunctionSpec, SystemMessage, UserMessage}
 import io.cequence.openaiscala.service.OpenAIService
 import play.api.libs.json.Json
-import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import service.model.DetectEmotionRequest
 
@@ -14,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 @Named("ChatGpt")
-class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configuration, openAiService: OpenAIService)(implicit ec: ExecutionContext) extends EmotionDetectionService {
+class ChatGptEmotionDetectionServiceImpl @Inject()(config: Configuration, openAiService: OpenAIService)(implicit ec: ExecutionContext) extends EmotionDetectionService {
 
   private final val logger: Logger = play.api.Logger(getClass)
   private final val fakeEmoDetectionResult = "{\"emotionType\":\"Positive\",\"intensity\":3,\"mainEmotionId\":\"Joy\",\"subEmotionId\":\"Serenity\",\"description\":\"Listening to Dada Istamaya's spiritual experience and feeling the inner silence, love, and beauty inspires you and brings you joy.\",\"suggestion\":\"Take a moment to reflect on the emotions and sensations you felt during the video. Explore ways to incorporate more moments of inner silence, love, and beauty into your own life, such as through meditation or engaging in activities that bring you joy and inspiration.\",\"triggers\":[{\"triggerName\":\"Other\"},{\"triggerName\":\"Spiritual experience\"}],\"tags\":[{\"tagName\":\"joy\"},{\"tagName\":\"inspiration\"},{\"tagName\":\"inner silence\"},{\"tagName\":\"love\"},{\"tagName\":\"beauty\"}]}"
@@ -39,7 +38,7 @@ class ChatGptEmotionDetectionServiceImpl @Inject()(ws: WSClient, config: Configu
         )
         .map { response =>
           val chatFunCompletionMessage = response.choices.head.message
-          val toolCalls = chatFunCompletionMessage.tool_calls.collect {
+          val toolCalls: Seq[(String, FunctionCallSpec)] = chatFunCompletionMessage.tool_calls.collect {
             case (id, x: FunctionCallSpec) => (id, x)
           }
           val content = toolCalls.map(_._2.arguments).head
