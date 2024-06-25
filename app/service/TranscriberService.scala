@@ -18,7 +18,6 @@ trait TranscriberService {
 class OpenAiWhisperServiceImpl @Inject() (openAi: OpenAIService) extends TranscriberService {
 
   override def transcribeAudioToText(path: Path): Future[TranscribedText] = {
-
     openAi.createAudioTranscription(path.toFile,
       settings = DefaultSettings.CreateTranscription.copy(language = None)).map(response => {
       TranscribedText(response.text)
