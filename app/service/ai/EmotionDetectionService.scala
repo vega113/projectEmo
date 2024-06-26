@@ -18,6 +18,7 @@ import scala.concurrent.duration._
 
 trait EmotionDetectionService {
   def detectEmotion(request: DetectEmotionRequest): Future[EmotionDetectionResult]
+
 }
 
 @ImplementedBy(classOf[CompositeEmotionDetectionServiceImpl])
