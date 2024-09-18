@@ -51,4 +51,10 @@ export class SignupComponent {
       });
   }
 
+  get invalid(): boolean {
+    // Implement your validation logic here
+    // For example, return true if username, email, or password is empty
+    return !this.username || !this.email || !this.password;
+  }
+
 }

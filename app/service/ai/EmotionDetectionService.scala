@@ -57,7 +57,7 @@ class CompositeEmotionDetectionServiceImpl @Inject()(@Named("ChatGpt") v1: Emoti
         fetchCompletedEmotionDetectionResult(requestsInFlight).map(Some(_))
       case _ =>
         logger.info(s"Request with idempotencyKey: $idempotencyKey does not exist or is not completed, running emotion detection")
-        val eventualResult = v1.detectEmotion(request)
+        val eventualResult = v2.detectEmotion(request)
         val v1EmotionFuture: Future[Option[EmotionDetectionResult]] = eventualResult.map(Some(_))
         val delayFuture: Future[Option[EmotionDetectionResult]] =
           after(28.seconds, using = system.scheduler)(Future.successful(None))

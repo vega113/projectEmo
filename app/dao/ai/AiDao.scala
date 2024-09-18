@@ -9,8 +9,8 @@ import java.sql.Connection
 import scala.util.Try
 
 class AiDao {
-  def insertAiThread(aiThread: AiThread)(implicit connection: Connection): Option[Long] = {
-    SQL(
+  def insertAiThread(aiThread: AiThread)(implicit connection: Connection): AiThread = {
+    val id: Option[Long] = SQL(
       """
         |INSERT INTO ai_threads (external_id, user_id, thread_type)
         |VALUES ({externalId}, {userId}, {threadType})
@@ -20,6 +20,7 @@ class AiDao {
       "userId" -> aiThread.userId,
       "threadType" -> aiThread.threadType
     ).executeInsert()
+    aiThread.copy(id = id)
   }
 
   def fetchThreadById(id: Long)(implicit connection: Connection): Option[AiThread] = {

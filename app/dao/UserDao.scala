@@ -19,7 +19,7 @@ trait UserDao {
   def delete(userId: Long)(implicit conn: Connection): Int
 
   def checkUserExists(username: String, email: String)(implicit conn: Connection): Boolean = {
-    findByUsername(username).isDefined || findByEmail(email).isDefined
+    findByUsername(username).isDefined || email.nonEmpty && findByEmail(email).isDefined
   }
 }
 

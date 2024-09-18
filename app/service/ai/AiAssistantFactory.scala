@@ -2,6 +2,7 @@ package service.ai
 
 import akka.actor.ActorSystem
 import com.google.inject.{ImplementedBy, Inject}
+import io.cequence.openaiscala.service.OpenAIService
 import play.api.Configuration
 import service.UserInfoService
 
@@ -13,10 +14,11 @@ trait AiAssistantFactory {
 class AiAssistantFactoryImpl @Inject() (aiDbService: AiDbService, userInfoService: UserInfoService,
                                         apiService: AiAssistantApiService,
                                         config: Configuration,
-                                        system: ActorSystem) extends AiAssistantFactory {
+                                        system: ActorSystem,
+                                        openAi: OpenAIService) extends AiAssistantFactory {
   override def fetchOrCreateAiAssistant(userId: Long, assistantType: Option[String]): AiAssistantService = {
     assistantType match {
-      case _ => new ChatGptAiAssistantServiceImpl(aiDbService, userInfoService, apiService, config, system)
+      case _ => new ChatGptAiAssistantServiceImpl(aiDbService, userInfoService, config, system, openAi)
     }
   }
 }

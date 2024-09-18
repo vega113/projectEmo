@@ -19,18 +19,19 @@ export class AuthGuard  {
       map(isAuthenticated => {
         // Check if the URL is the landing page
         if (state.url === '/' || state.url === '') {
-          this.router.navigate(['/charts']);
-          if (!isAuthenticated) {
-            return true;  // Allow access to the landing page
-          }
+          this.router.navigate(['/landing-page']);
+          return true;
+        }
+        const decodedToken = this.authService.fetchDecodedToken();
+        if(state.url === '/admin') {
+          return isAuthenticated && decodedToken.role === 'admin';
         }
 
-        if (isAuthenticated) {
-          return true;
-        } else {
-          // Redirect to the login page if the user is not authenticated
+        if (!isAuthenticated) {
           this.router.navigate(['/login']);
           return false;
+        } else {
+          return true;
         }
       })
     );

@@ -75,9 +75,7 @@ dependencyOverrides += "org.scala-lang.modules" %% "scala-parser-combinators" % 
 
 libraryDependencies += "io.honeybadger" % "honeybadger-java" % "2.1.2"
 
-libraryDependencies += "io.github.sashirestela" % "simple-openai" % "3.5.0"
-
-libraryDependencies += "io.cequence" %% "openai-scala-client" % "1.0.0"
+libraryDependencies += "io.cequence" %% "openai-scala-client" % "1.0.1-RC.26"
 
 
 libraryDependencies ++= Seq(

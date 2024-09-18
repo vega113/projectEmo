@@ -25,7 +25,8 @@ object model {
                  ) {
     def toTokenData: TokenData = TokenData(userId.
       getOrElse(throw new RuntimeException(s"No user Id found, username: $username")),
-      username, email, firstName.getOrElse(""), lastName.getOrElse(""))
+      username, email, firstName.getOrElse(""), lastName.getOrElse(""),
+      isAdmin.map(isAdmin => if (isAdmin) "admin" else "user").getOrElse("user"))
   }
 
   case class Emotion(id: Option[String], emotionName: Option[String], emotionType: Option[String], description: Option[String] = None)
@@ -510,8 +511,8 @@ object model {
                        id: Int,
                        userId: Int,
                        bio: Option[String],
-                       aiAssistantId: Option[Int],
-                       threadId: Option[Int],
+                       aiAssistantId: String,
+                       threadId: Option[String],
                        created: LocalDateTime,
                        lastUpdated: Option[LocalDateTime],
                        tokensUsedTotal: Option[Long],
@@ -525,8 +526,8 @@ object model {
       get[Int]("id") ~
         get[Int]("user_id") ~
         get[Option[String]]("bio") ~
-        get[Option[Int]]("ai_assistant_id") ~
-        get[Option[Int]]("thread_id") ~
+        get[String]("ai_assistant_id") ~
+        get[Option[String]]("thread_id") ~
         get[LocalDateTime]("created") ~
         get[Option[LocalDateTime]]("last_updated") ~
         get[Option[Long]]("tokens_used_total") ~

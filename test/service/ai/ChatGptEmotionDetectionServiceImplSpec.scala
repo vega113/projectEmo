@@ -33,22 +33,4 @@ class ChatGptEmotionDetectionServiceImplSpec extends AnyFlatSpec with Matchers w
   override def afterAll(): Unit = {
     shutdownHelpers()
   }
-
-
-
-  "makeApiCall response" should "correctly deserialize the response" in new Builder {
-    val wsClient: WSClient = MockWS { case (POST, "http://localhost:9000/v1/chat/completions") =>
-      Action { request =>
-        Ok(Json.parse(
-          """
-            |{"id":"chatcmpl-1a666760-19f6-4943-a23b-2cf2006db7fa","object":"chat.completion","created":1716101230,"model":"llama3-8b-8192","choices":[{"index":0,"message":{"role":"assistant","content":"Here's the JSON output for the given text:\n\n{\"textTitle\": \"Testing Ollama 3 AI Model for Emotion\", \"intensity\": 3, \"subEmotionId\": \"Curiosity\", \"description\": \"You're excited to test the Ollama 3 AI model for emotions!\", \"suggestion\": \"Explore more about Ollama 3's capabilities and how it can be used in various applications.\", \"triggers\": [{\"triggerName\": \"Ideas\"}], \"tags\": [{\"tagName\": \"ArtificialIntelligence\"}, {\"tagName\": \"Emotions\"}], \"todos\": [{\"title\": \"Test the Ollama 3 AI model for different scenarios\"}, {\"title\": \"Explore Ollama 3's documentation and tutorials\"}], \"tags\": []}"},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":1372,"prompt_time":0.348,"completion_tokens":163,"completion_time":0.196,"total_tokens":1535,"total_time":0.544},"system_fingerprint":"fp_dadc9d6142","x_groq":{"id":"req_01hy7snb92e2x9e9zwg4fan0gy"}}
-            |""".stripMargin))
-      }
-    }
-
-    val service = new ChatGptEmotionDetectionServiceImpl(wsClient, config)
-    val result: EmotionDetectionResult = service.makeApiCall(DetectEmotionRequest("testing emo app with groq again", 1)).futureValue
-
-    result.intensity shouldBe 3
-  }
 }

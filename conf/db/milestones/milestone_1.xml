@@ -802,5 +802,13 @@
             ALTER TABLE ai_responses MODIFY original_text TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
         </sql>
     </changeSet>
+    
+    <changeSet id="modify user_info.ai_assistant_id to string" author="vega">
+        <modifyDataType tableName="user_info" columnName="ai_assistant_id" newDataType="varchar(255)"/>
+    </changeSet>
+
+    <changeSet id="modify user_info.threadId to string" author="vega">
+        <modifyDataType tableName="user_info" columnName="thread_id" newDataType="varchar(255)"/>
+    </changeSet>
 
 </databaseChangeLog>

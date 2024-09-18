@@ -6,7 +6,7 @@ import dao.model.UserInfo
 import java.sql.Connection
 
 class UserInfoDao {
-  def upsertUserInfo(userId: Long, aiAssistantId: Long, aiThreadId: Long)(implicit connection: Connection): Option[Long] = {
+  def upsertUserInfo(userId: Long, aiAssistantId: String, aiThreadId: String)(implicit connection: Connection): Option[Long] = {
     SQL(
       """
         |INSERT INTO user_info (user_id, ai_assistant_id, thread_id)

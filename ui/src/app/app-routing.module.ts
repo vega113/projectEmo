@@ -12,6 +12,7 @@ import {DisplayEmotionComponent} from "./display-emotion/display-emotion.compone
 import { MatListModule } from '@angular/material/list';
 import {EmotionCalendarComponent} from "./emotion-calendar/emotion-calendar.component";
 import {UserTodosComponent} from "./user-todos/user-todos.component";
+import {AdminComponent} from "./admin/admin.component";
 
 export const routes: Routes = [
   { path: '', redirectTo: 'create-emotion', pathMatch: 'full' },
@@ -28,6 +29,7 @@ export const routes: Routes = [
       { path: 'charts', component: DashboardComponent, canActivate: [AuthGuard] },
       { path: 'display-emotion', component: DisplayEmotionComponent , canActivate: [AuthGuard]},
       { path: 'emotions-calendar', component: EmotionCalendarComponent, canActivate: [AuthGuard] },
+      { path: 'admin', component: AdminComponent, canActivate: [AuthGuard] }
     ],
   },
 ];

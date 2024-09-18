@@ -10,7 +10,7 @@ import scala.concurrent.Future
 @ImplementedBy(classOf[UserInfoServiceImpl])
 trait UserInfoService {
   def fetchUserInfo(userId: Long): Future[Option[UserInfo]]
-  def upsertUserInfo(userId: Long, aiAssistantId: Long, aiThreadId: Long): Future[Option[Long]]
+  def upsertUserInfo(userId: Long, aiAssistantId: String, aiThreadId: String): Future[Option[Long]]
 }
 
 class UserInfoServiceImpl @Inject()(userInfoDao: UserInfoDao, databaseExecutionContext: DatabaseExecutionContext) extends UserInfoService {
@@ -21,7 +21,7 @@ class UserInfoServiceImpl @Inject()(userInfoDao: UserInfoDao, databaseExecutionC
     }))
   }
 
-  override def upsertUserInfo(userId: Long, aiAssistantId: Long, aiThreadId: Long): Future[Option[Long]] = {
+  override def upsertUserInfo(userId: Long, aiAssistantId: String, aiThreadId: String): Future[Option[Long]] = {
     Future(databaseExecutionContext.withConnection({ implicit connection =>
       userInfoDao.upsertUserInfo(userId, aiAssistantId, aiThreadId)
     }))

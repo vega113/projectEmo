@@ -14,7 +14,7 @@ import scala.util.Try
 
 @ImplementedBy(classOf[AiDbServiceImpl])
 trait AiDbService {
-  def saveAiThread(aiThread: AiThread): Future[Option[Long]]
+  def saveAiThread(aiThread: AiThread): Future[AiThread]
 
   def deleteAiAssistantByExternalId(externalId: String): Future[Boolean]
 
@@ -28,7 +28,7 @@ trait AiDbService {
 
   def fetchAiAssistantByExternalId(externalId: String): Future[Option[AiAssistant]]
 
-  def fetchDefaultAiAssistantForType(assistantType: String): Future[Option[AiAssistant]]
+  def fetchDefaultAiAssistantIdForType(assistantType: String): Future[Option[String]]
 
   def fetchThreadByExternalId(externalId: String): Future[Option[AiThread]]
 
@@ -96,9 +96,9 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
     })
   }
 
-  override def fetchDefaultAiAssistantForType(assistantType: String): Future[Option[AiAssistant]] = {
+  override def fetchDefaultAiAssistantIdForType(assistantType: String): Future[Option[String]] = {
     databaseExecutionContext.withConnection({ implicit connection =>
-      Future.successful(aiDao.fetchDefaultAiAssistantForType(assistantType))
+      Future.successful(aiDao.fetchDefaultAiAssistantForType(assistantType).map(_.externalId))
     })
   }
 
@@ -120,7 +120,7 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
     })
   }
 
-  override def saveAiThread(aiThread: AiThread): Future[Option[Long]] = {
+  override def saveAiThread(aiThread: AiThread): Future[AiThread] = {
     databaseExecutionContext.withConnection({ implicit connection =>
       Future.successful(aiDao.insertAiThread(aiThread))
     })
