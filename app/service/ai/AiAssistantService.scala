@@ -223,12 +223,18 @@ class ChatGptAiAssistantServiceImpl @Inject()(aiDbService: AiDbService, userInfo
       case Some(run) => run
     }.takeWhile(currentRun => {
       logger.info(s"Polling thread run for thread $externalThreadId, runId: $threadRunId, status: ${currentRun.status}")
-      currentRun.status != expectedRunStatus
-    }, inclusive = true).runWith(Sink.last)
+      currentRun.status != expectedRunStatus && currentRun.status != RunStatus.Failed
+    }, inclusive = true).runWith(Sink.last).flatMap {
+      case run if run.status == RunStatus.Failed =>
+        Future.failed(new RuntimeException(s"Run $threadRunId failed for thread $externalThreadId. " +
+          s"error code: ${run.last_error.map(_.code).getOrElse("")}, " +
+          s"Message: ${run.last_error.map(_.message).getOrElse("")}"))
+      case run =>
+        Future.successful(run)
+    }
   }
 
   override def submitToolOutput(runWithFunctionCall: Run): Future[Unit] = {
-
     val toolCalls = runWithFunctionCall.required_action.get.submit_tool_outputs.tool_calls
     val functionCalls = toolCalls.collect {
       case toolCall if toolCall.function.name == "detect_emotion" =>

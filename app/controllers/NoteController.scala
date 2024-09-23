@@ -76,6 +76,7 @@ class NoteController @Inject()(cc: ControllerComponents,
 
     for {
       _ <- emotionRecordService.updateWithEmotionDetectionResult(userId, emotionRecordId, emotionDetectionResult)
+      _ <- validateResultContainsNoteData(emotionDetectionResult)
       _ <- noteService.update(copyEmotionDetectionResultToNote(note.copy(userId = Some(userId)), emotionDetectionResult))
       _ <- noteService.addTodosFromAi(emotionDetectionResult.todos, Some(userId), note.emotionRecordId, note.id)
       emotionRecord <- emotionRecordService.findByIdForUser(emotionRecordId, userId).map {
@@ -88,6 +89,15 @@ class NoteController @Inject()(cc: ControllerComponents,
     } yield emotionRecord
   }
 
+  private def validateResultContainsNoteData(emotionDetectionResult: EmotionDetectionResult): Future[Unit] = {
+    if (emotionDetectionResult.textTitle.isEmpty || emotionDetectionResult.suggestion.isEmpty ||
+      emotionDetectionResult.description.isEmpty || emotionDetectionResult.todos.isEmpty) {
+      logger.error("Emotion detection result is missing required fields")
+      Future.failed(new Exception("Emotion detection result is missing required fields"))
+    } else {
+      Future.successful(())
+    }
+  }
 
   def acceptTodo(noteTodoId: Long): Action[AnyContent] =
     Action andThen authenticatedAction async { implicit token =>
