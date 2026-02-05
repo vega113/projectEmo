@@ -2,6 +2,12 @@ textarea {
   min-height: 6em;
 }
 
+.add-todo-dialog-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
 mat-form-field {
   width: 95%;
   margin-bottom: 20px;
@@ -42,6 +48,5 @@ mat-form-field {
   }
 }
 /* Custom styles for the dialog */
-
 
 

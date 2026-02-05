@@ -22,7 +22,7 @@ GET            /api/emotionRecord/day/user/month/:monthStart/:monthEnd          
 GET            /api/charts/user/month/:monthStart/:monthEnd                                     controllers.EmotionRecordController.findAllByUserIdAndDateRangeForSunburstChart(monthStart: String, monthEnd)
 GET            /api/charts/user/doughnut/emotionTypesTrigger/month/:monthStart/:monthEnd        controllers.EmotionRecordController.findAllByUserIdAndDateRangeForDoughnutEmotionTypeTriggersChart(monthStart: String, monthEnd)
 DELETE         /api/note/tag/:id                                                                controllers.EmotionRecordController.deleteTag(id: Long)
-POST           /api/note/tag                                                                    controllers.EmotionRecordController.addTag
+POST           /api/note/tag                                                                    controllers.EmotionRecordController.addTag()
 
 GET            /api/emotion                                                                     controllers.EmotionController.findAll()
 GET            /api/trigger                                                                     controllers.TriggerController.findAll()
@@ -31,7 +31,7 @@ GET            /api/noteTemplate                                                
 
 # Note routes
 PUT            /api/note/delete/:id                                                             controllers.NoteController.deleteNote(id: Long)
-POST           /api/note/emotion/detect                                                         controllers.NoteController.detectEmotion
+POST           /api/note/emotion/detect                                                         controllers.NoteController.detectEmotion()
 PUT            /api/note/todo/accept/:noteTodoId                                                controllers.NoteController.acceptTodo(noteTodoId: Long)
 
 # User Todo routes
@@ -66,7 +66,6 @@ GET            /api/healthcheck                                                 
 GET            /*file                                                                           controllers.FrontendController.assetOrDefault(file)
 
 OPTIONS        /*all                                                                            controllers.DefaultController.defaultOptions(all: String)
-
 
 
 

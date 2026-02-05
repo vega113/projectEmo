@@ -32,8 +32,8 @@ class EmotionDataServiceImpl @Inject()(emotionDao: EmotionDao,
         )
       )
       val emotionTypes = emotionSubEmotions.groupBy(_.emotion.emotionType).map {
-        case (Some(emotionType), emotionWithSubEmotions) => EmotionTypesWithEmotions(emotionType,
-          emotionWithSubEmotions)
+        case (emotionTypeOpt, emotionWithSubEmotions) =>
+          EmotionTypesWithEmotions(emotionTypeOpt.getOrElse("Unknown"), emotionWithSubEmotions)
       }.toList
       EmotionData(emotionTypes, triggers)
     }

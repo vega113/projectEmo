@@ -10,7 +10,6 @@ dockerUpdateLatest := true
 
 Universal / javaOptions ++= Seq(
   "-J-Xmx2g",
-  "-Dpidfile.path=/dev/null"
 )
 
 Docker / defaultLinuxLogsLocation := "/opt/docker/logs"

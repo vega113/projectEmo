@@ -1,0 +1,13 @@
+# Exclude frontend build-time dependencies and caches from the runtime slug.
+# Heroku slugs are built after compilation, so this also prunes build outputs.
+
+# Node
+node_modules/
+ui/node_modules/
+ui/.angular/
+ui/.npm/
+ui/.cache/
+
+# OS
+.DS_Store
+

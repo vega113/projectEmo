@@ -17,7 +17,7 @@
       <app-voice-recorder (transcriptionReady)="onTranscriptionReady($event, 'description')"></app-voice-recorder>
     </mat-form-field>
   </div>
-  <div fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="10px" class="add-todo-dialog-actions">
+  <div class="add-todo-dialog-actions">
     <button mat-button class="add-todo-dialog-button cancel" (click)="onCancel(); $event.preventDefault()">Cancel</button>
     <button mat-button type="submit" [disabled]="todoForm.invalid">{{ isNewTodo ? 'Add' : 'Update' }}</button>
   </div>

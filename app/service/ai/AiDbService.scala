@@ -51,12 +51,12 @@ class AiDbServiceImpl @Inject()(databaseExecutionContext: DatabaseExecutionConte
     } match {
       case scala.util.Success(Some(id: Long)) =>
         Option(id)
-      case _ => {
-        logger.error(s"Failed to insert AiResponse for userId: ${aiResponse.userId}")
-        None
-      }
       case scala.util.Failure(e) => {
         logger.error(s"Failed to insert AiResponse for userId: ${aiResponse.userId}", e)
+        None
+      }
+      case _ => {
+        logger.error(s"Failed to insert AiResponse for userId: ${aiResponse.userId}")
         None
       }
     }

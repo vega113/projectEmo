@@ -54,6 +54,42 @@ class EmotionDataServiceImplSpec extends PlaySpec with MockitoSugar {
 
       sortedActual mustEqual expectedEmotionData
     }
+
+    "fetch EmotionData with missing emotionType" in {
+      val mockEmotionDao = mock[EmotionDao]
+      val mockSubEmotionDao = mock[SubEmotionDao]
+      val mockSuggestedActionDao = mock[SuggestedActionDao]
+      val mockTriggerDao = mock[TriggerDao]
+      val connection = mock[java.sql.Connection]
+      val fakeDatabaseExecutionContext = new DatabaseExecutionContext {
+        override def withConnection[A](block: java.sql.Connection => A): A = {
+          block(connection)
+        }
+      }
+
+      val emotionServiceImpl = new EmotionDataServiceImpl(
+        mockEmotionDao,
+        mockTriggerDao,
+        fakeDatabaseExecutionContext,
+        mockSubEmotionDao
+      )
+
+      val emotions = List(Emotion(Some("Calm"), Some("Calm"), None))
+      val subEmotions = List.empty[SubEmotion]
+      val triggers = List.empty[Trigger]
+
+      when(mockEmotionDao.findAll()(connection)).thenReturn(emotions)
+      when(mockSubEmotionDao.findAll()(connection)).thenReturn(subEmotions)
+      when(mockTriggerDao.findAll()(connection)).thenReturn(triggers)
+
+      val expectedEmotionData = EmotionData(
+        List(EmotionTypesWithEmotions("Unknown", List(EmotionWithSubEmotions(emotions.head, List.empty)))),
+        triggers
+      )
+
+      val actual: EmotionData = Await.result(emotionServiceImpl.fetchEmotionData(), 10000.seconds)
+
+      actual mustEqual expectedEmotionData
+    }
   }
 }
-

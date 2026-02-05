@@ -60,7 +60,6 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import { AddTodoDialogComponent } from './add-todo-dialog/add-todo-dialog.component';
 import {MatMenuModule} from "@angular/material/menu";
 import { TodoTabComponent } from './todo-tab/todo-tab.component';
-import {FlexModule} from "@angular/flex-layout";
 import { NoteFormComponent } from './note-form/note-form.component';
 import { EmotionAnalyzerComponent } from './emotion-analyzer/emotion-analyzer.component';
 import {VoiceRecorderComponent} from "./voice/voice-recorder.component";
@@ -140,8 +139,7 @@ export const MAT_DATE_FNS_FORMATS = {
         MatRadioModule,
         MatDialogModule,
         MatCheckboxModule,
-        MatMenuModule,
-        FlexModule
+        MatMenuModule
 
     ],
   providers: [{ provide: DateAdapter, useClass: DateFnsAdapter }, {
