@@ -10,6 +10,7 @@ dockerUpdateLatest := true
 
 Universal / javaOptions ++= Seq(
   "-J-Xmx2g",
+  "-Dpidfile.path=/dev/null",
 )
 
 Docker / defaultLinuxLogsLocation := "/opt/docker/logs"
@@ -29,7 +30,6 @@ dockerCommands ++= Seq(
 //bashScriptExtraDefines += """exec "$@" &"""
 //bashScriptExtraDefines += """touch /opt/docker/logs/application.log"""
 //bashScriptExtraDefines += """tail -F /opt/docker/logs/application.log"""
-
 
 
 
